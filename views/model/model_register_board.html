@@ -6,5 +6,85 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>모델 등록</title>
 	</head>
-	<body></body>
+	<body>
+		<h1>모델 등록</h1>
+		<table>
+			<thead>
+				분석시간
+			</thead>
+			<tbody>
+				<td>초 : <input type="submit"/></td>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				데이터 선택
+			</thead>
+			<tbody>
+				<td>
+					<button><input placeholder="수위" /></button>
+				</td>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				input 파라미터 매칭
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{input_value1}}</td>
+					<td><input /></td>
+				</tr>
+				<tr>
+					<td>{{input_value2}}</td>
+					<td><input /></td>
+				</tr>
+				<tr>
+					<td>{{input_value3}}</td>
+					<td><input /></td>
+				</tr>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				분석결과 테이블
+			</thead>
+			<tbody>
+				<td><input /></td>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				분석 모델
+			</thead>
+			<tbody>
+				<td><input class="analysisModel" placeholder="{{model_name}}" /></td>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				output 파라미터 매칭
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{output_value1}}</td>
+					<td><input /></td>
+				</tr>
+				<tr>
+					<td>{{output_value2}}</td>
+					<td><input /></td>
+				</tr>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				내용
+			</thead>
+			<tbody>
+				<form><input></form>
+			</tbody>
+		</table>
+		<div>{{all_input}}</div>
+		<div>{{all_output}}</div>
+	</body>
 </html>
