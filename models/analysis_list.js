@@ -9,6 +9,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   analysis_list.init({
+    al_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false
+    },
     al_name: {
       type: DataTypes.STRING,
       allowNull: false

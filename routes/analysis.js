@@ -11,7 +11,6 @@ const output = {
 // Post
 const process = {
   insert: function(req,res,next){
-    console.log(req);
     let body = req.body;
     models.analysis_list.create({
       al_name : body.tableName,
@@ -21,6 +20,7 @@ const process = {
       res.redirect("/analysis/view");
     }).catch(err=>{
       console.log("data insert failed");
+      console.log(err);
     });
   },
 };
