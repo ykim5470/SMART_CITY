@@ -5,7 +5,11 @@ const router = express.Router();
 // Get
 const output = {
   plus : function(req,res,next){res.render("analysis/al_insert")},
-  show : function(req,res,next){res.render("analysis/al_list")},
+  show : function(req,res,next){
+    models.analysis_list.findAll().then(result=>{
+      res.render("analysis/al_list",{ anaList : result})
+    })
+  },
 };
 
 // Post

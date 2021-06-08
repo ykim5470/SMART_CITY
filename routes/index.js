@@ -8,6 +8,7 @@ router.get("/", function (req, res, next) {
   res.render("index");
 })
 router.get("/analysis/plus",analysis.output.plus)
+router.get("/analysis/view",analysis.output.show)
 router.get("/model_manage_board", auth.output.model_manage_board)
 router.get("/model_register_board", auth.output.model_register_board)
 
