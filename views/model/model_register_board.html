@@ -7,91 +7,104 @@
 		<title>모델 등록</title>
 	</head>
 	<body>
-		<div>
-			<form action="/model_register_board" method="post">
+		<!-- <div>
+			
 				<input type="text" name="nick" placeholder="이름" />
 				<button id="“join-btn”" type="“submit”" class="“btn”">회원가입</button>
-			</form>
-		</div>
+			
+		</div> -->
+		<form action="/model_register_board" method="post">
+			<h1>모델 등록</h1>
+			<table>
+				<thead>
+					분석시간
+				</thead>
+				<tbody>
+					<td>
+						초 :
 
-		<h1>모델 등록</h1>
-		<table>
-			<thead>
-				분석시간
-			</thead>
-			<tbody>
-				<td>초 : <input type="submit" /></td>
-			</tbody>
-		</table>
-		<table>
-			<thead>
-				데이터 선택
-			</thead>
-			<tbody>
-				<td>
-					<button><input placeholder="수위" /></button>
-				</td>
-			</tbody>
-		</table>
-		<table>
-			<thead>
-				input 파라미터 매칭
-			</thead>
-			<tbody>
-				<tr>
-					<td>{{input_value1}}</td>
+						<input type="text" name="al_time" placeholder="분석 시간" />
+					</td>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					데이터 선택
+				</thead>
+				<tbody>
+					<td>
+						<input type="text" name="data_name" placeholder="수위" />
+					</td>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					input 파라미터 매칭
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<input type="text" name="ip_value1" placeholder="input value" />
+						</td>
+						<td>
+							<input type="text" name="ip_param1" placeholder="input parameter" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" name="ip_value2" placeholder="input value" />
+						</td>
+						<td>
+							<input type="text" name="ip_param2" placeholder="input parameter" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" name="ip_value3" placeholder="input value" />
+						</td>
+						<td>
+							<input type="text" name="ip_param3" placeholder="input parameter" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					분석결과 테이블
+				</thead>
+				<tbody>
 					<td><input /></td>
-				</tr>
-				<tr>
-					<td>{{input_value2}}</td>
-					<td><input /></td>
-				</tr>
-				<tr>
-					<td>{{input_value3}}</td>
-					<td><input /></td>
-				</tr>
-			</tbody>
-		</table>
-		<table>
-			<thead>
-				분석결과 테이블
-			</thead>
-			<tbody>
-				<td><input /></td>
-			</tbody>
-		</table>
-		<table>
-			<thead>
-				분석 모델
-			</thead>
-			<tbody>
-				<td><input class="analysisModel" placeholder="{{model_name}}" /></td>
-			</tbody>
-		</table>
-		<table>
-			<thead>
-				output 파라미터 매칭
-			</thead>
-			<tbody>
-				<tr>
-					<td>{{output_value1}}</td>
-					<td><input /></td>
-				</tr>
-				<tr>
-					<td>{{output_value2}}</td>
-					<td><input /></td>
-				</tr>
-			</tbody>
-		</table>
-		<table>
-			<thead>
-				내용
-			</thead>
-			<tbody>
-				<form><input /></form>
-			</tbody>
-		</table>
-		<div>{{all_input}}</div>
-		<div>{{all_output}}</div>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					분석 모델
+				</thead>
+				<tbody>
+					<td><input class="analysisModel" placeholder="{{model_name}}" /></td>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					output 파라미터 매칭
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="text" name="op_value1" placeholder="output value" /></td>
+					</tr>
+					<tr>
+						<td><input type="text" name="op_param1" placeholder="output param" /></td>
+					</tr>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					내용
+				</thead>
+			</table>
+			<div>{{all_input}}</div>
+			<div>{{all_output}}</div>
+			<button type="submit" class="btn">등록</button>
+		</form>
 	</body>
 </html>
