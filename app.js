@@ -3,7 +3,15 @@ const morgan = require("morgan");
 const dotenv = require("dotenv");
 const path = require("path");
 const sequelize = require('sequelize')
+const models = require('./models/index')
 // const nunjucks = require("nunjucks");
+
+
+models.sequelize.sync().then(() => {
+  console.log('DB connected')
+}).catch(err => {
+  console.log(`DB connection fail: ${err}`)
+})
 
 dotenv.config();
 const app = express();
