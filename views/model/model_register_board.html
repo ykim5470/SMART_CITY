@@ -7,13 +7,20 @@
 		<title>모델 등록</title>
 	</head>
 	<body>
+		<div>
+			<form action="/model_register_board" method="post">
+				<input type="text" name="nick" placeholder="이름" />
+				<button id="“join-btn”" type="“submit”" class="“btn”">회원가입</button>
+			</form>
+		</div>
+
 		<h1>모델 등록</h1>
 		<table>
 			<thead>
 				분석시간
 			</thead>
 			<tbody>
-				<td>초 : <input type="submit"/></td>
+				<td>초 : <input type="submit" /></td>
 			</tbody>
 		</table>
 		<table>
@@ -81,7 +88,7 @@
 				내용
 			</thead>
 			<tbody>
-				<form><input></form>
+				<form><input /></form>
 			</tbody>
 		</table>
 		<div>{{all_input}}</div>
