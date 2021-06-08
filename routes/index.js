@@ -7,9 +7,9 @@ const analysis = require("./analysis");
 router.get("/", function (req, res, next) {
   res.render("index");
 });
-router.get("/analysis/input",analysis.output.plus)
+router.get("/analysis/plus",analysis.output.plus)
 router.get("/", auth.output.fff);
 
 //router.post
-
+router.post("/analysis/insert",analysis.process.insert);
 module.exports = router;

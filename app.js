@@ -30,13 +30,14 @@ nunjucks.configure("views", {
 	watch: true,
 });
 
-app.use('/', index_router);
+
 app.get('/model_manage_board', model_manage_board_router)
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/', index_router);
 
 app.listen(app.get("port"), () => {
 	console.log(`http://localhost:${app.get("port")}`);
