@@ -12,14 +12,15 @@ router.get("/model_manage_board", async (req, res) => {
 	}
 });
 
-router.post("/model_manage_board", async (req, res) => {
-	try {
-		const { md_id, al_time, md_name, al_name_mo, run_status } = req.body;
-		const data = await model_list.create({ md_id, al_time, md_name, al_name_mo, run_status });
-		return res.json(data);
-	} catch (err) {
-		return res.status(500).json({ error: "Something went wrong" });
-	}
-});
+const out = {
+    ttt :  async (req, res) => {
+    try {
+        const data = await model_list.findAll()
+        return res.render('model/model_manage_board', { test: 'a', allList: data })
+    }catch(err){
+        return res.status(500).json({error: 'Something went wrong'})
+    }
+}
+}
 
 module.exports = router;

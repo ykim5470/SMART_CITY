@@ -2,9 +2,13 @@ const express = require("express");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const path = require("path");
-const sequelize = require("sequelize");
-const models = require("./models/index");
+const sequelize = require('sequelize');
+const models = require('./models/index');
 const nunjucks = require("nunjucks");
+
+//routers 
+const index_router = require('./routes/index');
+const model_manage_board_router = require('./routes/model_manage_board');
 
 
 models.sequelize
@@ -19,13 +23,15 @@ models.sequelize
 dotenv.config();
 const app = express();
 app.set("port", process.env.PORT || 4000);
+app.set('views', path.join(__dirname, 'views'));
 app.set("view engine", "html");
 nunjucks.configure("views", {
 	express: app,
 	watch: true,
 });
 
-app.get("/model_manage_board", model_manage_board_router);
+app.use('/', index_router);
+app.get('/model_manage_board', model_manage_board_router)
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
