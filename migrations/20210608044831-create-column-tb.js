@@ -2,10 +2,14 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('column_tbs', {
+      col_id:{
+        allowNull: false,
+        primaryKey: true,
+        autoIncrement: true,
+        type: DataTypes.INTEGER
+      },
       al_id_col: {
         allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
         foreignKey: true,
         type: Sequelize.INTEGER
       },

@@ -16,5 +16,6 @@ router.get("/model_register_board", auth.output.model_register_board)
 
 //router.post
 router.post("/analysis/insert", analysis.process.insert);
+router.post("/analysis/column/:al_id",analysis.process.columnInsert);
 router.post("/model_register_board",uploadFile.single('atch_origin_file_name'), auth.process.model_register_board)
 module.exports = router;
