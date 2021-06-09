@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const auth = require("./auth");
 const analysis = require("./analysis");
-const multer = require('multer')
 const uploadFile = require('../helpers/upload_dir')
 
 //router.get

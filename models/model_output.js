@@ -9,13 +9,14 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
-      // this.belongsTo(models.analysis_lists, {foreignKey: ''})
+			this.belongsTo(models.analysis_list, { foreignKey: "md_id" });
+			this.belongsTo(models.column_tb, { foreignKey: "al_id_col" });
 		}
 	}
 	model_output.init(
 		{
-			op_id: { type: DataTypes.INTEGER, allowNull: false, foreginkey: true},
-			op_param: { type: DataTypes.STRING, allowNull: false },
+			op_id: { type: DataTypes.INTEGER, allowNull: true, foreginkey: true },
+			op_param: { type: DataTypes.STRING, allowNull: true },
 			op_value: { type: DataTypes.STRING, allowNull: true },
 		},
 		{

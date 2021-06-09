@@ -15,9 +15,11 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			ip_id: {
 				type: DataTypes.INTEGER,
+				primaryKey: true,
+				autoIncrement: true,
 				allowNull: false,
 			},
-			ip_param: { type: DataTypes.INTEGER, allowNull: false },
+			ip_param: { type: DataTypes.INTEGER, allowNull: true },
 			ip_value: { type: DataTypes.STRING, allowNull: true },
 		},
 		{

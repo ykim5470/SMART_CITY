@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   class analysis_list extends Model {
     static associate(models) {
       analysis_list.hasMany(models.column_tb);
+      analysis_list.hasMany(models.model_output, { foreignKeys: 'md_id' })
     }
   };
   analysis_list.init({

@@ -2,14 +2,11 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('model_lists', {
-      id: {
+      md_id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
-      },
-      md_id: {
-        type: Sequelize.STRING
       },
       al_time: {
         type: Sequelize.STRING

@@ -13,14 +13,14 @@ module.exports = (sequelize, DataTypes) => {
 	}
 	model_list.init(
 		{
-			md_id: { type: DataTypes.INTEGER, allowNull: false },
+			md_id: { type: DataTypes.INTEGER, allowNull: false ,autoIncrement: true, primaryKey:true},
 			al_time: { type: DataTypes.INTEGER, allowNull: false },
 			md_name: {
 				type: DataTypes.STRING,
-				allowNull: false,
+				allowNull: true,
 			},
-			al_name_mo: { type: DataTypes.STRING, allowNull: false },
-			run_status: { type: DataTypes.ENUM("running", "stop"), allowNull: false },
+			al_name_mo: { type: DataTypes.STRING, allowNull: true },
+			run_status: { type: DataTypes.ENUM("running", "stop"), defaultValue: "running", allowNull: false },
 		},
 		{
 			sequelize,
