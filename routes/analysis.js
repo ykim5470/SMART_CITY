@@ -10,6 +10,14 @@ const output = {
       res.render("analysis/al_list",{ anaList : result})
     })
   },
+  view : function(req,res,next){
+    let analysisId = req.params.al_id;
+    models.analysis_list.findOne({
+      where:{al_id : analysisId}
+    }).then(result =>{
+      res.render("analysis/al_edit",{analysis : result});
+    });
+  }
 };
 
 // Post
@@ -27,6 +35,7 @@ const process = {
       console.log(err);
     });
   },
+  
 };
 
 module.exports = {

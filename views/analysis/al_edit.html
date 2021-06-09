@@ -10,10 +10,10 @@
     <form action="/analysis/edit/{{post.id}}?_method=PUT" method="post">
       <table>
         <tr>
-          <td><input type="text" name="editName" value="{{post.id}}" readonly /></td>
+          <td><input type="text" name="editName" value="{{analysis.al_name}}" readonly /></td>
         </tr>
         <tr>
-          <td><input type="text" name="editDes" value="{{post.id}}" /></td>
+          <td><input type="text" name="editDes" value="{{analysis.al_des}}" /></td>
         </tr>
       </table>
       <input type="submit" value="수정하기" />
@@ -22,11 +22,17 @@
     <h4>예측데이터 컬럼 생성</h4>
     <form action="/reply/<%=post.id%>" method="post">
       <select name="colType">
+        <option value="">데이터 타입</option>
         <option value="STRING">STRING</option>
-        <option value="STRING">STRING</option>
-        <option value="STRING">STRING</option>
-        <option value="STRING">STRING</option>
+        <option value="TEXT">TEXT</option>
+        <option value="INTEGER">INTEGER</option>
+        <option value="CHAR">CHAR</option>
+        <option value="FLOAT">FLOAT</option>
+        <option value="BOOLEAN">BOOLEAN</option>
+        <option value="DATE">DATE</option>
       </select>
+      <input type="number" name="dataSize" placeholder="데이터 사이즈를 입력해주세요"/>
+      <input type="text" name="colName" placeholder="컬럼명을 입력해주세요"/>
     </form>
   </body>
 </html>
