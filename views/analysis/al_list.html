@@ -10,14 +10,14 @@
     <div>
       <table>
         <tr>
-          <td>테이블 이름</td>
-          <td>테이블 설명</td>
+          <td>테이블 이름 &nbsp&nbsp&nbsp&nbsp</td>
+          <td>테이블 설명 &nbsp&nbsp&nbsp&nbsp</td>
           <td>등록일</td>
         </tr>
         {% for list in anaList %}
         <tr>
-          <td><a href="/analysis/edit/{{list.al_id}}">{{list.al_name}}</a></td>
-          <td><a href="/analysis/edit/{{list.al_id}}">{{list.al_des}}</a></td>
+          <td><a href="/analysis/view/{{list.al_id}}">{{list.al_name}}</a></td>
+          <td><a href="/analysis/view/{{list.al_id}}">{{list.al_des}}</a></td>
           <td>{{list.createdAt}}</td>
         </tr>
         {% endfor %}

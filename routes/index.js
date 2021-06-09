@@ -10,7 +10,7 @@ router.get("/", function (req, res, next) {
 })
 router.get("/analysis/plus",analysis.output.plus)
 router.get("/analysis/list",analysis.output.show)
-router.get("/analysis/edit/:al_id",analysis.output.view)
+router.get("/analysis/view/:al_id",analysis.output.view)
 router.get("/model_manage_board", auth.output.model_manage_board)
 router.get("/model_register_board", auth.output.model_register_board)
 

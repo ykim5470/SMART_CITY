@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>분석 테이블 조회</title>
+  </head>
+  <body>
+    <h3>분석 테이블</h3>
+    <div>
+      <p>
+        테이블 이름 : <br> {{analysis.al_name}} <br><br>
+        테이블 내용 : <br> {{analysis.al_des}}
+      </p>
+    </div>
+    <input type="button" value="수정하기" />
+    <input type="button" value="삭제하기" />
+    <h4>예측데이터 컬럼 생성</h4>
+    <form action="/analysis/column/{{analysis.al_id}}" method="post">
+      <select name="colType">
+        <option value="">데이터 타입</option>
+        <option value="STRING">STRING</option>
+        <option value="TEXT">TEXT</option>
+        <option value="INTEGER">INTEGER</option>
+        <option value="CHAR">CHAR</option>
+        <option value="FLOAT">FLOAT</option>
+        <option value="BOOLEAN">BOOLEAN</option>
+        <option value="DATE">DATE</option>
+      </select>
+      <input type="text" name="dataSize" placeholder="데이터 사이즈를 입력해주세요" />
+      <input type="text" name="colName" placeholder="컬럼명을 입력해주세요" />
+      <input type="submit" value="V" />
+    </form>
+    {% if column %}
+    <h4>예측데이터 컬럼 리스트</h4>
+    <table>
+      <tr>
+        <td>데이터타입 &nbsp&nbsp&nbsp&nbsp</td>
+        <td>데이터크기 &nbsp&nbsp&nbsp&nbsp</td>
+        <td>컬럼명</td>
+      </tr>
+      {% for colList in column %}
+      <tr>
+        <td>{{ colList.data_type }}</td>
+        <td>{{ colList.data_size }}</td>
+        <td>{{ colList.column_name }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </body>
+</html>

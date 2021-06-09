@@ -24,7 +24,7 @@ const output = {
           models.column_tb.findAll({
             where: {al_id_col : analysisId}
           }).then((result)=>{
-            res.render("analysis/al_edit", { analysis: ana, column:result });
+            res.render("analysis/al_view", { analysis: ana, column:result });
           })
         }
       });
@@ -65,7 +65,7 @@ const process = {
       })
       .then((result) => {
         console.log("column insert succeed");
-        res.redirect("/analysis/edit/list");
+        res.redirect("/analysis/list");
       })
       .catch((err) => {
         console.log("column insert failed");
