@@ -14,7 +14,7 @@ const output = {
 	model_register_board: async (req, res) => {
 		try {
 			const data = await model_list.findAll();
-			return res.render("model/model_register_board", { data });
+			return res.render("model/model_register_board");
 		} catch (err) {
 			return res.status(500).json({ error: "Something went wrong" });
 		}
@@ -24,10 +24,12 @@ const output = {
 // Post
 const process = {
 	model_register_board: async (req, res) => {
-		const { al_time, data_name, run_status, ip_value, ip_param, op_value, op_param, atch_origin_file_name } = req.body;
-		console.log(atch_origin_file_name)
+		const { al_time, data_name, run_status, ip_value, ip_param, op_value, op_param } = req.body;
+		const { originalname, mimetype, path, filename } = req.file;
 		try {
-			const table_data = await atch_file_tb.create({  atch_origin_file_name });
+			if (req.file != undefined) {
+				const table_data = await atch_file_tb.create({ originalname, mimetype, path, filename });
+			}
 			const model_data = await model_list.create({ al_time, data_name, run_status });
 			const input_data = await model_input.create({ ip_value, ip_param });
 			const output_data = await model_output.create({ op_value, op_param });
