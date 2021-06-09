@@ -9,11 +9,12 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
+      // this.belongsTo(models.analysis_lists, {foreignKey: ''})
 		}
 	}
 	model_output.init(
 		{
-			op_id: { type: DataTypes.INT, allowNull: false, foreginkey: true},
+			op_id: { type: DataTypes.INTEGER, allowNull: false, foreginkey: true},
 			op_param: { type: DataTypes.STRING, allowNull: false },
 			op_value: { type: DataTypes.STRING, allowNull: true },
 		},

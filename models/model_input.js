@@ -14,10 +14,10 @@ module.exports = (sequelize, DataTypes) => {
 	model_input.init(
 		{
 			ip_id: {
-				type: DataTypes.INT,
+				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
-			ip_param: { type: DataTypes.INT, allowNull: false },
+			ip_param: { type: DataTypes.INTEGER, allowNull: false },
 			ip_value: { type: DataTypes.STRING, allowNull: true },
 		},
 		{
