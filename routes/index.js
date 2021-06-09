@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const auth = require("./auth");
 const analysis = require("./analysis");
+const multer = require('multer')
+var upload = multer({ dest: 'uplodats/'})
 
 //router.get
 router.get("/", function (req, res, next) {

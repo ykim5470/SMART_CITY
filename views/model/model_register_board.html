@@ -13,7 +13,7 @@
 				<button id="“join-btn”" type="“submit”" class="“btn”">회원가입</button>
 			
 		</div> -->
-		<form action="/model_register_board" method="post">
+		<form action="/model_register_board" method="post" enctype="multipart/form-data">
 			<h1>모델 등록</h1>
 			<table>
 				<thead>
@@ -81,7 +81,7 @@
 					분석 모델
 				</thead>
 				<tbody>
-					<td><input class="analysisModel" placeholder="{{model_name}}" /></td>
+					<input type="file" id="al_file" name="atch_origin_file_name">
 				</tbody>
 			</table>
 			<table>
