@@ -1,0 +1,8 @@
+{% extends "index.html" %} {% block content %}
+<div class="container pt-3">
+	<h1>분석 모델 관리 모달</h1>
+	<div>현재 분석 상황: {{current_status}}</div>
+	<form action="/model_manage_board/{{md_id}}?_method=PUT" method="post"><button type="submit" name="new_status" value="중지">중지</button> <button type="submit" name="new_status" value="실행중">실행</button></form>
+
+	{% endblock %}
+</div>

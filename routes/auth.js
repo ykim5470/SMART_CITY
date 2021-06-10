@@ -1,85 +1,149 @@
 const { model_list, model_output, model_input, atch_file_tb, analysis_list } = require("../models");
-const url = require('url');
-
 
 // Get
 const output = {
-	model_manage_board: async (req, res) => {
+	manage_board: async (req, res) => {
+		const { model_select } = req.body;
+		console.log(req.body);
+		console.log(model_select);
 		try {
-			await model_list.findAll({ attributes: { exclude: ["updatedAt"] } }).then((result) => {
-				const str = JSON.stringify(result);
-				const newValue = JSON.parse(str);
-				return res.render("model/model_manage_board", { list_data: newValue });
-			});
+			await model_list
+				.findAll({
+					attributes: {
+						exclude: ["updatedAt"],
+					},
+				})
+				.then((result) => {
+					const str = JSON.stringify(result);
+					const newValue = JSON.parse(str);
+					return res.render(`model/model_manage_board`, { list_data: newValue });
+				});
 		} catch (err) {
-			return res.status(500).json({ error: "Something went wrong" });
+			return res.status(500).json({
+				error: "Something went wrong",
+			});
 		}
+	},
+
+	manage_status: async (req, res) => {
+		const { status } = req.query;
+		const { md_id } = req.params;
+		return res.render("model/model_status", { current_status: status, md_id: md_id });
 	},
 
 	model_register_board: async (req, res) => {
 		try {
-			await analysis_list.findAll({ attributes: ["al_name"] }).then((result) => {
-				const str = JSON.stringify(result);
-				const newValue = JSON.parse(str);
-				res.render("model/model_register_board", { al_name_mo: newValue });
-				return;
-			});
+			await analysis_list
+				.findAll({
+					attributes: ["al_name"],
+				})
+				.then((result) => {
+					const str = JSON.stringify(result);
+					const newValue = JSON.parse(str);
+					res.render("model/model_register_board", { al_name_mo: newValue });
+					return;
+				});
 		} catch (err) {
-			return res.status(500).json({ error: "Something went wrong" });
+			return res.status(500).json({
+				error: "Something went wrong",
+			});
 		}
 	},
 };
 
 // Post
 const process = {
-	model_register_board: async (req, res) => {
-		const { al_time, md_name, run_status, ip_value, ip_param, op_value, op_param, al_name_mo } = req.body;
+	// Analysis file upload metadata create
+	file_add: async (req, res) => {
 		try {
-			// Analysis file upload metadata create
 			if (req.file != undefined) {
 				const { originalname, mimetype, path, filename } = req.file;
 				// e.g. dataSoil.txt, text/plain, uploads/1623xx.txt, 1623xx.txt
-				await atch_file_tb.create({ originalname, mimetype, path, filename });
+				await atch_file_tb.create({
+					originalname,
+					mimetype,
+					path,
+					filename,
+				});
 			}
-
-			// Model register info submitted
-			// e.g. 분석시간, 모델 이름, 분석 모델
-			await model_list.create({ al_time, md_name, al_name_mo });
-
-			// Input data submitted
-			await model_input.create({ ip_value, ip_param });
-
-			// Output data submitted
-			await model_output.create({ op_value, op_param });
-
-			// Redirect to manage_board
-			return res.redirect('/model_manage_board')
+		} catch (err) {
+			return res.status(500).json({
+				error: "file upload failed",
+			});
+		}
+	},
+	// Model register info add
+	list_add: async (req, res) => {
+		const { al_time, md_name, al_name_mo } = req.body;
+		try {
+			await model_list.create({
+				al_time,
+				md_name,
+				al_name_mo,
+			});
 		} catch (err) {
 			console.log(err);
-			return res.status(500).json({ error: "Something went wrong" });
+		}
+	},
+	// Input table add
+	input_add: async (req, res) => {
+		const { in_value, in_param } = req.body;
+		try {
+			await model_input.create({
+				ip_value,
+				ip_param,
+			});
+		} catch (err) {
+			console.log(err);
+		}
+	},
+	// Output table add
+	output_add: async (req, res) => {
+		const { op_value, op_param } = req.body;
+		try {
+			await model_output.create({
+				op_value,
+				op_param,
+			});
+		} catch (err) {
+			console.log(err);
+		}
+	},
+	// Redirect to model manage board being registerd
+	register_complete: async (req, res) => {
+		process.file_add(req, res);
+		process.list_add(req, res);
+		process.input_add(req, res);
+		process.output_add(req, res);
+		return await res.redirect("/model_manage_board");
+	},
+	// Identify selected model
+	status_update: async (req, res) => {
+		const { md_id } = req.body;
+		const selected_model = await model_list.findOne({ where: { md_id: md_id } }).then((result) => result.run_status);
+		return res.redirect(`model_manage_board/${md_id}?status=${selected_model}`);
+	},
+	// Edit selected model status
+	edit: async (req, res) => {
+		try {
+			const { new_status } = req.body;
+			const md_id = req.params.md_id;
+			await model_list.update({ run_status: new_status }, { where: { md_id: md_id } });
+			return res.redirect("/model_manage_board");
+		} catch (err) {
+			console.log("model status error");
+		}
+	},
+	delete: async (req, ers) => {
+		try {
+			console.log("b");
+		} catch (err) {
+			console.log("model delete error");
 		}
 	},
 };
 
-
-// Put
-const update = {
-	model_manage_board: async (req, res) => { 
-		const { run_status } = req.params.md_id
-		console.log(run_status)
-		try {
-			await model_list.update({ run_status: run_status })
-			return res.render("model/model_manage_board");
-		} catch (err) {
-			return req.status(500).json({error: "Something went wrong"})
-		}
-	}
-}
-
-
-
 module.exports = {
 	output,
 	process,
-	update
 };
