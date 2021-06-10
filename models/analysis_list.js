@@ -5,8 +5,12 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class analysis_list extends Model {
     static associate(models) {
-      analysis_list.hasMany(models.column_tb);
-      this.hasMany(models.model_list, {foreignKey: 'md_id'})
+      analysis_list.hasMany(models.column_tb,{
+        foreignKey: 'al_id_col',
+      });
+      this.hasMany(models.model_list, {
+        foreignKey: 'md_id'
+      })
     }
   };
   analysis_list.init({

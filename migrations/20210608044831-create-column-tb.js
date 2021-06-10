@@ -11,6 +11,11 @@ module.exports = {
       al_id_col: {
         allowNull: false,
         foreignKey: true,
+        onDelete:'CASCADE',
+        references:{
+          model: 'analysis_list',
+          key : 'al_id'
+        },
         type: Sequelize.INTEGER
       },
       data_type: {

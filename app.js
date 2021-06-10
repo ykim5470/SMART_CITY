@@ -5,6 +5,8 @@ const path = require("path");
 const sequelize = require("sequelize");
 const models = require("./models/index");
 const nunjucks = require("nunjucks");
+const methodOverride = require("method-override");
+
 
 //routers
 const index_router = require("./routes/index");
@@ -33,6 +35,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride('_method'));
 app.use("/", index_router);
 
 app.listen(app.get("port"), () => {

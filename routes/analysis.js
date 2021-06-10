@@ -21,17 +21,29 @@ const output = {
       .then((result) => {
         if (result) {
           let ana = result;
-          models.column_tb.findAll({
-            where: {al_id_col : analysisId}
-          }).then((result)=>{
-            res.render("analysis/al_view", { analysis: ana, column:result });
-          })
+          models.column_tb
+            .findAll({
+              where: { al_id_col: analysisId },
+            })
+            .then((result) => {
+              res.render("analysis/al_view", { analysis: ana, column: result });
+            });
         }
+      });
+  },
+  edit: function (req, res, next) {
+    let analysisId = req.params.al_id;
+    models.analysis_list
+      .findOne({
+        where: { al_id: analysisId },
+      })
+      .then((result) => {
+        res.render("analysis/al_edit", { analysis: result });
       });
   },
 };
 
-// Post
+// Post , put , delete
 const process = {
   insert: function (req, res, next) {
     let body = req.body;
@@ -53,8 +65,8 @@ const process = {
     let analyId = req.params.al_id;
     let body = req.body;
     let size = null;
-    if(body.dataSize!=""){
-      size=body.dataSize;
+    if (body.dataSize != "") {
+      size = body.dataSize;
     }
     models.column_tb
       .create({
@@ -72,6 +84,35 @@ const process = {
         console.log(err);
       });
   },
+  edit : function(req,res,next){
+    let analyId = req.params.al_id;
+    let body = req.body;
+    models.analysis_list.update({
+      al_name : body.editName,
+      al_des : body.editDes
+    },{
+      where: {al_id:analyId}
+    }).then( result =>{
+      console.log("data update complete");
+      res.redirect("/analysis/list");
+    }).catch(err =>{
+      console.log("data update failed");
+      console.log(err);
+    });
+  },
+  delete : async(req,res)=>{
+    let analyId = req.params.al_id;
+    await models.analysis_list.destroy({
+      where : {al_id:analyId}
+    }).then(result=>{
+      console.log("data delete complete");
+      res.redirect("/analysis/list");
+    }).catch(err=>{
+      console.log("data delete failed");
+      console.log(err);
+    });
+  },
+  
 };
 
 module.exports = {

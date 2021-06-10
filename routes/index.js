@@ -11,6 +11,7 @@ router.get("/", function (req, res, next) {
 router.get("/analysis/plus",analysis.output.plus)
 router.get("/analysis/list",analysis.output.show)
 router.get("/analysis/view/:al_id",analysis.output.view)
+router.get("/analysis/edit/:al_id",analysis.output.edit)
 router.get("/model_manage_board", auth.output.model_manage_board)
 router.get("/model_register_board", auth.output.model_register_board)
 
@@ -18,4 +19,10 @@ router.get("/model_register_board", auth.output.model_register_board)
 router.post("/analysis/insert", analysis.process.insert);
 router.post("/analysis/column/:al_id",analysis.process.columnInsert);
 router.post("/model_register_board",uploadFile.single('atch_origin_file_name'), auth.process.model_register_board)
+
+
+//router.put = update관련
+router.put("/analysis/edited/:al_id",analysis.process.edit);
+//router.delete = delete 관련
+router.delete("/analysis/delete/:al_id",analysis.process.delete);
 module.exports = router;

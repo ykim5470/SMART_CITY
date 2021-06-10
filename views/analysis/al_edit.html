@@ -7,50 +7,17 @@
     <title>분석 테이블 수정</title>
   </head>
   <body>
-    <form action="/analysis/edit/{{post.id}}?_method=PUT" method="post">
-      <table>
-        <tr>
-          <td><input type="text" name="editName" value="{{analysis.al_name}}" readonly /></td>
-        </tr>
-        <tr>
-          <td><input type="text" name="editDes" value="{{analysis.al_des}}" /></td>
-        </tr>
-      </table>
+    <form action="/analysis/edited/{{analysis.al_id}}?_method=PUT" method="post">
+      <div>
+        <p>
+          테이블 이름 : <br />
+          <input type="text" name="editName" value="{{analysis.al_name}}" readonly /><br /><br />
+          테이블 내용 : <br />
+          <input type="text" name="editDes" value="{{analysis.al_des}}" />
+        </p>
+      </div>
       <input type="submit" value="수정하기" />
-      <input type="submit" value="삭제하기" />
+      <a href="/analysis/view/{{analysis.al_id}}"><input type="button" value="돌아가기" /></a>
     </form>
-    <h4>예측데이터 컬럼 생성</h4>
-    <form action="/analysis/column/{{analysis.al_id}}" method="post">
-      <select name="colType">
-        <option value="">데이터 타입</option>
-        <option value="STRING">STRING</option>
-        <option value="TEXT">TEXT</option>
-        <option value="INTEGER">INTEGER</option>
-        <option value="CHAR">CHAR</option>
-        <option value="FLOAT">FLOAT</option>
-        <option value="BOOLEAN">BOOLEAN</option>
-        <option value="DATE">DATE</option>
-      </select>
-      <input type="text" name="dataSize" placeholder="데이터 사이즈를 입력해주세요"/>
-      <input type="text" name="colName" placeholder="컬럼명을 입력해주세요" />
-      <input type="submit" value="V" />
-    </form>
-    {% if column %} 
-    <h4>예측데이터 컬럼 리스트</h4>
-    <table>
-      <tr>
-        <td>데이터타입</td>
-        <td>데이터크기</td>
-        <td>컬럼명</td>
-      </tr>
-      {% for colList in column %}
-        <tr>
-          <td>{{ colList.data_type }}</td>
-          <td>{{ colList.data_size }}</td>
-          <td>{{ colList.column_name }}</td>
-        </tr>
-      {% endfor %}
-    </table>  
-    {% endif %} 
   </body>
 </html>

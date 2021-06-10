@@ -4,7 +4,8 @@ module.exports = (sequelize, DataTypes) => {
   class column_tb extends Model {
     static associate(models) {
       column_tb.belongsTo(models.analysis_list, {
-        foreignKey: "al_id_col",
+        foreignKey: {name:'al_id_col', allowNull:false},
+        onDelete:"CASCADE"
       });
     }
   }
