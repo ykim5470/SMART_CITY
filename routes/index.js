@@ -25,4 +25,5 @@ router.post("/model_register_board",uploadFile.single('atch_origin_file_name'), 
 router.put("/analysis/edited/:al_id",analysis.process.edit);
 //router.delete = delete 관련
 router.delete("/analysis/delete/:al_id",analysis.process.delete);
+router.delete("/analysis/column/delete/:col_id",analysis.process.colDelete);
 module.exports = router;

@@ -77,7 +77,7 @@ const process = {
       })
       .then((result) => {
         console.log("column insert succeed");
-        res.redirect("/analysis/list");
+        res.redirect("/analysis/view/"+analyId);
       })
       .catch((err) => {
         console.log("column insert failed");
@@ -94,7 +94,7 @@ const process = {
       where: {al_id:analyId}
     }).then( result =>{
       console.log("data update complete");
-      res.redirect("/analysis/list");
+      res.redirect("/analysis/view/"+analyId);
     }).catch(err =>{
       console.log("data update failed");
       console.log(err);
@@ -109,6 +109,19 @@ const process = {
       res.redirect("/analysis/list");
     }).catch(err=>{
       console.log("data delete failed");
+      console.log(err);
+    });
+  },
+  colDelete : async(req,res)=>{
+    let colId = req.params.col_id;
+    let viewNum = req.body.alNum;
+    await models.column_tb.destroy({
+      where : {col_id:colId}
+    }).then(result=>{
+      console.log("column delete complete");
+      res.redirect("/analysis/view/"+viewNum);
+    }).catch(err=>{
+      console.log("column delete failed");
       console.log(err);
     });
   },
