@@ -1,6 +1,8 @@
 {% extends "index.html" %} {% block content %}
 <div class="container pt-3">
 	<h1>모델 관리</h1>
+	<button><a href="http://localhost:3000/model_register_board">등록</a></button>
+	<button>삭제</button>
 	<table>
 		<tr>
 			<th>No.</th>
@@ -11,13 +13,33 @@
 			<th>상태</th>
 			<th>관리</th>
             {% for item in list_data %}
-            <tr><td>{{item.md_id}}</td><td>{{ item.al_time }}</td><td>{{item.md_name}}</td><td>{{item.al_name_mo}}</td><td>{{item.createdAt}}</td><td>{{item.run_status}}</td><td><button>관리</button></td></tr>
+            <tr><td>{{item.md_id}}</td><td>{{ item.al_time }}</td><td>{{item.md_name}}</td><td>{{item.al_name_mo}}</td><td>{{item.createdAt}}</td><td>{{item.run_status}}</td><td><form action="/model_manage_board" method='put'><button type="submit" name="md_id" value={{item.md_id}}>관리</button></form></td></tr>
 	{% endfor %}
 		</tr>
-
 	</table>
+	<br>
+	<br>
+	<!-- Modal -->
+	<div id="myModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
 
-	<a href="http://localhost:3000/model_register_board">모델 등록</a>
+			<!-- Modal content-->
+			<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">분석 모델 관리</h4>
+			</div>
+			<form action="/model_manage_board", method= 'put'>
+				<button type='submit' name='running'>실행</button>
+				<button type='submit' name='stop'>중단</button></form>
+
+			<div class="modal-footer">
+				<br>
+				<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+			</div>
+			</div>
+
+		</div>
+	</div>
 </div>
 <br />
 {% endblock %}

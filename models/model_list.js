@@ -9,8 +9,6 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
-			this.belongsTo(models.analysis_list, { foreignKey: "md_id" });
-			// this.belongsTo(models.atch_file_tb, { foreignKey: "id" });
 		}
 	}
 	model_list.init(
@@ -23,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: true,
 			},
 			al_name_mo: { type: DataTypes.STRING, defaultValue: "no Model selected", allowNull: true },
-			run_status: { type: DataTypes.ENUM("running", "stop"), defaultValue: "running", allowNull: false },
+			run_status: { type: DataTypes.ENUM("running", "stop"), defaultValue: "실행중", allowNull: false },
 		},
 		{
 			sequelize,

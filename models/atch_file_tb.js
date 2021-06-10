@@ -9,7 +9,6 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
-			// this.hasOne(models.model_list, { foreginKey: "id" });
 		}
 	}
 	atch_file_tb.init(
