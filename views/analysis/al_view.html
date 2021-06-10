@@ -48,7 +48,11 @@
       {% for colList in column %}
       <tr>
         <td>{{ colList.data_type }}</td>
-        <td>{{ colList.data_size }}</td>
+        {% if colList.data_size %}
+          <td>{{ colList.data_size }}</td>
+        {% else %}
+          <td>(null)</td>
+        {% endif %}
         <td>{{ colList.column_name }}</td>
         <td>
           <form action="/analysis/column/delete/{{colList.col_id}}?_method=DELETE" method="POST">
