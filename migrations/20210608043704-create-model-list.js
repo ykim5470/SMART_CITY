@@ -4,9 +4,8 @@ module.exports = {
     await queryInterface.createTable('model_lists', {
       md_id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID
       },
       al_time: {
         type: Sequelize.STRING

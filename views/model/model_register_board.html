@@ -1,110 +1,101 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>모델 등록</title>
-	</head>
-	<body>
-		<!-- <div>
-			
-				<input type="text" name="nick" placeholder="이름" />
-				<button id="“join-btn”" type="“submit”" class="“btn”">회원가입</button>
-			
-		</div> -->
-		<form action="/model_register_board" method="post" enctype="multipart/form-data">
-			<h1>모델 등록</h1>
-			<table>
-				<thead>
-					분석시간
-				</thead>
-				<tbody>
-					<td>
-						초 :
+{% extends "index.html" %} {% block content %}
+<form action="/model_register_board" method="post" enctype="multipart/form-data">
+	<h1>모델 등록</h1>
+	<table>
+		<thead>
+			분석시간
+		</thead>
+		<tbody>
+			<td>
+				초 :
 
-						<input type="text" name="al_time" placeholder="분석 시간" />
-					</td>
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					데이터 선택
-				</thead>
-				<tbody>
-					<td>
-						<input type="text" name="data_name" placeholder="수위" />
-					</td>
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					input 파라미터 매칭
-				</thead>
-				<tbody>
-					<tr>
-						<td>
-							<input type="text" name="ip_value1" placeholder="input value" />
-						</td>
-						<td>
-							<input type="text" name="ip_param1" placeholder="input parameter" />
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<input type="text" name="ip_value2" placeholder="input value" />
-						</td>
-						<td>
-							<input type="text" name="ip_param2" placeholder="input parameter" />
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<input type="text" name="ip_value3" placeholder="input value" />
-						</td>
-						<td>
-							<input type="text" name="ip_param3" placeholder="input parameter" />
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					분석결과 테이블
-				</thead>
-				<tbody>
-					<td><input /></td>
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					분석 모델
-				</thead>
-				<tbody>
-					<input type="file" name='atch_origin_file_name' />
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					output 파라미터 매칭
-				</thead>
-				<tbody>
-					<tr>
-						<td><input type="text" name="op_value1" placeholder="output value" /></td>
-					</tr>
-					<tr>
-						<td><input type="text" name="op_param1" placeholder="output param" /></td>
-					</tr>
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					내용
-				</thead>
-			</table>
-			<div>{{all_input}}</div>
-			<div>{{all_output}}</div>
-			<button type="submit" class="btn">등록</button>
-		</form>
-	</body>
-</html>
+				<input type="text" name="al_time" placeholder="분석 시간" />
+			</td>
+		</tbody>
+	</table>
+	<table>
+		<thead>
+			데이터 선택
+		</thead>
+		<tbody>
+			<td>
+				<input type="text" name="data_name" placeholder="수위" />
+			</td>
+		</tbody>
+	</table>
+	<table>
+		<thead>
+			input 파라미터 매칭
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<input type="text" name="ip_value1" placeholder="input value" />
+				</td>
+				<td>
+					<input type="text" name="ip_param1" placeholder="input parameter" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="text" name="ip_value2" placeholder="input value" />
+				</td>
+				<td>
+					<input type="text" name="ip_param2" placeholder="input parameter" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="text" name="ip_value3" placeholder="input value" />
+				</td>
+				<td>
+					<input type="text" name="ip_param3" placeholder="input parameter" />
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<table>
+		<thead>
+			분석결과 테이블
+		</thead>
+		<tbody>
+			<td>
+				<label for="al_name_mo">/분석 테이블/</label>
+				<select name="al_name_mo">
+					{% for el in al_name_mo %}
+					<option value={{el.al_name}}>{{el.al_name}}</option>
+					{% endfor %}
+				</select>
+			</td>
+		</tbody>
+	</table>
+	<table>
+		<thead>
+			분석 모델
+		</thead>
+		<tbody>
+			<input type="file" name="atch_origin_file_name" />
+		</tbody>
+	</table>
+	<table>
+		<thead>
+			output 파라미터 매칭
+		</thead>
+		<tbody>
+			<tr>
+				<td><input type="text" name="op_value1" placeholder="output value" /></td>
+			</tr>
+			<tr>
+				<td><input type="text" name="op_param1" placeholder="output param" /></td>
+			</tr>
+		</tbody>
+	</table>
+	<table>
+		<thead>
+			내용
+		</thead>
+	</table>
+	<button type="submit" class="btn">등록</button>
+	<a href="http://localhost:3000/model_manage_board">모델 관리</a>
+</form>
+{% endblock %}

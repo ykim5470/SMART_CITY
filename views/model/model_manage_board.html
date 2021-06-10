@@ -1,12 +1,23 @@
-
-{% extends "index.html" %} 
-{% block content %}
+{% extends "index.html" %} {% block content %}
 <div class="container pt-3">
-    <h1>
-        모델 관리
-    </h1>
-    <div>{{test}}</div>
-    <div>{{allList}}</div>
+	<h1>모델 관리</h1>
+	<table>
+		<tr>
+			<th>No.</th>
+			<th>분석시간</th>
+			<th>모델 이름</th>
+			<th>분석 모델</th>
+			<th>등록일</th>
+			<th>상태</th>
+			<th>관리</th>
+            {% for item in list_data %}
+            <tr><td>{{item.md_id}}</td><td>{{ item.al_time }}</td><td>{{item.md_name}}</td><td>{{item.al_name_mo}}</td><td>{{item.createdAt}}</td><td>{{item.run_status}}</td><td><button>관리</button></td></tr>
+	{% endfor %}
+		</tr>
+
+	</table>
+
+	<a href="http://localhost:3000/model_register_board">모델 등록</a>
 </div>
-<br>
+<br />
 {% endblock %}
