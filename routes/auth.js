@@ -3,9 +3,6 @@ const { model_list, model_output, model_input, atch_file_tb, analysis_list } = r
 // Get
 const output = {
 	manage_board: async (req, res) => {
-		const { model_select } = req.body;
-		console.log(req.body);
-		console.log(model_select);
 		try {
 			await model_list
 				.findAll({
@@ -134,12 +131,10 @@ const process = {
 			console.log("model status error");
 		}
 	},
-	delete: async (req, ers) => {
-		try {
-			console.log("b");
-		} catch (err) {
-			console.log("model delete error");
-		}
+	delete: async (req, res) => {
+		const { md_id } = req.body
+		await model_list.destroy({ where: { md_id: md_id } })
+		res.redirect('/model_manage_board')
 	},
 };
 

@@ -28,5 +28,5 @@ router.put("/model_manage_board/:md_id", auth.process.edit);
 //router.delete = delete 관련
 router.delete("/analysis/delete/:al_id", analysis.process.delete);
 router.delete("/analysis/column/delete/:col_id", analysis.process.colDelete);
-router.delete('/model_manage_board/:md_id', auth.process.delete)
+router.delete('/model_manage_board', auth.process.delete)
 module.exports = router;

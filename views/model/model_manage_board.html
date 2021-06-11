@@ -2,7 +2,8 @@
 <div class="container pt-3">
 	<h1>모델 관리</h1>
 	<button><a href="http://localhost:3000/model_register_board">등록</a></button>
-	<button type="submit" name="delete">삭제</button>
+	<form action="/model_manage_board?_method=DELETE" method="post"><button type="submit" name="confirm" value='true'>삭제</button></form>
+
 	<table>
 		<tr>
 			<th>No.</th>
@@ -12,13 +13,15 @@
 			<th>등록일</th>
 			<th>상태</th>
 			<th>관리</th>
-			{% for item in list_data %}
 		</tr>
-
+		{% for item in list_data %}
 		<tr>
-			<form action="/model_manage_board/{{md_id}}?_method=DELETE" method="post">
-				<td><input type="checkbox" name="model_select" /></td>
-			</form>
+			<td>
+				<form action="/model_manage_board?_method=DELETE" method="post">
+					<input type="checkbox" name="md_id" value="{{item.md_id}}" onChange="submit()" />
+				</form>
+			</td>
+
 			<td>{{item.md_id}}</td>
 			<td>{{ item.al_time }}</td>
 			<td>{{item.md_name}}</td>
@@ -28,8 +31,8 @@
 			<td>
 				<form action="/model_manage_board" method="post"><button type="submit" name="md_id" value="{{item.md_id}}">관리</button></form>
 			</td>
-			{% endfor %}
 		</tr>
+		{% endfor %}
 	</table>
 
 	{% endblock %}

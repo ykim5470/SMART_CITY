@@ -8,6 +8,7 @@ const nunjucks = require("nunjucks");
 const methodOverride = require("method-override");
 
 
+
 //routers
 const index_router = require("./routes/index");
 
@@ -29,6 +30,7 @@ nunjucks.configure("views", {
   express: app,
   watch: true,
 });
+
 
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
