@@ -1,6 +1,7 @@
 const express = require("express");
 const models = require("../models");
 const router = express.Router();
+const axios = require('axios')
 
 // Get
 const output = {
@@ -46,6 +47,65 @@ const output = {
 // Post , put , delete
 const process = {
   insert: function (req, res, next) {
+    const namaspace =  analyist_list.findOne({where id : 1}) //test123
+    const test = axios.post('http://203.253.128.184:18827/datamodels', { headers: { 'Content-Type': 'application/json' } }, body: {
+    
+      {
+        "type": "lewis-test",
+        "namespace": test,
+        "version": "1.0",
+        "context": [
+            "http://uri.etsi.org/ngsi-ld/core-context.jsonld",
+            "http://datahub.kr/test.jsonld"
+        ],
+        "description": "test air description",
+        "attributes": [
+            {
+                "name": "name",
+                "isRequired": true,
+                "attributeType": "Property",
+                "maxLength": 50,
+                "valueType": "String"
+            },
+            {
+                "name": "address",
+                "attributeType": "Property",
+                "valueType": "Object",
+                "objectMembers": [
+                    {
+                        "name": "addressCountry",
+                        "valueType": "String"
+                    },
+                    {
+                        "name": "addressRegion",
+                        "valueType": "String"
+                    },
+                    {
+                        "name": "addressLocality",
+                        "valueType": "String"
+                    },
+                    {
+                        "name": "streetAddress",
+                        "valueType": "String"
+                    },
+                    {
+                        "name": "addressTown",
+                        "valueType": "String"
+                    }
+                ]
+            },
+            {
+                "name": "predictedValue",
+                "isRequired": true,
+                "hasObservedAt": true,
+                "attributeType": "Property",
+                "valueType": "Double"
+            }
+        ]
+    }
+     
+    })
+
     let body = req.body;
     models.analysis_list
       .create({

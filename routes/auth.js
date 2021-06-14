@@ -1,4 +1,5 @@
 const { model_list, model_output, model_input, atch_file_tb, analysis_list } = require("../models");
+const axios = require('axios')
 
 // Get
 const output = {
@@ -22,6 +23,15 @@ const output = {
 		}
 	},
 
+	// Database select register info 
+	data_select: async (req, res) => {
+		console.log('data select request')
+		const dataset = await axios.get('http://203.253.128.184:18827/datasets', { headers: { Accept: "application/json" } })
+		const dataset_name = []
+		dataset.data.filter(el => { return dataset_name.push(el.name) })
+		return dataset_name
+	},
+
 	manage_status: async (req, res) => {
 		const { status } = req.query;
 		const { md_id } = req.params;
@@ -37,8 +47,10 @@ const output = {
 				.then((result) => {
 					const str = JSON.stringify(result);
 					const newValue = JSON.parse(str);
-					res.render("model/model_register_board", { al_name_mo: newValue });
-					return;
+					const dataset_name = output.data_select()
+					console.log(dataset_name)
+					return res.render("model/model_register_board", { al_name_mo: newValue, dataset_name: dataset_name});
+					
 				});
 		} catch (err) {
 			return res.status(500).json({
@@ -82,9 +94,10 @@ const process = {
 			console.log(err);
 		}
 	},
+
 	// Input table add
 	input_add: async (req, res) => {
-		const { in_value, in_param } = req.body;
+		const { ip_value, ip_param } = req.body;
 		try {
 			await model_input.create({
 				ip_value,

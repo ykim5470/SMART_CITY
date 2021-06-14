@@ -17,9 +17,14 @@
 		<thead>
 			데이터 선택
 		</thead>
+
 		<tbody>
 			<td>
-				<input type="text" name="data_name" placeholder="수위" />
+				<select>
+					{% for name in dataset_name%}
+					<option value={{name}}>{{name}}</option>
+					{% endfor %}
+				</select>
 			</td>
 		</tbody>
 	</table>
@@ -63,7 +68,7 @@
 				<label for="al_name_mo">/분석 테이블/</label>
 				<select name="al_name_mo">
 					{% for el in al_name_mo %}
-					<option value={{el.al_name}}>{{el.al_name}}</option>
+					<option value="{{el.al_name}}">{{el.al_name}}</option>
 					{% endfor %}
 				</select>
 			</td>
