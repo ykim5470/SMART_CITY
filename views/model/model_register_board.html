@@ -1,5 +1,5 @@
 {% extends "index.html" %} {% block content %}
-<form action="/model_register_board" method="post" enctype="multipart/form-data">
+<form action="/model/register/complete" method="post" enctype="multipart/form-data">
 	<h1>모델 등록</h1>
 	<table>
 		<thead>
@@ -17,14 +17,16 @@
 		<thead>
 			데이터 선택
 		</thead>
-
+	
 		<tbody>
 			<td>
-				<select>
-					{% for name in dataset_name%}
-					<option value={{name}}>{{name}}</option>
-					{% endfor %}
-				</select>
+				<form action="model/register/input" method="post" >
+					<select name="dataset_id"  onchange='javascript:this.form.submit()' required>
+						{% for name in dataset_name%}
+						<option value="{'id' : {{name.value.id}}, 'type': {{name.value.dataModelType}}, namespace: {{name.value.dataModelNamespace}} }">{{name.key}}</option>
+						{% endfor %}
+					</select>
+				</form>
 			</td>
 		</tbody>
 	</table>

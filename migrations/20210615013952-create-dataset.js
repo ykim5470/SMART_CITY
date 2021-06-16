@@ -1,24 +1,24 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('model_lists', {
-      id: {allowNull: false, autoIncrement: true, type: Sequelize.INTEGER},
-      md_id: {
+    await queryInterface.createTable('datasets', {
+      id: {
         allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.UUID
+        type: Sequelize.INTEGER
       },
-      al_time: {
+      datset_id: {
+        type: Sequelize.INTEGER
+      },
+      dataset_type: {
         type: Sequelize.STRING
       },
-      md_name: {
+      dataset_name: {
         type: Sequelize.STRING
       },
-      al_name_mo: {
-        type: Sequelize.STRING
-      },
-      run_status: {
-        type: Sequelize.STRING
+      ip_id: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
@@ -31,6 +31,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('model_lists');
+    await queryInterface.dropTable('datasets');
   }
 };

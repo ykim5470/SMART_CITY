@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
+			this.hasOne(models.dataset, {
+				foreignKey: 'ip_id'
+			})
 		}
 	}
 	model_input.init(

@@ -1,8 +1,8 @@
 {% extends "index.html" %} {% block content %}
 <div class="container pt-3">
 	<h1>모델 관리</h1>
-	<button><a href="http://localhost:3000/model_register_board">등록</a></button>
-	<form action="/model_manage_board?_method=DELETE" method="post"><button type="submit" name="confirm" value='true'>삭제</button></form>
+	<form action='model/register' method="post"><button type="submit">등록</button></form>
+	<form action="/model_manage_board?_method=DELETE" method="post"><button type="submit" name="confirm" value="true">삭제</button></form>
 
 	<table>
 		<tr>
@@ -22,7 +22,7 @@
 				</form>
 			</td>
 
-			<td>{{item.md_id}}</td>
+			<td>{{item.id}}</td>
 			<td>{{ item.al_time }}</td>
 			<td>{{item.md_name}}</td>
 			<td>{{item.al_name_mo}}</td>
