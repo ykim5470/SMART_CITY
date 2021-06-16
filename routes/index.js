@@ -20,8 +20,10 @@ router.get("/model_register_board", auth.output.model_register_board);
 router.post("/analysis/insert", analysis.process.insert);
 router.post("/analysis/column/:al_id", analysis.process.columnInsert);
 router.post("/analysis/listDelete", analysis.process.deleteList);
-router.post("/model_register_board", uploadFile.single("atch_origin_file_name"), auth.process.register_complete);
+router.post("/model/register/complete", uploadFile.single("atch_origin_file_name"), auth.process.register_complete);
 router.post("/model_manage_board", auth.process.status_update);
+router.post("/model/register", auth.process.register_init);
+router.post('model/register/input', auth.process.input_add)
 
 //router.put = update관련
 router.put("/analysis/edited/:al_id", analysis.process.edit);
