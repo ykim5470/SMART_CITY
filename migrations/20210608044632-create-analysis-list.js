@@ -12,6 +12,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      al_ns: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       al_des: {
         type: Sequelize.TEXT
       },

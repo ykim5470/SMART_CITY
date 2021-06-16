@@ -12,12 +12,15 @@
       <p>
         테이블 이름 : <br />
         {{analysis.al_name}} <br /><br />
+        Name Space : <br />
+        {{analysis.al_ns}} <br /><br />
         테이블 내용 : <br />
         {{analysis.al_des}}
       </p>
     </div>
     <form action="/analysis/delete/{{analysis.al_id}}?_method=DELETE" method="POST">
       <a href="/analysis/edit/{{analysis.al_id}}"><input type="button" value="수정하기" /></a>
+      <input type="hidden" value="{{analysis.al_ns}}" name="al_ns">
       <input type="submit" value="삭제하기" />
       <a href="/analysis/list"><input type="button" value="목록" /></a>
     </form>
