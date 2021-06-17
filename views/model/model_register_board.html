@@ -1,108 +1,125 @@
-{% extends "index.html" %} {% block content %}
-<form action="/model/register/complete" method="post" enctype="multipart/form-data">
-	<h1>모델 등록</h1>
-	<table>
-		<thead>
-			분석시간
-		</thead>
-		<tbody>
-			<td>
-				초 :
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>모델 등록</title>
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+		<script>
+			$(document).ready(function () {
+				$("#submitBtn").click(function () {
+					$(".myForm").submit(); // Submit the form
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<table>
+			<thead>
+				분석시간
+			</thead>
+			<tbody>
+				<form action="/model/register/al_time" method="post" class="myForm">
+					<td>
+						초 :
+						<input type="text" name="al_time" placeholder="분석 시간" />
+					</td>
+				</form>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				데이터 선택
+			</thead>
 
-				<input type="text" name="al_time" placeholder="분석 시간" />
-			</td>
-		</tbody>
-	</table>
-	<table>
-		<thead>
-			데이터 선택
-		</thead>
-	
-		<tbody>
-			<td>
-				<form action="model/register/input" method="post" >
-					<select name="dataset_id"  onchange='javascript:this.form.submit()' required>
-						{% for name in dataset_name%}
-						<option value="{'id' : {{name.value.id}}, 'type': {{name.value.dataModelType}}, namespace: {{name.value.dataModelNamespace}} }">{{name.key}}</option>
+			<tbody>
+				<td>
+					<form action="/model/register/input" method="post">
+						<select name="dataset_id" onchange="this.form.submit()">
+							{% for name in dataset_name%}
+							<option value='{"id":"{{name.value.id}}","type":"{{name.value.dataModelType}}","namespace":"{{name.value.dataModelNamespace}}"}'>{{name.key}}</option>
+							{% endfor %}
+						</select>
+					</form>
+				</td>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				input 파라미터 매칭
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						<input type="text" name="ip_value1" placeholder="input value" />
+					</td>
+					<td>
+						<input type="text" name="ip_param1" placeholder="input parameter" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="text" name="ip_value2" placeholder="input value" />
+					</td>
+					<td>
+						<input type="text" name="ip_param2" placeholder="input parameter" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="text" name="ip_value3" placeholder="input value" />
+					</td>
+					<td>
+						<input type="text" name="ip_param3" placeholder="input parameter" />
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				분석결과 테이블
+			</thead>
+			<tbody>
+				<td>
+					<form action="/model/register/al_list" method="post" class="myForm">
+					<label for="al_name_mo">/분석 테이블/</label>
+					<select name="al_name_mo" onchange='this.form.submit()'>
+						{% for el in al_name_mo %}
+						<option value="{{el.al_name}}">{{el.al_name}}</option>
 						{% endfor %}
 					</select>
 				</form>
-			</td>
-		</tbody>
-	</table>
-	<table>
-		<thead>
-			input 파라미터 매칭
-		</thead>
-		<tbody>
-			<tr>
-				<td>
-					<input type="text" name="ip_value1" placeholder="input value" />
 				</td>
-				<td>
-					<input type="text" name="ip_param1" placeholder="input parameter" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="text" name="ip_value2" placeholder="input value" />
-				</td>
-				<td>
-					<input type="text" name="ip_param2" placeholder="input parameter" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="text" name="ip_value3" placeholder="input value" />
-				</td>
-				<td>
-					<input type="text" name="ip_param3" placeholder="input parameter" />
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<table>
-		<thead>
-			분석결과 테이블
-		</thead>
-		<tbody>
-			<td>
-				<label for="al_name_mo">/분석 테이블/</label>
-				<select name="al_name_mo">
-					{% for el in al_name_mo %}
-					<option value="{{el.al_name}}">{{el.al_name}}</option>
-					{% endfor %}
-				</select>
-			</td>
-		</tbody>
-	</table>
-	<table>
-		<thead>
-			분석 모델
-		</thead>
-		<tbody>
-			<input type="file" name="atch_origin_file_name" />
-		</tbody>
-	</table>
-	<table>
-		<thead>
-			output 파라미터 매칭
-		</thead>
-		<tbody>
-			<tr>
-				<td><input type="text" name="op_value1" placeholder="output value" /></td>
-			</tr>
-			<tr>
-				<td><input type="text" name="op_param1" placeholder="output param" /></td>
-			</tr>
-		</tbody>
-	</table>
-	<table>
-		<thead>
-			내용
-		</thead>
-	</table>
-	<button type="submit" class="btn">등록</button>
-	<a href="http://localhost:3000/model_manage_board">모델 관리</a>
-</form>
-{% endblock %}
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				분석 모델
+			</thead>
+			<tbody>
+				<input type="file" accept=".hdf, .pb" name="atch_origin_file_name" />
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				output 파라미터 매칭
+			</thead>
+			<tbody>
+				<tr>
+					<td><input type="text" name="op_value1" placeholder="output value" /></td>
+				</tr>
+				<tr>
+					<td><input type="text" name="op_param1" placeholder="output param" /></td>
+				</tr>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				내용
+			</thead>
+		</table>
+		<button type="button" id="submitBtn">등록 완료</button>
+		<a href="http://localhost:3000/model_manage_board">모델 관리</a>
+	</body>
+</html>

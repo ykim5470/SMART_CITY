@@ -1,4 +1,4 @@
-const { model_list, model_output, model_input, atch_file_tb, analysis_list, dataset, sequelize } = require("../models");
+const { model_list, model_output, model_input, atch_file_tb, analysis_list, dataset, sequelize, column_tb } = require("../models");
 const axios = require("axios");
 
 // Get
@@ -39,10 +39,8 @@ const output = {
 		return res.render("model/model_status", { current_status: status, md_id: md_id });
 	},
 
-
-
 	model_register_board: async (req, res) => {
-		console.log('모델 등록 get')
+		console.log("모델 등록 get");
 		try {
 			await analysis_list
 				.findAll({
@@ -52,9 +50,8 @@ const output = {
 					const str = JSON.stringify(result);
 					const newValue = JSON.parse(str);
 					const dataset_name = output.dataset_select();
-					dataset_name.then((result) =>
-					{
-						res.render(`model/model_register_board`, { al_name_mo: newValue, dataset_name: result  });
+					dataset_name.then((result) => {
+						res.render(`model/model_register_board`, { al_name_mo: newValue, dataset_name: result });
 					});
 				});
 		} catch (err) {
@@ -89,8 +86,10 @@ const process = {
 	// Model register info add
 	list_add: async (req, res) => {
 		const { al_time, md_name, al_name_mo } = req.body;
+		console.log(al_time);
+		console.log(al_name_mo);
 		try {
-			await model_list.update({
+			await model_list.create({
 				al_time: al_time,
 				md_name: md_name,
 				al_name_mo: al_name_mo,
@@ -102,36 +101,47 @@ const process = {
 
 	// Input table add
 	input_add: async (req, res) => {
-		console.log('인풋 add 실행')
-		const { ip_value, ip_param, dataset_id,  } = req.body;
-		console.log(dataset_id)
-		// 데이터를 클릭했을 때, 받아오는 dataset정보를 가지고 API호출 
-		try {
-			await model_input.create({
-				ip_value,
-				ip_param,
+		console.log("인풋");
+		const { ip_value, ip_param, dataset_id } = req.body;
+		const dataset_obj = JSON.parse(dataset_id);
+		const get_input_attr = await axios.get(`http://203.253.128.184:18827/datamodels/${dataset_obj.namespace}/${dataset_obj.type}/1.0`, { headers: { Accept: "application/json" } }).then((res) => {
+			const analysis_models = res.data;
+			const input_attributes = analysis_models.attributes.map((el) => {
+				const attributes_name = el.name;
+				const attributes_value_type = el.valueType;
+				return { attributes_name, attributes_value_type };
 			});
-		} catch (err) {
-			console.log(err);
-		}
+			return input_attributes;
+		});
+		console.log(get_input_attr);
+		return get_input_attr;
+		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님께 여쭤보기
 	},
 	// Output table add
 	output_add: async (req, res) => {
-		const { op_value, op_param } = req.body;
-		try {
-			await model_output.create({
-				op_value,
-				op_param,
+		console.log("아웃풋");
+		const { al_name_mo } = req.body;
+		console.log(typeof al_name_mo);
+		const analysis_output = await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
+			const al_list_str = JSON.stringify(res);
+			const al_list_value = JSON.parse(al_list_str);
+			const al_id = al_list_value.al_id;
+			const column_attr = column_tb.findOne({ where: { al_id_col: al_id } }).then((result) => {
+				const column_str = JSON.stringify(result)
+				const column_value = JSON.parse(column_str)
+				return column_value
 			});
-		} catch (err) {
-			console.log(err);
-		}
+			return column_attr			
+		});
+		console.log(analysis_output)
+		return analysis_output
+		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님게 여쭤보기 
 	},
 	// Redirect to model manage board being registerd
 	register_complete: async (req, res) => {
-		console.log('등록 완료 및 funtion실행')
+		console.log("등록 완료 및 funtion실행");
 		// process.file_add(req, res);
-		process.list_add(req, res);
+		// process.list_add(req, res);
 		// process.input_add(req, res);
 		// process.output_add(req, res);
 		return await res.redirect("/model_manage_board");
@@ -148,10 +158,10 @@ const process = {
 	// 	});
 	// 	return current_md_id;
 	// },
-	// 
+	//
 	register_init: async (req, res) => {
-		console.log('등록 클릭 완료, model_register_board 페이지로 이동')
-		res.redirect(`/model_register_board`)
+		console.log("등록 클릭 완료, model_register_board 페이지로 이동");
+		res.redirect(`/model_register_board`);
 	},
 	// Identify selected model
 	status_update: async (req, res) => {
