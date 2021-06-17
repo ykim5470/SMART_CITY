@@ -15,7 +15,10 @@
         Name Space : <br />
         {{analysis.al_ns}} <br /><br />
         테이블 내용 : <br />
-        {{analysis.al_des}}
+        {{analysis.al_des}} <br /><br />
+        Version : {{analysis.al_version}} <br />
+        context : <br />
+        {{analysis.al_context}} 
       </p>
     </div>
     <form action="/analysis/delete/{{analysis.al_id}}?_method=DELETE" method="POST">

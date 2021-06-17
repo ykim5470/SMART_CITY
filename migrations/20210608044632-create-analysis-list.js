@@ -16,8 +16,22 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      al_version: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      al_context: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      al_delYn: {
+        type: Sequelize.CHAR,
+        allowNull: false,
+        defaultValue:'N'
+      },
       al_des: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,

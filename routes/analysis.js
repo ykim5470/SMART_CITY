@@ -1,5 +1,5 @@
 const express = require("express");
-const models = require("../models");
+const {analysis_list,column_tb} = require("../models");
 const router = express.Router();
 const axios = require("axios");
 const sequelize = require("sequelize");
@@ -7,36 +7,44 @@ const Op = sequelize.Op;
 
 // Get
 const output = {
+  //테이블 등록 화면
   plus: function (req, res, next) {
     res.render("analysis/al_insert");
   },
+  //테이블 목록
   show: function (req, res, next) {
-    models.analysis_list.findAll().then((result) => {
+    analysis_list.findAll().then((result) => {
       res.render("analysis/al_list", { anaList: result });
     });
   },
-  view: function (req, res, next) {
+  //테이블 & 해당 컬럼 조회
+  view: async (req, res) => {
     let analysisId = req.params.al_id;
-    models.analysis_list
-      .findOne({
-        where: { al_id: analysisId },
-      })
-      .then((result) => {
-        if (result) {
-          let ana = result;
-          models.column_tb
-            .findAll({
-              where: { al_id_col: analysisId },
-            })
-            .then((result) => {
-              res.render("analysis/al_view", { analysis: ana, column: result });
-            });
-        }
-      });
+    try {
+      await analysis_list
+        .findOne({
+          where: { al_id: analysisId },
+        })
+        .then(async (result) => {
+          if (result) {
+            let ana = result;
+            await column_tb
+              .findAll({
+                where: { al_id_col: analysisId },
+              })
+              .then((result) => {
+                res.render("analysis/al_view", { analysis: ana, column: result });
+              });
+          }
+        });
+    } catch (err) {
+      console.log(err);
+    }
   },
-  edit: function (req, res, next) {
+  //테이블 수정 화면
+  edit: async (req, res) => {
     let analysisId = req.params.al_id;
-    models.analysis_list
+    await analysis_list
       .findOne({
         where: { al_id: analysisId },
       })
@@ -48,25 +56,29 @@ const output = {
 
 // Post , put , delete
 const process = {
+  //테이블 등록
   insert: async (req, res) => {
+    let body = req.body;
     try {
-      let body = req.body;
-      models.analysis_list
+      if(body.tableName&&body.description&&body.version&&body.nameSpace&&body.context){
+        await analysis_list
         .create({
-          al_name: body.tableName,
-          al_ns : body.nameSpace,
-          al_des: body.description,
+          al_name: body.tableName, al_ns: body.nameSpace,
+          al_des: body.description, al_version: body.version,
+          al_context: body.context
         })
         .then((result) => {
           console.log("analysis data insert succeed");
+          const conList = result.al_context.split(",");
           axios({
+            //데이터 모델 생성 요청
             method: "post",
             url: "http://203.253.128.184:18827/datamodels",
             data: {
-              type: result.al_id, // 나중에 al_name으로 수정
-              namespace: result.al_ns, 
-              version: "1.0",
-              context: ["http://uri.etsi.org/ngsi-ld/core-context.jsonld", "http://datahub.kr/test.jsonld"],
+              type: result.al_name,
+              namespace: result.al_ns,
+              version: result.al_version,
+              context: conList,
               description: result.al_des,
               attributes: [
                 {
@@ -80,48 +92,49 @@ const process = {
             },
             headers: { "Content-Type": "application/json" },
           });
-          console.log("id : " + result.al_id);
           res.redirect("/analysis/list");
-        })
-        .catch((err) => {
-          console.log("data insert failed");
-          console.log(err);
         });
-    } catch {
+      }else{
+        res.render("analysis/al_insert",{blank : "nullPointException"});
+      }
+    } catch (err) {
+      console.log("data insert failed");
       console.log(err);
     }
   },
-  columnInsert: function (req, res, next) {
+  //컬럼생성
+  columnInsert: async (req, res) => {
     let analyId = req.params.al_id;
     let body = req.body;
     let size = null;
     if (body.dataSize != "") {
       size = body.dataSize;
     }
-    models.column_tb
-      .create({
-        al_id_col: analyId,
-        data_type: body.colType,
-        data_size: size,
-        column_name: body.colName,
-      })
-      .then((result) => {
-        console.log("column insert succeed");
-        res.redirect("/analysis/view/" + analyId);
-      })
-      .catch((err) => {
-        console.log("column insert failed");
-        console.log(err);
-      });
+    try {
+      await column_tb
+        .create({
+          al_id_col: analyId,
+          data_type: body.colType,
+          data_size: size,
+          column_name: body.colName,
+        })
+        .then((result) => {
+          console.log("column insert succeed");
+          res.redirect("/analysis/view/" + analyId);
+        });
+    } catch (err) {
+      console.log(err);
+    }
   },
-  edit: function (req, res, next) {
+  //테이블 수정
+  edit: async (req, res)=> {
     let analyId = req.params.al_id;
     let body = req.body;
-    models.analysis_list
+    analysis_list
       .update(
         {
           al_name: body.editName,
-          al_ns : body.editNs,
+          al_ns: body.editNs,
           al_des: body.editDes,
         },
         {
@@ -137,16 +150,18 @@ const process = {
         console.log(err);
       });
   },
+  //테이블 개별 삭제 (DB까지)
   delete: async (req, res) => {
     let analyId = req.params.al_id;
     let analyNs = req.body.al_ns;
-    await models.analysis_list
+    await analysis_list
       .destroy({
         where: { al_id: analyId },
       })
       .then(async (result) => {
         console.log("data delete complete");
-        await axios.delete("http://203.253.128.184:18827/datamodels/" + analyNs + "/" + analyId + "/1.0", { headers: { Accept: "application/json" } });
+        //삭제 요청
+        await axios.delete(`http://203.253.128.184:18827/datamodels/${analyNs}/${analyId}/1.0`, { headers: { Accept: "application/json" } });
         res.redirect("/analysis/list");
       })
       .catch((err) => {
@@ -154,10 +169,11 @@ const process = {
         console.log(err);
       });
   },
+  //테이블 일괄 삭제( DB까지)
   deleteList: async (req, res) => {
     var delListId = [];
     delListId = req.body.deleteList.split(",");
-    await models.analysis_list
+    await analysis_list
       .findAll({
         attributes: ["al_ns"],
         where: {
@@ -169,7 +185,7 @@ const process = {
         const test = JSON.stringify(result);
         const newValue = JSON.parse(test);
         newValue.map((el) => nsList.push(el.al_ns));
-        await models.analysis_list
+        await analysis_list
           .destroy({
             where: {
               al_id: { [Op.in]: delListId },
@@ -177,7 +193,7 @@ const process = {
           })
           .then(async (result) => {
             for (var i = 0; i < delListId.length; i++) {
-              await axios.delete("http://203.253.128.184:18827/datamodels/" + nsList[i] + "/" + delListId[i] + "/1.0", { headers: { Accept: "application/json" } });
+              await axios.delete(`http://203.253.128.184:18827/datamodels/${nsList[i]}/${delListId[i]}/1.0`, { headers: { Accept: "application/json" } });
             }
             res.redirect("/analysis/list");
           })
@@ -191,10 +207,11 @@ const process = {
         console.log(err);
       });
   },
+  //컬럼삭제 (db까지)
   colDelete: async (req, res) => {
     let colId = req.params.col_id;
     let viewNum = req.body.alNum;
-    await models.column_tb
+    await column_tb
       .destroy({
         where: { col_id: colId },
       })

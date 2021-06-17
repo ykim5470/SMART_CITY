@@ -27,7 +27,23 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      al_des: { type: DataTypes.TEXT },
+      al_version: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      al_context: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      al_delYn: {
+        type: DataTypes.CHAR,
+        allowNull: false,
+        defaultValue: 'N'
+      },
+      al_des: { 
+        type: DataTypes.TEXT, 
+        allowNull: false,
+      },
     },
     {
       sequelize,
