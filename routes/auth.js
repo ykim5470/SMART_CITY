@@ -14,6 +14,7 @@ const output = {
 				.then((result) => {
 					const str = JSON.stringify(result);
 					const new_value = JSON.parse(str);
+					// console.log(new_value)
 					return res.render(`model/model_manage_board`, { list_data: new_value });
 				});
 		} catch (err) {
@@ -83,22 +84,6 @@ const process = {
 			});
 		}
 	},
-	// Model register info add
-	list_add: async (req, res) => {
-		const { al_time, md_name, al_name_mo } = req.body;
-		console.log(al_time);
-		console.log(al_name_mo);
-		try {
-			await model_list.create({
-				al_time: al_time,
-				md_name: md_name,
-				al_name_mo: al_name_mo,
-			});
-		} catch (err) {
-			console.log(err);
-		}
-	},
-
 	// Input table add
 	input_add: async (req, res) => {
 		console.log("인풋");
@@ -114,6 +99,7 @@ const process = {
 			return input_attributes;
 		});
 		console.log(get_input_attr);
+		res.redirect("/model_register_board");
 		return get_input_attr;
 		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님께 여쭤보기
 	},
@@ -121,46 +107,40 @@ const process = {
 	output_add: async (req, res) => {
 		console.log("아웃풋");
 		const { al_name_mo } = req.body;
-		console.log(typeof al_name_mo);
+		model_list.create({ al_name_mo: al_name_mo })
 		const analysis_output = await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
 			const al_list_str = JSON.stringify(res);
 			const al_list_value = JSON.parse(al_list_str);
 			const al_id = al_list_value.al_id;
 			const column_attr = column_tb.findOne({ where: { al_id_col: al_id } }).then((result) => {
-				const column_str = JSON.stringify(result)
-				const column_value = JSON.parse(column_str)
-				return column_value
+				const column_str = JSON.stringify(result);
+				const column_value = JSON.parse(column_str);
+				return column_value;
 			});
-			return column_attr			
+			return column_attr;
 		});
-		console.log(analysis_output)
-		return analysis_output
-		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님게 여쭤보기 
+		console.log(analysis_output);
+		res.redirect("/model_register_board");
+		return analysis_output;
+		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님게 여쭤보기
 	},
 	// Redirect to model manage board being registerd
 	register_complete: async (req, res) => {
 		console.log("등록 완료 및 funtion실행");
-		// process.file_add(req, res);
-		// process.list_add(req, res);
+		// console.log(req)
+
+		const { al_time } = req.body;
+		await model_list.create({
+			al_time: al_time,
+		});
+	
+		process.file_add(req, res);
 		// process.input_add(req, res);
 		// process.output_add(req, res);
-		return await res.redirect("/model_manage_board");
+		return res.redirect("/model_manage_board");
 	},
-	// init_list: async (req, res) => {
-	// 	// Init model create
-	// 	await model_list.create({});
-	// 	// new model md_id
-	// 	const current_md_id = model_list.findAll({ limit: 1, order: [["createdAt", "DESC"]] }).then((result) => {
-	// 		const init_model = JSON.stringify(result);
-	// 		const init_model_value = JSON.parse(init_model);
-	// 		working_md_id = init_model_value[0].md_id;
-	// 		return working_md_id;
-	// 	});
-	// 	return current_md_id;
-	// },
-	//
+
 	register_init: async (req, res) => {
-		console.log("등록 클릭 완료, model_register_board 페이지로 이동");
 		res.redirect(`/model_register_board`);
 	},
 	// Identify selected model
@@ -181,9 +161,12 @@ const process = {
 		}
 	},
 	delete: async (req, res) => {
-		const { md_id } = req.body;
-		await model_list.destroy({ where: { md_id: md_id } });
-		res.redirect("/model_manage_board");
+		console.log('삭제 클릭 완료')
+		console.log(req.body.delModel)
+		const delModelList = req.body.delModel.split(',')
+		console.log(delModelList)
+		delModelList.map(el => { model_list.destroy({ where: { md_id: el } }) })
+		res.redirect('/model_manage_board')
 	},
 };
 

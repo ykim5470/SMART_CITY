@@ -1,39 +1,56 @@
-{% extends "index.html" %} {% block content %}
-<div class="container pt-3">
-	<h1>모델 관리</h1>
-	<form action='model/register' method="post"><button type="submit">등록</button></form>
-	<form action="/model_manage_board?_method=DELETE" method="post"><button type="submit" name="confirm" value="true">삭제</button></form>
-
-	<table>
-		<tr>
-			<th>No.</th>
-			<th>분석시간</th>
-			<th>모델 이름</th>
-			<th>분석 모델</th>
-			<th>등록일</th>
-			<th>상태</th>
-			<th>관리</th>
-		</tr>
-		{% for item in list_data %}
-		<tr>
-			<td>
-				<form action="/model_manage_board?_method=DELETE" method="post">
-					<input type="checkbox" name="md_id" value="{{item.md_id}}" onChange="submit()" />
-				</form>
-			</td>
-
-			<td>{{item.id}}</td>
-			<td>{{ item.al_time }}</td>
-			<td>{{item.md_name}}</td>
-			<td>{{item.al_name_mo}}</td>
-			<td>{{item.createdAt}}</td>
-			<td>{{item.run_status}}</td>
-			<td>
-				<form action="/model_manage_board" method="post"><button type="submit" name="md_id" value="{{item.md_id}}">관리</button></form>
-			</td>
-		</tr>
-		{% endfor %}
-	</table>
-
-	{% endblock %}
-</div>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>모델 관리</title>
+		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script>
+			function ListDelete() {
+				var chkArray = new Array();
+				$("input:checkbox[name=md_id]:checked").each(function() {
+					chkArray.push(this.value);
+				});
+				console.log(chkArray);
+				$("#delModel").val(chkArray);
+				$("#confirm").submit();
+			}
+		</script>
+	</head>
+	<body>
+		<h1>모델 관리</h1>
+		<form action="model/register" method="post"><button type="submit">등록</button></form>
+		<input type="button" onclick="ListDelete()" value="삭제" />
+		<table>
+			<tr>
+				<th>No.</th>
+				<th>분석시간</th>
+				<th>모델 이름</th>
+				<th>분석 모델</th>
+				<th>등록일</th>
+				<th>상태</th>
+				<th>관리</th>
+			</tr>
+			{% for item in list_data %}
+			<tr>
+				<td>
+					<form action="/model/list/delete" method="post" id="confirm">
+						<input type="checkbox" name="md_id" value="{{item.md_id}}" />
+						<input type="hidden" name="delModel" id="delModel" value="" />
+					</form>
+				</td>
+				<td>{{item.id}}</td>
+				<td>{{ item.al_time }}</td>
+				<td>{{item.md_name}}</td>
+				<td>{{item.al_name_mo}}</td>
+				<td>{{item.createdAt}}</td>
+				<td>{{item.run_status}}</td>
+				<td>
+					<form action="/model_manage_board" method="post"><button type="submit" name="md_id" value="{{item.md_id}}">관리</button></form>
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>

@@ -9,7 +9,8 @@
 		<script>
 			$(document).ready(function () {
 				$("#submitBtn").click(function () {
-					$(".myForm").submit(); // Submit the form
+					$("#myForm").submit(); // Submit the form
+					$("#myForm1").submit(); // Submit the form1
 				});
 			});
 		</script>
@@ -20,12 +21,12 @@
 				분석시간
 			</thead>
 			<tbody>
-				<form action="/model/register/al_time" method="post" class="myForm">
-					<td>
-						초 :
+				<td>
+					초 :
+					<form action="/model/register/complete" method="post" id="myForm1">
 						<input type="text" name="al_time" placeholder="분석 시간" />
-					</td>
-				</form>
+					</form>
+				</td>
 			</tbody>
 		</table>
 		<table>
@@ -82,14 +83,14 @@
 			</thead>
 			<tbody>
 				<td>
-					<form action="/model/register/al_list" method="post" class="myForm">
-					<label for="al_name_mo">/분석 테이블/</label>
-					<select name="al_name_mo" onchange='this.form.submit()'>
-						{% for el in al_name_mo %}
-						<option value="{{el.al_name}}">{{el.al_name}}</option>
-						{% endfor %}
-					</select>
-				</form>
+					<form action="/model/register/al_list" method="post">
+						<label for="al_name_mo">/분석 테이블/</label>
+						<select name="al_name_mo" onchange="this.form.submit()">
+							{% for el in al_name_mo %}
+							<option value="{{el.al_name}}">{{el.al_name}}</option>
+							{% endfor %}
+						</select>
+					</form>
 				</td>
 			</tbody>
 		</table>
@@ -98,7 +99,9 @@
 				분석 모델
 			</thead>
 			<tbody>
-				<input type="file" accept=".hdf, .pb" name="atch_origin_file_name" />
+				<form action="/model/register/complete" method="post" id="myForm" enctype="multipart/form-data">
+					<input type="file" accept=".hdf, .pb" name="atch_origin_file_name" />
+				</form>
 			</tbody>
 		</table>
 		<table>
@@ -120,6 +123,5 @@
 			</thead>
 		</table>
 		<button type="button" id="submitBtn">등록 완료</button>
-		<a href="http://localhost:3000/model_manage_board">모델 관리</a>
 	</body>
 </html>
