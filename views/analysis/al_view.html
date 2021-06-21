@@ -6,6 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>분석 테이블 조회</title>
   </head>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script>
+    function goEdit(box) {
+      var thisName = document.getElementsByName("editId")[0].value.split(",");
+      var editInput = "<input type='text' name='colName' value='" + thisName[1] + "' />";
+      var origin = thisName[1];
+      if (box.checked == true) {
+        document.getElementById("columnName").innerHTML = editInput;
+      } else {
+        document.getElementById("columnName").innerHTML = origin;
+      }
+      // $(':checkbox[name="editId"]').on({
+      //   click: function (e) {
+      //     $("#clickFlag").toggleClass("on");
+      //   },
+      //   change: function (e) {
+      //     $("#changeFlag").toggleClass("on");
+      //   },
+      // });
+    }
+  </script>
   <body>
     <h3>분석 테이블</h3>
     <div>
@@ -18,15 +39,22 @@
         {{analysis.al_des}} <br /><br />
         Version : {{analysis.al_version}} <br />
         context : <br />
-        {{analysis.al_context}} 
+        {{analysis.al_context}}
       </p>
     </div>
-    <form action="/analysis/delete/{{analysis.al_id}}?_method=DELETE" method="POST">
+    {% if admin %}
+    <form action="/analysis/hardDel/{{analysis.al_id}}?_method=DELETE" method="POST">
+      <input type="submit" value="테이블 영구삭제" />
+      <a href="/analysis/admin/deleted"><input type="button" value="목록" /></a>
+    </form>
+    {% else %}
+    <form action="/analysis/softDel/{{analysis.al_id}}?_method=PUT" method="POST">
       <a href="/analysis/edit/{{analysis.al_id}}"><input type="button" value="수정하기" /></a>
-      <input type="hidden" value="{{analysis.al_ns}}" name="al_ns">
       <input type="submit" value="삭제하기" />
       <a href="/analysis/list"><input type="button" value="목록" /></a>
     </form>
+    {% endif %}
+
     <h4>예측데이터 컬럼 생성</h4>
     <form action="/analysis/column/{{analysis.al_id}}" method="post">
       <select name="colType">
@@ -47,23 +75,25 @@
     <h4>예측데이터 컬럼 리스트</h4>
     <table>
       <tr>
+        <td>선택 &nbsp</td>
         <td>데이터타입 &nbsp&nbsp&nbsp&nbsp</td>
         <td>데이터크기 &nbsp&nbsp&nbsp&nbsp</td>
         <td>컬럼명</td>
       </tr>
       {% for colList in column %}
       <tr>
+        <td><input type="checkbox" name="editId" value="{{colList.col_id}},{{colList.column_name}}" onclick="goEdit(this)" /></td>
         <td>{{ colList.data_type }}</td>
         {% if colList.data_size %}
-          <td>{{ colList.data_size }}</td>
+        <td>{{ colList.data_size }}</td>
         {% else %}
-          <td>(null)</td>
+        <td>(null)</td>
         {% endif %}
-        <td>{{ colList.column_name }}</td>
+        <td id="columnName">{{ colList.column_name }}</td>
         <td>
           <form action="/analysis/column/delete/{{colList.col_id}}?_method=DELETE" method="POST">
-            <input type="hidden" value="{{colList.al_id_col}}" name="alNum">
-            <button>X</button>
+            <input type="hidden" value="{{colList.al_id_col}}" name="alNum" />
+            <input type="submit" id="colButton" value="X" />
           </form>
         </td>
       </tr>
