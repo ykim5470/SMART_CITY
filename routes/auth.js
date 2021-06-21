@@ -3,6 +3,7 @@ const axios = require("axios");
 
 // Get
 const output = {
+	// 모델 관리 보드
 	manage_board: async (req, res) => {
 		try {
 			await model_list
@@ -14,17 +15,16 @@ const output = {
 				.then((result) => {
 					const str = JSON.stringify(result);
 					const new_value = JSON.parse(str);
-					// console.log(new_value)
 					return res.render(`model/model_manage_board`, { list_data: new_value });
 				});
 		} catch (err) {
 			return res.status(500).json({
-				error: "Something went wrong",
+				error: "SQL query error",
 			});
 		}
 	},
 
-	// Database select register info
+	// 데이터 선택
 	dataset_select: async (req, res) => {
 		const dataset = await axios.get("http://203.253.128.184:18827/datasets", { headers: { Accept: "application/json" } });
 		const dataset_dict = [];
@@ -34,14 +34,19 @@ const output = {
 		return dataset_dict;
 	},
 
-	manage_status: async (req, res) => {
+	manage_status: (req, res) => {
 		const { status } = req.query;
 		const { md_id } = req.params;
 		return res.render("model/model_status", { current_status: status, md_id: md_id });
 	},
 
+	// 모델 등록 보드
 	model_register_board: async (req, res) => {
-		console.log("모델 등록 get");
+		console.log("----------------------------------------------");
+		// console.log(process.input_add(req).then(res => console.log(res)))
+		const { dataset_id } = req.body
+		console.log(dataset_id)
+		console.log("----------------------------------------------");
 		try {
 			await analysis_list
 				.findAll({
@@ -67,6 +72,7 @@ const output = {
 const process = {
 	// Analysis file upload metadata create
 	file_add: async (req, res) => {
+		console.log(req.file);
 		try {
 			if (req.file != undefined) {
 				const { originalname, mimetype, path, filename } = req.file;
@@ -77,6 +83,7 @@ const process = {
 					path,
 					filename,
 				});
+				return originalname;
 			}
 		} catch (err) {
 			return res.status(500).json({
@@ -84,30 +91,41 @@ const process = {
 			});
 		}
 	},
+
 	// Input table add
 	input_add: async (req, res) => {
 		console.log("인풋");
-		const { ip_value, ip_param, dataset_id } = req.body;
-		const dataset_obj = JSON.parse(dataset_id);
-		const get_input_attr = await axios.get(`http://203.253.128.184:18827/datamodels/${dataset_obj.namespace}/${dataset_obj.type}/1.0`, { headers: { Accept: "application/json" } }).then((res) => {
-			const analysis_models = res.data;
-			const input_attributes = analysis_models.attributes.map((el) => {
-				const attributes_name = el.name;
-				const attributes_value_type = el.valueType;
-				return { attributes_name, attributes_value_type };
+		try {
+			const { ip_value, ip_param, dataset_id } = req.body;
+			const dataset_obj = JSON.parse(dataset_id);
+			const get_input_attr = await axios.get(`http://203.253.128.184:18827/datamodels/${dataset_obj.namespace}/${dataset_obj.type}/1.0`, { headers: { Accept: "application/json" } }).then((res) => {
+				const analysis_models = res.data;
+				const input_attributes = analysis_models.attributes.map((el) => {
+					const attributes_name = el.name;
+					const attributes_value_type = el.valueType;
+					return { attributes_name, attributes_value_type };
+				});
+				return input_attributes;
 			});
-			return input_attributes;
-		});
-		console.log(get_input_attr);
-		res.redirect("/model_register_board");
-		return get_input_attr;
+			// console.log(get_input_attr);
+			res.redirect('/model_register_board')
+			return get_input_attr;
+		} catch (err) {
+			console.log(err);
+		}
 		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님께 여쭤보기
+	},
+
+	ip_mapping: (req, res) => {
+		console.log("인풋 매칭 완료 ");
+		const { user_input_param } = req.body;
+		// console.log(user_input_param)
 	},
 	// Output table add
 	output_add: async (req, res) => {
 		console.log("아웃풋");
 		const { al_name_mo } = req.body;
-		model_list.create({ al_name_mo: al_name_mo })
+		model_list.create({ al_name_mo: al_name_mo });
 		const analysis_output = await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
 			const al_list_str = JSON.stringify(res);
 			const al_list_value = JSON.parse(al_list_str);
@@ -124,20 +142,28 @@ const process = {
 		return analysis_output;
 		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님게 여쭤보기
 	},
+
 	// Redirect to model manage board being registerd
 	register_complete: async (req, res) => {
-		console.log("등록 완료 및 funtion실행");
-		// console.log(req)
-
 		const { al_time } = req.body;
 		await model_list.create({
 			al_time: al_time,
 		});
-	
-		process.file_add(req, res);
-		// process.input_add(req, res);
-		// process.output_add(req, res);
-		return res.redirect("/model_manage_board");
+
+		const file_md_name = process.file_add(req); // upload file info & return that originalname
+
+		await file_md_name.then((resolve) => {
+			const modified_md_name = resolve.split(".")[0]; // file.pb -> file
+
+			model_list.findOne({ where: { al_time: al_time } }).then((res) => {
+				const test_str = JSON.stringify(res);
+				const test_value = JSON.parse(test_str);
+				model_list.update({ md_name: modified_md_name }, { where: { id: test_value.id } });
+			});
+		});
+
+		res.redirect("/model_manage_board");
+		return;
 	},
 
 	register_init: async (req, res) => {
@@ -161,12 +187,12 @@ const process = {
 		}
 	},
 	delete: async (req, res) => {
-		console.log('삭제 클릭 완료')
-		console.log(req.body.delModel)
-		const delModelList = req.body.delModel.split(',')
-		console.log(delModelList)
-		delModelList.map(el => { model_list.destroy({ where: { md_id: el } }) })
-		res.redirect('/model_manage_board')
+		const delModelList = req.body.delModel.split(",");
+		console.log(delModelList);
+		delModelList.map((el) => {
+			model_list.destroy({ where: { md_id: el } });
+		});
+		res.redirect("/model_manage_board");
 	},
 };
 

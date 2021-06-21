@@ -26,7 +26,7 @@ router.post("/analysis/column/:al_id", analysis.process.columnInsert);
 router.post("/model/register/complete", uploadFile.single("atch_origin_file_name"), auth.process.register_complete);
 router.post("/model_manage_board", auth.process.status_update);
 router.post("/model/register", auth.process.register_init);
-router.post('/model/register/input', auth.process.input_add)
+router.post('/model/model_register_board', auth.process.input_add)
 router.post('/model/register/al_list', auth.process.output_add)
 router.post('/model/list/delete', auth.process.delete)
 

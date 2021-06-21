@@ -7,12 +7,10 @@
 		<title>모델 등록</title>
 		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 		<script>
-			$(document).ready(function () {
-				$("#submitBtn").click(function () {
-					$("#myForm").submit(); // Submit the form
-					$("#myForm1").submit(); // Submit the form1
-				});
-			});
+			function ready() {
+				$("#al_time_cont").val($("#al_time").val());
+				$(".myForm").submit(); // Submit the form
+			}
 		</script>
 	</head>
 	<body>
@@ -23,9 +21,7 @@
 			<tbody>
 				<td>
 					초 :
-					<form action="/model/register/complete" method="post" id="myForm1">
-						<input type="text" name="al_time" placeholder="분석 시간" />
-					</form>
+					<input type="text" id="al_time" name="al_time" placeholder="분석 시간" />
 				</td>
 			</tbody>
 		</table>
@@ -36,7 +32,7 @@
 
 			<tbody>
 				<td>
-					<form action="/model/register/input" method="post">
+					<form action="/model_register_board" method="post">
 						<select name="dataset_id" onchange="this.form.submit()">
 							{% for name in dataset_name%}
 							<option value='{"id":"{{name.value.id}}","type":"{{name.value.dataModelType}}","namespace":"{{name.value.dataModelNamespace}}"}'>{{name.key}}</option>
@@ -52,28 +48,7 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td>
-						<input type="text" name="ip_value1" placeholder="input value" />
-					</td>
-					<td>
-						<input type="text" name="ip_param1" placeholder="input parameter" />
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type="text" name="ip_value2" placeholder="input value" />
-					</td>
-					<td>
-						<input type="text" name="ip_param2" placeholder="input parameter" />
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type="text" name="ip_value3" placeholder="input value" />
-					</td>
-					<td>
-						<input type="text" name="ip_param3" placeholder="input parameter" />
-					</td>
+					<!-- 실제 input parameter 자리  -->
 				</tr>
 			</tbody>
 		</table>
@@ -99,8 +74,9 @@
 				분석 모델
 			</thead>
 			<tbody>
-				<form action="/model/register/complete" method="post" id="myForm" enctype="multipart/form-data">
-					<input type="file" accept=".hdf, .pb" name="atch_origin_file_name" />
+				<form action="/model/register/complete" method="post" class="myForm" enctype="multipart/form-data">
+					<input type="hidden" name="al_time" id="al_time_cont" value="" />
+					<input type="file" accept=".h5, .zip" name="atch_origin_file_name" />
 				</form>
 			</tbody>
 		</table>
@@ -120,8 +96,9 @@
 		<table>
 			<thead>
 				내용
+				<input />
 			</thead>
 		</table>
-		<button type="button" id="submitBtn">등록 완료</button>
+		<button type="button" id="submitBtn" onclick="ready()">등록 완료</button>
 	</body>
 </html>
