@@ -95,25 +95,22 @@ const process = {
 	// Input table add
 	input_add: async (req, res) => {
 		console.log("인풋");
-		try {
-			const { ip_value, ip_param, dataset_id } = req.body;
-			const dataset_obj = JSON.parse(dataset_id);
-			const get_input_attr = await axios.get(`http://203.253.128.184:18827/datamodels/${dataset_obj.namespace}/${dataset_obj.type}/1.0`, { headers: { Accept: "application/json" } }).then((res) => {
-				const analysis_models = res.data;
-				const input_attributes = analysis_models.attributes.map((el) => {
-					const attributes_name = el.name;
-					const attributes_value_type = el.valueType;
-					return { attributes_name, attributes_value_type };
-				});
-				return input_attributes;
-			});
-			console.log(get_input_attr);
+			const body = req.body;
+			//const dataset_obj = JSON.parse(dataset_id);
+			// const get_input_attr = await axios.get(`http://203.253.128.184:18827/datamodels/${body.namespace}/${body.type}/1.0`, { headers: { Accept: "application/json" } }).then((res) => {
+			// 	const analysis_models = res.data;
+			// 	const input_attributes = analysis_models.attributes.map((el) => {
+			// 		const attributes_name = el.name;
+			// 		const attributes_value_type = el.valueType;
+			// 		return { attributes_name, attributes_value_type };
+			// 	});
+			// 	return input_attributes;
+			// });
+			// console.log(get_input_attr);
 			// res.redirect('/model_register_board')
 			// console.log(get_input_attr)
-			return get_input_attr;
-		} catch (err) {
-			console.log(err);
-		}
+			//return get_input_attr;
+			return "dddddd"
 		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님께 여쭤보기
 	},
 
