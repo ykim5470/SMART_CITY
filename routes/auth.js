@@ -107,8 +107,9 @@ const process = {
 				});
 				return input_attributes;
 			});
-			// console.log(get_input_attr);
-			res.redirect('/model_register_board')
+			console.log(get_input_attr);
+			// res.redirect('/model_register_board')
+			// console.log(get_input_attr)
 			return get_input_attr;
 		} catch (err) {
 			console.log(err);
