@@ -97,16 +97,18 @@ const process = {
 		console.log("인풋");
 			const body = req.body;
 			//const dataset_obj = JSON.parse(dataset_id);
-			// const get_input_attr = await axios.get(`http://203.253.128.184:18827/datamodels/${body.namespace}/${body.type}/1.0`, { headers: { Accept: "application/json" } }).then((res) => {
-			// 	const analysis_models = res.data;
-			// 	const input_attributes = analysis_models.attributes.map((el) => {
-			// 		const attributes_name = el.name;
-			// 		const attributes_value_type = el.valueType;
-			// 		return { attributes_name, attributes_value_type };
-			// 	});
-			// 	return input_attributes;
-			// });
-			// console.log(get_input_attr);
+			// const type = req.params.type;
+			// const namespace = req.params.namespace;
+			const get_input_attr = await axios.get(`http://203.253.128.184:18827/datamodels/${body.namespace}/${body.type}/1.0`, { headers: { Accept: "application/json" } }).then((res) => {
+				const analysis_models = res.data;
+				const input_attributes = analysis_models.attributes.map((el) => {
+					const attributes_name = el.name;
+					const attributes_value_type = el.valueType;
+					return { attributes_name, attributes_value_type };
+				});
+				return input_attributes;
+			});
+			console.log(get_input_attr);
 			// res.redirect('/model_register_board')
 			// console.log(get_input_attr)
 			//return get_input_attr;

@@ -30,21 +30,48 @@
         // 		alert("error");
         // 	}
         // });
+
+        //방법 2
         fetch("/model_register_board", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({'id' : thisValue[0] , 'type' : thisValue[1] ,'namespace' : thisValue[2] }),
-        }).then((response)=>{
-			if(!response.ok){
-				console.log("안되네")
-			}
-			return response;
-		})
-		console.log('bb')
+        }).then((response) => {
+        	if(!response){
+        		console.log("안됩니까")
+        	}else{
+        		console.log("됩니까")
+        	}
+        });
+
+        // const URL = "/model_register_board/" + thisValue[1] + "/" + thisValue[2];
+        // const A = async () => {
+        //   let data = await fetch(URL)
+        //     .then((response) => {
+        //       response.blob();
+        //     })
+        //     .then((data) => {
+        //       return data;
+        //     })
+        //     .catch((error) => {
+        //       console.log(error);
+        //     });
+		// 	console.log(data);
+        // };
+
+        //방법 3
+        // const URL = "/model_register_board/"+thisValue[1]+"/"+thisValue[2];
+        // const A = async () => {
+        //   const response = await fetch(URL);
+        //   const data = await response.text();
+        //   return data;
+        // };
+        // (async () => {
+        //   console.log(await A());
+        // })();
       }
-	  
     </script>
   </head>
   <body>
