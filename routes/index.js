@@ -3,14 +3,15 @@ const router = express.Router();
 const auth = require("./auth");
 const analysis = require("./analysis");
 const uploadFile = require("../helpers/upload_dir");
+const paginate = require('express-paginate')
 
 //router.get
 router.get("/", function (req, res, next) {
 	res.render("index");
 });
 router.get("/analysis/plus", analysis.output.plus);
-router.get("/analysis/list", analysis.output.show);
-router.get("/analysis/list/:page", analysis.output.show);
+router.get("/analysis/list",paginate.middleware(10, 50), analysis.output.show);
+router.get("/analysis/list/:page",paginate.middleware(10, 50), analysis.output.show);
 router.get("/analysis/admin/deleted", analysis.output.viewDelList);
 router.get("/analysis/view/:al_id", analysis.output.view);
 router.get("/analysis/admin/delview/:al_id", analysis.output.delView);
