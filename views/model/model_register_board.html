@@ -1,166 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>모델 등록</title>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script>
-      function ready() {
-        $("#al_time_cont").val($("#al_time").val());
-        $(".myForm").submit(); // Submit the form
-      }
-      function goValue() {
-        var thisValue = document.getElementsByName("dataset_id")[0].value.split(",");
-        console.log(thisValue);
-        // $.ajax({
-        // 	url:'/model_register_board',
-        // 	dataType:'text',
-        // 	type:'POST',
-        // 	data: {'id' : thisValue[0] , 'type' : thisValue[1] ,'namespace' : thisValue[2] },
-        // 	success : function(data){
-        // 		if(!data){
-        // 			console.log("통신실패")
-        // 		}else{
-        // 			console.log("통신성공")
-        // 		}
-        // 	},
-        // 	error:function(error){
-        // 		alert("error");
-        // 	}
-        // });
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>모델 등록</title>
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+		<script>
+			function ready() {
+				$("#al_time_cont").val($("#al_time").val());
+				$(".myForm").submit(); // Submit the form
+			}
+			function goValue() {
+				var thisValue = document.getElementsByName("dataset_id")[0].value.split(",");
+				// console.log(thisValue);
+				$("#input_add").submit();
+			}
+		</script>
+	</head>
+	<body>
+		<table>
+			<thead>
+				분석시간
+			</thead>
+			<tbody>
+				<td>
+					초 :
+					<input type="text" id="al_time" name="al_time" placeholder="분석 시간" />
+				</td>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				데이터 선택
+			</thead>
 
-        //방법 2
-        fetch("/model_register_board", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({'id' : thisValue[0] , 'type' : thisValue[1] ,'namespace' : thisValue[2] }),
-        }).then((response) => {
-        	if(!response){
-        		console.log("안됩니까")
-        	}else{
-        		console.log("됩니까")
-        	}
-        });
+			<tbody>
+				<td>
+					<form action="/model_register_board" id="input_add" method="get">
+						<select name="dataset_id" onchange="goValue()">
+							{% for name in dataset_name%}
+							<option value="{{name.value.id}},{{name.value.dataModelType}},{{name.value.dataModelNamespace}},{{name.value.dataModelVersion}}">{{name.key}}</option>
+							{% endfor %}
+						</select>
+					</form>
+				</td>
+			</tbody>
+		</table>
 
-        // const URL = "/model_register_board/" + thisValue[1] + "/" + thisValue[2];
-        // const A = async () => {
-        //   let data = await fetch(URL)
-        //     .then((response) => {
-        //       response.blob();
-        //     })
-        //     .then((data) => {
-        //       return data;
-        //     })
-        //     .catch((error) => {
-        //       console.log(error);
-        //     });
-		// 	console.log(data);
-        // };
+		<table>
+			<thead>
+				input 파라미터 매칭
+			</thead>
+			<tbody>
+				<th>값 타입</th>
+				<th>속성</th>
+				<th>파라미터</th>
 
-        //방법 3
-        // const URL = "/model_register_board/"+thisValue[1]+"/"+thisValue[2];
-        // const A = async () => {
-        //   const response = await fetch(URL);
-        //   const data = await response.text();
-        //   return data;
-        // };
-        // (async () => {
-        //   console.log(await A());
-        // })();
-      }
-    </script>
-  </head>
-  <body>
-    <table>
-      <thead>
-        분석시간
-      </thead>
-      <tbody>
-        <td>
-          초 :
-          <input type="text" id="al_time" name="al_time" placeholder="분석 시간" />
-        </td>
-      </tbody>
-    </table>
-    <table>
-      <thead>
-        데이터 선택
-      </thead>
-
-      <tbody>
-        <td>
-          <form action="/model_register_board" method="post">
-            <select name="dataset_id" onchange="goValue()">
-              {% for name in dataset_name%}
-              <option value="{{name.value.id}},{{name.value.dataModelType}},{{name.value.dataModelNamespace}}">{{name.key}}</option>
-              <!--<option value='{"id":"{{name.value.id}}","type":"{{name.value.dataModelType}}","namespace":"{{name.value.dataModelNamespace}}"}'>{{name.key}}</option>-->
-              {% endfor %}
-            </select>
-          </form>
-        </td>
-      </tbody>
-    </table>
-    <table>
-      <thead>
-        input 파라미터 매칭
-      </thead>
-      <tbody>
-        <tr>
-          <!-- 실제 input parameter 자리  -->
-        </tr>
-      </tbody>
-    </table>
-    <table>
-      <thead>
-        분석결과 테이블
-      </thead>
-      <tbody>
-        <td>
-          <form action="/model/register/al_list" method="post">
-            <label for="al_name_mo">/분석 테이블/</label>
-            <select name="al_name_mo" onchange="this.form.submit()">
-              {% for el in al_name_mo %}
-              <option value="{{el.al_name}}">{{el.al_name}}</option>
-              {% endfor %}
-            </select>
-          </form>
-        </td>
-      </tbody>
-    </table>
-    <table>
-      <thead>
-        분석 모델
-      </thead>
-      <tbody>
-        <form action="/model/register/complete" method="post" class="myForm" enctype="multipart/form-data">
-          <input type="hidden" name="al_time" id="al_time_cont" value="" />
-          <input type="file" accept=".h5, .zip" name="atch_origin_file_name" />
-        </form>
-      </tbody>
-    </table>
-    <table>
-      <thead>
-        output 파라미터 매칭
-      </thead>
-      <tbody>
-        <tr>
-          <td><input type="text" name="op_value1" placeholder="output value" /></td>
-        </tr>
-        <tr>
-          <td><input type="text" name="op_param1" placeholder="output param" /></td>
-        </tr>
-      </tbody>
-    </table>
-    <table>
-      <thead>
-        내용
-        <input />
-      </thead>
-    </table>
-    <button type="button" id="submitBtn" onclick="ready()">등록 완료</button>
-  </body>
+				{% for items in input_items %}
+				<tr>
+					<td><input name="ip_attr_value_type" value="{{items.attributes_value_type}}" disabled /></td>
+					<td><input name="ip_attr_name" value="{{items.attributes_name}}" disabled /></td>
+					<td><input name="user_input_param" /></td>
+				</tr>
+				<tr>
+					{%endfor%}
+				</tr>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				분석결과 테이블
+			</thead>
+			<tbody>
+				<td>
+					<form action="/model/register/al_list" method="post">
+						<label for="al_name_mo">/분석 테이블/</label>
+						<select name="al_name_mo" onchange="this.form.submit()">
+							{% for el in al_name_mo %}
+							<option value="{{el.al_name}}">{{el.al_name}}</option>
+							{% endfor %}
+						</select>
+					</form>
+				</td>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				분석 모델
+			</thead>
+			<tbody>
+				<form action="/model/register/complete" method="post" class="myForm" enctype="multipart/form-data">
+					<input type="hidden" name="al_time" id="al_time_cont" value="" />
+					<input type="file" accept=".h5, .zip" name="atch_origin_file_name" />
+				</form>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				output 파라미터 매칭
+			</thead>
+			<tbody>
+				<tr>
+					<td><input type="text" name="op_value1" placeholder="output value" /></td>
+				</tr>
+				<tr>
+					<td><input type="text" name="op_param1" placeholder="output param" /></td>
+				</tr>
+			</tbody>
+		</table>
+		<table>
+			<thead>
+				내용
+				<input />
+			</thead>
+		</table>
+		<button type="button" id="submitBtn" onclick="ready()">등록 완료</button>
+	</body>
 </html>

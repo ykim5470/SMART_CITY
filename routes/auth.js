@@ -29,7 +29,7 @@ const output = {
 		const dataset = await axios.get("http://203.253.128.184:18827/datasets", { headers: { Accept: "application/json" } });
 		const dataset_dict = [];
 		dataset.data.filter((el) => {
-			return dataset_dict.push({ key: el.name, value: { id: el.id, dataModelType: el.dataModelType, dataModelNamespace: el.dataModelNamespace } });
+			return dataset_dict.push({ key: el.name, value: { id: el.id, dataModelType: el.dataModelType, dataModelNamespace: el.dataModelNamespace, dataModelVersion: el.dataModelVersion } });
 		});
 		return dataset_dict;
 	},
@@ -42,12 +42,23 @@ const output = {
 
 	// 모델 등록 보드
 	model_register_board: async (req, res) => {
+		const {dataset_id} = req.query
 		console.log("----------------------------------------------");
-		// console.log(process.input_add(req).then(res => console.log(res)))
-		const { dataset_id } = req.body
-		console.log(dataset_id)
-		console.log("----------------------------------------------");
-		try {
+		if (dataset_id != undefined) {
+			const { dataset_id } = req.query;
+			const input_queries = dataset_id.split(",");
+			const input_attr = ["id", "type", "name", "version"];
+			const attr_obj = Object.fromEntries(input_attr.map((key, index) => [key, input_queries[index]]));
+			const input_items = await axios.get(`http://203.253.128.184:18827/datamodels/${attr_obj.name}/${attr_obj.type}/${attr_obj.version}`, { headers: { Accept: "application/json" } }).then((res) => {
+				const analysis_models = res.data;
+				const input_attributes = analysis_models.attributes.map((el) => {
+					const attributes_name = el.name;
+					const attributes_value_type = el.valueType;
+					return { attributes_name, attributes_value_type };
+				});
+				return input_attributes;
+			});
+			console.log(input_items)
 			await analysis_list
 				.findAll({
 					attributes: ["al_name"],
@@ -57,15 +68,31 @@ const output = {
 					const newValue = JSON.parse(str);
 					const dataset_name = output.dataset_select();
 					dataset_name.then((result) => {
-						res.render(`model/model_register_board`, { al_name_mo: newValue, dataset_name: result });
+						res.render(`model/model_register_board`, { al_name_mo: newValue, dataset_name: result, input_items: input_items });
 					});
 				});
-		} catch (err) {
-			return res.status(500).json({
-				error: "Something went wrong",
-			});
+		} else {
+			console.log("----------------------------------------------");
+			try {
+				await analysis_list
+					.findAll({
+						attributes: ["al_name"],
+					})
+					.then((result) => {
+						const str = JSON.stringify(result);
+						const newValue = JSON.parse(str);
+						const dataset_name = output.dataset_select();
+						dataset_name.then((result) => {
+							res.render(`model/model_register_board`, { al_name_mo: newValue, dataset_name: result, input_items: [] });
+						});
+					});
+			} catch (err) {
+				return res.status(500).json({
+					error: "Something went wrong",
+				});
+			}
 		}
-	},
+	}
 };
 
 // Post
@@ -95,24 +122,25 @@ const process = {
 	// Input table add
 	input_add: async (req, res) => {
 		console.log("인풋");
-			const body = req.body;
-			//const dataset_obj = JSON.parse(dataset_id);
-			// const type = req.params.type;
-			// const namespace = req.params.namespace;
-			const get_input_attr = await axios.get(`http://203.253.128.184:18827/datamodels/${body.namespace}/${body.type}/1.0`, { headers: { Accept: "application/json" } }).then((res) => {
-				const analysis_models = res.data;
-				const input_attributes = analysis_models.attributes.map((el) => {
-					const attributes_name = el.name;
-					const attributes_value_type = el.valueType;
-					return { attributes_name, attributes_value_type };
-				});
-				return input_attributes;
+		const body = req.body;
+
+		//const dataset_obj = JSON.parse(dataset_id);
+		// const type = req.params.type;
+		// const namespace = req.params.namespace;
+		const get_input_attr = await axios.get(`http://203.253.128.184:18827/datamodels/${body.namespace}/${body.type}/1.0`, { headers: { Accept: "application/json" } }).then((res) => {
+			const analysis_models = res.data;
+			const input_attributes = analysis_models.attributes.map((el) => {
+				const attributes_name = el.name;
+				const attributes_value_type = el.valueType;
+				return { attributes_name, attributes_value_type };
 			});
-			console.log(get_input_attr);
-			// res.redirect('/model_register_board')
-			// console.log(get_input_attr)
-			//return get_input_attr;
-			return "dddddd"
+			return input_attributes;
+		});
+		console.log(get_input_attr);
+		// res.redirect('/model_register_board')
+		// console.log(get_input_attr)
+		//return get_input_attr;
+		return "dddddd";
 		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님께 여쭤보기
 	},
 
