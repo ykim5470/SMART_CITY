@@ -19,6 +19,7 @@ router.get("/analysis/edit/:al_id", analysis.output.edit);
 router.get("/model_manage_board", auth.output.manage_board);
 router.get("/model_manage_board/:md_id", auth.output.manage_status);
 router.get("/model_register_board", auth.output.model_register_board);
+router.get('/test', auth.output.test)
 
 
 //router.post

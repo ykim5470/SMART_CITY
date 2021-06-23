@@ -13,9 +13,17 @@
 			}
 			function goValue() {
 				var thisValue = document.getElementsByName("dataset_id")[0].value.split(",");
-				// console.log(thisValue);
+				console.log(thisValue);
 				$("#input_add").submit();
 			}
+
+			$("#select").change(function () {
+				var selectedData = $(this).children("option:selected");
+				console.log(selectedData);
+				selectedData.setAttribute("selected");
+
+				// alert('you have selected the data - ' + selectedData) // waterDataset004,WaterFlowMeter,kr.waterdna,1.0
+			});
 		</script>
 	</head>
 	<body>
@@ -38,7 +46,7 @@
 			<tbody>
 				<td>
 					<form action="/model_register_board" id="input_add" method="get">
-						<select name="dataset_id" onchange="goValue()">
+						<select name="dataset_id" id="select" onchange="goValue()">
 							{% for name in dataset_name%}
 							<option value="{{name.value.id}},{{name.value.dataModelType}},{{name.value.dataModelNamespace}},{{name.value.dataModelVersion}}">{{name.key}}</option>
 							{% endfor %}

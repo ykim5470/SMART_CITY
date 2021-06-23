@@ -3,6 +3,12 @@ const axios = require("axios");
 
 // Get
 const output = {
+
+	// socket test
+	test: (req, res) => {
+		res.render('model/test')
+	}
+	,
 	// 모델 관리 보드
 	manage_board: async (req, res) => {
 		try {
@@ -45,6 +51,7 @@ const output = {
 		const {dataset_id} = req.query
 		console.log("----------------------------------------------");
 		if (dataset_id != undefined) {
+			console.log('데이터 선택 후')
 			const { dataset_id } = req.query;
 			const input_queries = dataset_id.split(",");
 			const input_attr = ["id", "type", "name", "version"];
@@ -58,6 +65,7 @@ const output = {
 				});
 				return input_attributes;
 			});
+			console.log(attr_obj.id)
 			console.log(input_items)
 			await analysis_list
 				.findAll({
@@ -68,11 +76,20 @@ const output = {
 					const newValue = JSON.parse(str);
 					const dataset_name = output.dataset_select();
 					dataset_name.then((result) => {
-						res.render(`model/model_register_board`, { al_name_mo: newValue, dataset_name: result, input_items: input_items });
+
+						const selected_key = result.filter(el => {
+							if (el.value.id === attr_obj.id) {
+								console.log(typeof (el.key))
+								console.log(el.key)
+								return el.key
+							}
+						})
+						res.render(`model/model_register_board`, { al_name_mo: newValue, dataset_name: result, input_items: input_items, selected_key: selected_key[0].key});
 					});
 				});
 		} else {
 			console.log("----------------------------------------------");
+			console.log('데이터 선택 전')
 			try {
 				await analysis_list
 					.findAll({
