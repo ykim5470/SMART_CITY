@@ -19,13 +19,23 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       data_type: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       data_size: {
         type: Sequelize.STRING
       },
       column_name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      allowNull: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      attributeType: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

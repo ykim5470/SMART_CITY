@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>분석테이블 등록</title>
+  </head>
+  <script>
+    window.onload = function(){
+        if("{{blank}}"!=""){
+            window.alert("잘못된 입력값입니다 확인하시고 다시 입력해주세요");
+        }
+    }
+    function goSubmit() {
+      var frm = document.register;
+      if (frm.tableName.value == ""||frm.nameSpace.value == ""||frm.description.value==""||frm.context.value=="") {
+        window.alert("빈칸을 모두 입력해주세요");
+        return "#";
+      } else {
+        const ver = frm.first.value+'.'+frm.middle.value+'.'+frm.last.value;
+        frm.version.value=ver;
+        frm.submit();
+      }
+    }
+  </script>
+  <body>
+    <h1>분석테이블 등록</h1>
+    <form action="/analysis/insert" method="POST" name="register">
+      <table>
+        <tr>
+          <td><input type="text" name="tableName" placeholder="테이블이름을 입력하세요." /></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="nameSpace" placeholder="nameSpace를 입력하세요." /></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="description" placeholder="테이블 설명을 입력하세요." /></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="context" placeholder="context를 입력하세요" /></td>
+        </tr>
+        <tr>
+          <td>
+            <p>버전선택</p>
+            <select name="first">
+              <option value="0">0</option>
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
+            <span>.</span>
+            <select name="middle">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
+            <span>.</span>
+            <select name="last">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
+            <input type="hidden" name="version" id="version" />
+          </td>
+        </tr>
+      </table></br>
+      <input type="button" value="등록하기" onclick="goSubmit()" />
+      <a href="/analysis/list"><input type="button" value="목록보기" /></a>
+    </form>
+  </body>
+</html>

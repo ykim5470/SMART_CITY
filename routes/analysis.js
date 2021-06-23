@@ -4,6 +4,32 @@ const router = express.Router();
 const axios = require("axios");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
+const moment = require("moment");
+
+//view 관련
+const paging = {
+  makeArray: function (current, totalPg, path) {
+    let start = current % 10 == 0 ? Math.floor((current - 1) / 10) * 10 + 1 : Math.floor(current / 10) * 10 + 1; // 페이징 시작 번호
+    let end = current % 10 == 0 ? Math.ceil((current - 1) / 10) * 10 : Math.ceil(current / 10) * 10; // 페이징 끝 번호
+    if (end > totalPg) {
+      end = totalPg;
+    }
+    let pageArray = []; // 페이징 번호 담는 배열
+    let newPath = "";
+    for (var i = start; i <= end; i++) {
+      if(path.indexOf('?page=')>-1){
+        newPath = path.replace("page=" + current, "page=" + i); // 현재경로를 해당 페이징 넘버 경로로 바꾸기
+      }else{
+        newPath = `list?page=${i}&limit=10`;
+      }
+      pageArray.push({
+        number: i,
+        url: newPath,
+      });
+    }
+    return pageArray;
+  },
+};
 
 // Get
 const output = {
@@ -14,6 +40,7 @@ const output = {
   //테이블 목록
   show: async (req, res) => {
     const currentPage = req.query.page; //현재 페이지
+    const temp = req.url; // 현재 경로
     let offset = 0;
     if (currentPage > 1) {
       offset = 10 * (currentPage - 1);
@@ -21,25 +48,13 @@ const output = {
     await analysis_list.findAndCountAll({ limit: req.query.limit, offset: offset, where: { al_delYn: "N" }, order: [["createdAt", "DESC"]] }).then((results) => {
       const itemCount = results.count; //총 게시글 갯수
       const pageCount = Math.ceil(itemCount / req.query.limit); //페이지 갯수
-      var start = currentPage % 10 == 0? Math.floor((currentPage-1)/10)*10 + 1 : Math.floor((currentPage) / 10) * 10 + 1; // 페이징 시작 번호
-      var end = currentPage % 10 == 0? Math.ceil((currentPage-1)/10)*10 : Math.ceil((currentPage)/10)*10; // 페이징 끝 번호
-      if (end>pageCount) {end = pageCount;}
-      var pageArray = []; // 페이징 번호 담는 배열 
-      var temp = req.url; // 현재 경로
-      var path = ""; 
-      for (var i = start; i <= end; i++) {
-        path = temp.replace('page=' + currentPage, 'page=' + i); // 현재경로를 해당 페이징 넘버 경로로 바꾸기
-        pageArray.push({
-          number: i,
-          url: path
-        });
-      }
+      const pageArray = paging.makeArray(currentPage, pageCount, temp);
       const hasMore = currentPage < pageCount ? `list?page=${currentPage + 1}&limit=10` : `list?page=${currentPage}&limit=10`;
       const hasprev = currentPage > 1 ? `list?page=${currentPage - 1}&limit=10` : `list?page=${currentPage}&limit=10`;
-      res.render("analysis/al_list", { anaList: results.rows, pageCount, itemCount, pages: pageArray, nextUrl: hasMore, prevUrl: hasprev });
+      analysis_list.prototype.dateFormat = (date) => moment(date).format("YYYY.MMM.DD - hh:mm A");
+      res.render("analysis/al_list", { anaList: results.rows, pages: pageArray, nextUrl: hasMore, prevUrl: hasprev });
     });
   },
-
   viewDelList: function (req, res, next) {
     analysis_list.findAll({ where: { al_delYn: "Y" } }).then((result) => {
       res.render("analysis/al_list", { anaList: result, admin: "admin" });

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const auth = require("./auth");
 const analysis = require("./analysis");
+const newAnaly = require("./newAnaly");
 const uploadFile = require("../helpers/upload_dir");
 const paginate = require('express-paginate')
 
@@ -19,8 +20,7 @@ router.get("/analysis/edit/:al_id", analysis.output.edit);
 router.get("/model_manage_board", auth.output.manage_board);
 router.get("/model_manage_board/:md_id", auth.output.manage_status);
 router.get("/model_register_board", auth.output.model_register_board);
-router.get('/test', auth.output.test)
-
+router.get('/test', auth.output.test);
 
 //router.post
 router.post("/analysis/insert", analysis.process.insert);
