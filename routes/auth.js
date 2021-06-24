@@ -3,12 +3,10 @@ const axios = require("axios");
 
 // Get
 const output = {
-
 	// socket test
 	test: (req, res) => {
-		res.render('model/test')
-	}
-	,
+		res.render("model/test");
+	},
 	// 모델 관리 보드
 	manage_board: async (req, res) => {
 		try {
@@ -48,25 +46,9 @@ const output = {
 
 	// 모델 등록 보드
 	model_register_board: async (req, res) => {
-		const {dataset_id} = req.query
 		console.log("----------------------------------------------");
-		if (dataset_id != undefined) {
-			console.log('데이터 선택 후')
-			const { dataset_id } = req.query;
-			const input_queries = dataset_id.split(",");
-			const input_attr = ["id", "type", "name", "version"];
-			const attr_obj = Object.fromEntries(input_attr.map((key, index) => [key, input_queries[index]]));
-			const input_items = await axios.get(`http://203.253.128.184:18827/datamodels/${attr_obj.name}/${attr_obj.type}/${attr_obj.version}`, { headers: { Accept: "application/json" } }).then((res) => {
-				const analysis_models = res.data;
-				const input_attributes = analysis_models.attributes.map((el) => {
-					const attributes_name = el.name;
-					const attributes_value_type = el.valueType;
-					return { attributes_name, attributes_value_type };
-				});
-				return input_attributes;
-			});
-			console.log(attr_obj.id)
-			console.log(input_items)
+		console.log("데이터 선택 전");
+		try {
 			await analysis_list
 				.findAll({
 					attributes: ["al_name"],
@@ -76,47 +58,22 @@ const output = {
 					const newValue = JSON.parse(str);
 					const dataset_name = output.dataset_select();
 					dataset_name.then((result) => {
-
-						const selected_key = result.filter(el => {
-							if (el.value.id === attr_obj.id) {
-								console.log(typeof (el.key))
-								console.log(el.key)
-								return el.key
-							}
-						})
-						res.render(`model/model_register_board`, { al_name_mo: newValue, dataset_name: result, input_items: input_items, selected_key: selected_key[0].key});
+						res.render(`model/model_register_board`, { al_name_mo: newValue, dataset_name: result, input_items: [] });
 					});
 				});
-		} else {
-			console.log("----------------------------------------------");
-			console.log('데이터 선택 전')
-			try {
-				await analysis_list
-					.findAll({
-						attributes: ["al_name"],
-					})
-					.then((result) => {
-						const str = JSON.stringify(result);
-						const newValue = JSON.parse(str);
-						const dataset_name = output.dataset_select();
-						dataset_name.then((result) => {
-							res.render(`model/model_register_board`, { al_name_mo: newValue, dataset_name: result, input_items: [] });
-						});
-					});
-			} catch (err) {
-				return res.status(500).json({
-					error: "Something went wrong",
-				});
-			}
+		} catch (err) {
+			return res.status(500).json({
+				error: "Something went wrong",
+			});
 		}
-	}
+	},
 };
 
 // Post
 const process = {
 	// Analysis file upload metadata create
 	file_add: async (req, res) => {
-		console.log(req.file);
+		// console.log(req.file);
 		try {
 			if (req.file != undefined) {
 				const { originalname, mimetype, path, filename } = req.file;
