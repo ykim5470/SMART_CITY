@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>분석테이블 등록</title>
+  </head>
+  <script>
+    window.onload = function(){
+        if("{{blank}}"!=""){
+            window.alert("잘못된 입력값입니다 확인하시고 다시 입력해주세요");
+        }
+    }
+    var oTbl;
+    //Row 추가
+    function insRow() {
+      oTbl = document.getElementById("addTable");
+      var oRow = oTbl.insertRow();
+      oRow.onmouseover = function () {
+        oTbl.clickedRowIndex = this.rowIndex;
+      }; //clickedRowIndex - 클릭한 Row의 위치를 확인;
+      var cell1 = oRow.insertCell();
+      var cell2 = oRow.insertCell();
+      var cell3 = oRow.insertCell();
+      var cell4 = oRow.insertCell();
+      var cell5 = oRow.insertCell();
+      //삽입될 Form Tag
+      var frmTag1 =
+        "<select name='colType'>" +
+        "<option value='STRING'>STRING</option><option value='TEXT'>TEXT</option>" +
+        "<option value='INTEGER'>INTEGER</option><option value='CHAR'>CHAR</option>" +
+        "<option value='FLOAT'>FLOAT</option><option value='BOOLEAN'>BOOLEAN</option>" +
+        "<option value='DATE'>DATE</option></select>";
+      var frmTag2 = "<input type='text' name='dataSize' placeholder='데이터 사이즈를 입력해주세요' />";
+      var frmTag3 = "<input type='text' name='colName' placeholder=' 컬럼이름을 입력하세요.' />";
+      var frmTag4 =
+        "<select name='attribute'><option value='Property'>Property</option><option value='GeoProperty'>GeoProperty</option>" + "<option value='RelationShip'>RelationShip</option></select>";
+      var frmTag5 = "<input type='checkbox' name='nullCheck' /><input type='hidden' name='allowNull' value='false'/>";
+      frmTag5 += "&nbsp&nbsp<input type=button value='삭제' onClick='removeRow()' style='cursor:hand'>";
+      cell1.innerHTML = frmTag1;
+      cell2.innerHTML = frmTag2;
+      cell3.innerHTML = frmTag3;
+      cell4.innerHTML = frmTag4;
+      cell5.innerHTML = frmTag5;
+    }
+    //Row 삭제
+    function removeRow() {
+      oTbl.deleteRow(oTbl.clickedRowIndex);
+    }
+    function goSubmit() {
+      var frm = document.register;
+     
+        const ver = frm.first.value+'.'+frm.middle.value+'.'+frm.last.value;
+        frm.version.value=ver;
+        if(frm.nullCheck){
+          frm.allowNull.value="true";
+        }
+        console.log(document.getElementsByName("colName").length);
+        // console.log(document.getElementsByName("colName")[1].value);
+        // console.log(document.getElementsByName("colName")[2].value);
+        // console.log(document.getElementsByName("colName")[4].value);
+        // console.log(document.getElementsByName("colName")[5].value);
+        //frm.submit();
+      
+    }
+  </script>
+  <body>
+    <h1>분석테이블 등록</h1>
+    <form action="/new/insert" method="POST" name="register">
+      <table>
+        <tr>
+          <td><input type="text" name="tableName" placeholder="테이블이름을 입력하세요." /></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="nameSpace" placeholder="nameSpace를 입력하세요." /></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="description" placeholder="테이블 설명을 입력하세요." /></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="context" placeholder="context를 입력하세요" /></td>
+        </tr>
+        <tr>
+          <td>
+            <p>버전선택</p>
+            <select name="first">
+              <option value="0">0</option>
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
+            <span>.</span>
+            <select name="middle">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
+            <span>.</span>
+            <select name="last">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
+            <input type="hidden" name="version" id="version" />
+          </td>
+        </tr>
+      </table>
+      <h4>분석테이블 컬럼 등록</h4>
+      <table>
+        <tr>
+          <td>
+            <input name="addButton" type="button" style="cursor: hand" onClick="insRow()" value="추가" />
+            필요한 만큼 추가버튼을 클릭하세요.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table id="addTable">
+              <tr>
+                <th>데이터타입</th>
+                <th>데이터사이즈</th>
+                <th>컬럼명</th>
+                <th>Attribute타입</th>
+                <th>Null 허용여부</th>
+              </tr>
+              <tr>
+                <td>
+                  <select name="colType">
+                    <option value="STRING">STRING</option>
+                    <option value="TEXT">TEXT</option>
+                    <option value="INTEGER">INTEGER</option>
+                    <option value="CHAR">CHAR</option>
+                    <option value="FLOAT">FLOAT</option>
+                    <option value="BOOLEAN">BOOLEAN</option>
+                    <option value="DATE">DATE</option>
+                  </select>
+                </td>
+                <td><input type="text" name="dataSize" placeholder="데이터 사이즈를 입력해주세요" /></td>
+                <td><input type="text" name="colName" placeholder=" 컬럼이름을 입력하세요." /></td>
+                <td>
+                  <select name="attribute">
+                    <option value="Property">Property</option>
+                    <option value="GeoProperty">GeoProperty</option>
+                    <option value="RelationShip">RelationShip</option>
+                  </select>
+                </td>
+                <td><input type="checkbox" name="nullCheck" /><input type="hidden" name="allowNull" value="false"/></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <br /><input type="button" value="등록하기" onclick="goSubmit()" />
+      <a href="/analysis/list"><input type="button" value="목록보기" /></a>
+    </form>
+  </body>
+</html>

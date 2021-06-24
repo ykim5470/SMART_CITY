@@ -7,9 +7,6 @@ const uploadFile = require("../helpers/upload_dir");
 const paginate = require('express-paginate')
 
 //router.get
-router.get("/", function (req, res, next) {
-	res.render("index");
-});
 router.get("/analysis/plus", analysis.output.plus);
 router.get("/analysis/list",paginate.middleware(10, 50), analysis.output.show);
 router.get("/analysis/list/:page",paginate.middleware(10, 50), analysis.output.show);
@@ -17,14 +14,21 @@ router.get("/analysis/admin/deleted", analysis.output.viewDelList);
 router.get("/analysis/view/:al_id", analysis.output.view);
 router.get("/analysis/admin/delview/:al_id", analysis.output.delView);
 router.get("/analysis/edit/:al_id", analysis.output.edit);
+
+router.get("/new/insert", newAnaly.output.insert);
+
 router.get("/model_manage_board", auth.output.manage_board);
 router.get("/model_manage_board/:md_id", auth.output.manage_status);
 router.get("/model_register_board", auth.output.model_register_board);
 router.get('/test', auth.output.test);
 
+
 //router.post
 router.post("/analysis/insert", analysis.process.insert);
 router.post("/analysis/column/:al_id", analysis.process.columnInsert);
+
+router.post("/new/insert", newAnaly.process.insert);
+
 router.post("/model/register/complete", uploadFile.single("atch_origin_file_name"), auth.process.register_complete);
 router.post("/model_manage_board", auth.process.status_update);
 router.post("/model/register", auth.process.register_init);
