@@ -1,8 +1,15 @@
-// client socket instance create
+// Client socket instance create
 const socket = io();
+
 /* 
     DOM
-    - 분석 시간 
+    - 분석 시간 input
+	- 데이터 선택 input
+	- 분석 모델 선택 input
+	- 인풋 파라미터 유저 input
+	- 파일 선택 input
+	- 아웃풋 파라미터 
+	- 등록 완료
  */
 const al_time_input = document.querySelector("#al_time");
 const data_select_input = document.querySelector("#data_select");
@@ -11,6 +18,10 @@ const file_select_input = document.querySelector("#file_select");
 const input_params_insert = document.querySelector(".input_params_insert");
 const output_params_insert = document.querySelector(".output_params_insert");
 const register_complete = document.querySelector("#submitBtn");
+
+const user_input_value = [];
+let isTrue = false;
+let isInput = [];
 
 /* emit event */
 // 분석 시간 입력 값 전송
@@ -46,26 +57,13 @@ analysis_select_input.addEventListener("change", (e) => {
 	});
 });
 
-// 파일 선택
-file_select_input.addEventListener("change", (e) => {
-	e.preventDefault();
-	if (file_select_input.value == undefined) {
-		return;
-	}
-	console.log(file_select_input.value);
-
-	socket.emit("파일 메타 정보", {
-		file_meta_info: file_select_input.value,
-	});
-});
-
 console.log("처음 숨겨진 친구" + input_params_insert.childNodes);
 console.log(input_params_insert.childNodes);
 
 /* Event listen */
 // input params GET & add to page
 socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
-	const data_model = attr; // JSON res
+	const data_model = attr;
 	console.log(data_model);
 	console.log("API 반환 데이터 : " + data_model);
 
@@ -73,30 +71,30 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 		return `
         <tr>
             <td><input name="ip_attr_value_type" value="${items.valueType}" disabled /></td>
-            <td><input name="ip_attr_name" value="${items.name}" disabled /></td>
+            <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" disabled /></td>
             <td><input class="user_input_param" name="user_input_param${index}"/></td>
         </tr>
         `;
 	});
 	input_params_insert.innerHTML = input_box.join("");
 
+	// 데이터 선택 후 유저 입력 여부 확인 및 테이블 데이터 INSERT
 	const user_input_param = document.getElementsByClassName("user_input_param");
+	const ip_attr_name = document.getElementsByClassName('ip_attr_name')
 	const input_arr = Array.from(user_input_param);
+	const input_name_arr = Array.from(ip_attr_name);
 
-	const user_input_value = [];
+	console.log(input_arr + input_name_arr)
+	console.log(input_arr)
+	console.log(input_name_arr)
 
-	input_arr.map((el) => {
+	input_arr.map((el,index) => {
 		el.addEventListener("change", (e) => {
-			console.log(e.target.value);
-            return user_input_value.push({ key: e.target.name, value: e.target.value });
+			console.log(e.target.value)
+			user_input_value.push({ key: index, value: e.target.value });
+			socket.emit("입력 데이터 값", { user_input_value: user_input_value });
 		});
-    });
-    console.log(user_input_value.length)
-    
-    let isTrue = (user_input_value.length === 0) ? false :true
-    console.log(isTrue)
-    test1(isTrue)
-
+	});
 });
 
 // output params GET & add to page
@@ -114,19 +112,41 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
         `;
 	});
 	output_params_insert.innerHTML = output_box.join("");
+	
+	const user_output_param = document.getElementsByClassName('user_output_param')
+	// 해당 output_value를 어떻게 할 것인가? 
 });
 
-// 등록 완료
-const test1 = (isTrue) => {
-    register_complete.addEventListener("click", (e) => {
-        e.preventDefault();
-        console.log(analysis_select_input.value) // ""
-        console.log(isTrue) // undefined
-        console.log(file_select_input.value) // ""
-        // 분석 시간 숫자인지 아닌지, 데이터 선택이 되었는지 아닌지, 인풋이 1개 이상 있는 지 없는지, 분석 테이블이 선택 되었는지 아닌지, 파일이 선택 되었는지 아닌지 
-        if ((!isNaN(al_time_input.value) && al_time_input.value !=='') || analysis_select_input.value === "" || isTrue || file_select_input.value === "") {
-			alert ('필수 값 입력 필요');
-        }
-        else{alert( '등록 준비 완료')}
+socket.on("입력 데이터 값 반환", (data) => {
+	console.log(data)
+	isInput = [...data];
+	console.log(isInput);
+	if (isInput === []) {
+		isTrue = false;
+	} else {
+		isTrue = true;
+		console.log("유저 입력 함");
+	}
+
+	register_submit(isTrue);
+});
+
+const register_submit = (isTrue) => {
+	register_complete.addEventListener("click", async(e) => {
+		document.querySelector('.encripted_file').submit()
+		e.preventDefault();
+		console.log(!isNaN(al_time_input.value) && al_time_input.value !== "");
+		console.log(isTrue);
+		console.log(analysis_select_input.value != ""); // ""
+		console.log(file_select_input.value !== ""); // ""
+		// 분석 시간 숫자인지 아닌지, 데이터 선택이 되었는지 아닌지, 인풋이 1개 이상 있는 지 없는지, 분석 테이블이 선택 되었는지 아닌지, 파일이 선택 되었는지 아닌지
+		if (!isNaN(al_time_input.value) && al_time_input.value !== "" && analysis_select_input.value !== "" && isTrue && file_select_input.value !== "") {
+			alert("등록 준비 완료");
+			// 서버에 필요 데이터 전송 및 처리
+			return await socket.emit('데이터 전송 요청')
+		} else {
+			alert("필수 값 입력 필요");
+			return
+		}
 	});
 };

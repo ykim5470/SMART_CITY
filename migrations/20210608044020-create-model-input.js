@@ -4,8 +4,7 @@ module.exports = {
 		await queryInterface.createTable("model_inputs", {
 			id: {
 				allowNull: false,
-				autoIncrement: true,
-				primaryKey: true,
+				foreignKey: true,
 				type: Sequelize.INTEGER,
 			},
 			ip_id: {

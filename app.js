@@ -49,17 +49,29 @@ const io = socket(server, {
 	allowEIO3: true, // false by default
 });
 
+let user_input_list = new Array();
+let al_time_obj = {};
+let data_selection_obj = {};
+let input_param_obj = {};
+let output_param_obj = {}
+
+
 io.on("connection", function (socket) {
 	console.log("Made socket connection");
+	// console.log(`분석 시간 ${al_time_obj}`);
 
 	socket.on("분석 시간 입력", (data) => {
 		const { al_time } = data;
 		console.log("분석 시간 :" + al_time);
+		al_time_obj = { ...data };
+		// console.log(al_time_obj);
 	});
 
 	socket.on("데이터 선택", (data) => {
 		const { dataset_info } = data;
 		console.log("데이터 선택 : " + dataset_info);
+		data_selection_obj = { ...data };
+		// console.log(data_selection_obj);
 
 		// 선택 된 데이터 API calling; attributes GET
 		const attr_get = async () => {
@@ -100,8 +112,20 @@ io.on("connection", function (socket) {
 		});
 	});
 
-	socket.on("파일 메타 정보", (data) => {
-		const { file_meta_info } = data;
-		console.log("파일 메타 정보: " + file_meta_info);
+	socket.on("입력 데이터 값", (data) => {
+		const { user_input_value } = data;
+		user_input_list = [...user_input_value];
+		input_param_obj = { ...user_input_list };
+	});
+
+	socket.emit("입력 데이터 값 반환",  user_input_list );
+
+
+	socket.on("데이터 전송 요청", () => {
+		const data = {al_time_obj, data_selection_obj, input_param_obj}
+		axios.post('http://localhost:3000/model/register/complete', data, { headers: { Accept: "application/json" } })
+		console.log(al_time_obj)
+		console.log(data_selection_obj)
+		console.log(input_param_obj)
 	});
 });

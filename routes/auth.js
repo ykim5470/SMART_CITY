@@ -73,7 +73,9 @@ const output = {
 const process = {
 	// Analysis file upload metadata create
 	file_add: async (req, res) => {
-		// console.log(req.file);
+		console.log("파일 포스트");
+		console.log("미리 보낸 파일 업로드 요청" + req.file);
+		console.log(req.file);
 		try {
 			if (req.file != undefined) {
 				const { originalname, mimetype, path, filename } = req.file;
@@ -84,8 +86,10 @@ const process = {
 					path,
 					filename,
 				});
-				return originalname;
+				return res.redirect("/model_manage_board");
 			}
+			else{return}
+			
 		} catch (err) {
 			return res.status(500).json({
 				error: "file upload failed",
@@ -147,24 +151,39 @@ const process = {
 
 	// Redirect to model manage board being registerd
 	register_complete: async (req, res) => {
-		const { al_time } = req.body;
+		console.log("입력 완료 API");
+		console.log(req.body);
+		const { al_time_obj, input_param_obj, data_selection_obj } = req.body;
+		let al_time = al_time_obj.al_time;
+		let ip_param = input_param_obj.key
+		let ip_value = input_param_obj.value
 		await model_list.create({
 			al_time: al_time,
 		});
 
-		const file_md_name = process.file_add(req); // upload file info & return that originalname
-
-		await file_md_name.then((resolve) => {
-			const modified_md_name = resolve.split(".")[0]; // file.pb -> file
-
-			model_list.findOne({ where: { al_time: al_time } }).then((res) => {
-				const test_str = JSON.stringify(res);
-				const test_value = JSON.parse(test_str);
-				model_list.update({ md_name: modified_md_name }, { where: { id: test_value.id } });
-			});
+		// new md_id
+		model_list.findAll({ limit: 1, where: { al_time: al_time }, order: [["createdAt", "DESC"]] }).then((res) => {
+			let md_id = res.getDataValue("md_id");
+			// model_input.create({
+			// 	ip_id: md_id,
+			// 	ip_param: ip_param ,
+			// 	ip_value: ip_value,
+			// })
 		});
 
-		res.redirect("/model_manage_board");
+		// const file_md_name = process.file_add(req); // upload file info & return that originalname
+
+		// await file_md_name.then((resolve) => {
+		// 	const modified_md_name = resolve.split(".")[0]; // file.pb -> file
+
+		// 	model_list.findOne({ where: { al_time: al_time } }).then((res) => {
+		// 		const test_str = JSON.stringify(res);
+		// 		const test_value = JSON.parse(test_str);
+		// 		model_list.update({ md_name: modified_md_name }, { where: { id: test_value.id } });
+		// 	});
+		// });
+
+		// res.redirect("/model_manage_board");
 		return;
 	},
 

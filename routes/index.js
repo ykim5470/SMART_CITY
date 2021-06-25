@@ -35,6 +35,7 @@ router.post("/model/register", auth.process.register_init);
 router.post('/model_register_board', auth.process.input_add)
 router.post('/model/register/al_list', auth.process.output_add)
 router.post('/model/list/delete', auth.process.delete)
+router.post('/model/file_add',uploadFile.single("atch_origin_file_name"), auth.process.file_add)
 
 //router.put = update관련
 router.put("/analysis/edited/:al_id", analysis.process.edit);
