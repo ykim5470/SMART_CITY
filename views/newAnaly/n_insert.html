@@ -36,7 +36,7 @@
       var frmTag3 = "<input type='text' name='colName' placeholder=' 컬럼이름을 입력하세요.' />";
       var frmTag4 =
         "<select name='attribute' onchange='attrChange()'><option value='Property'>Property</option><option value='GeoProperty'>GeoProperty</option>" +
-        "<option value='RelationShip'>RelationShip</option></select>";
+        "<option value='Relationship'>Relationship</option></select>";
       var frmTag5 = "<input type='checkbox' name='nullCheck' /><input type='hidden' name='allowNull' value='false'/>";
       frmTag5 += "&nbsp&nbsp<input type=button value='삭제' onClick='removeRow()' style='cursor:hand'>";
       cell1.innerHTML = frmTag1;
@@ -55,7 +55,7 @@
       for (var i = 0; i < valueType.length; i++) {
         if (attrType[i].value == "GeoProperty") {
           valueType[i].innerHTML = " <option value='GeoJson'>GeoJson</option>";
-        } else if (attrType[i].value == "RelationShip") {
+        } else if (attrType[i].value == "Relationship") {
           valueType[i].innerHTML = " <option value='String'>STRING</option>";
         } else {
           valueType[i].innerHTML =
@@ -81,10 +81,10 @@
         window.alert("빈칸을 모두 입력해주세요");
         return "#";
       } else {
-        const ver = frm.first.value + "." + frm.middle.value + "." + frm.last.value;
-        frm.version.value = ver;
-        for (var i = 0; i < columnName.length; i++) {
-          if (frm.nullCheck[i].checked) {
+        frm.version.value = frm.first.value + "." + frm.middle.value + "." + frm.last.value;
+        var checkValue = document.getElementsByName("nullCheck");
+        for (var i = 0; i < checkValue.length; i++) {
+          if (checkValue.checked) {
             frm.allowNull[i].value = "true";
           }
         }
@@ -191,7 +191,7 @@
                   <select name="attribute" onchange="attrChange()">
                     <option value="Property">Property</option>
                     <option value="GeoProperty">GeoProperty</option>
-                    <option value="RelationShip">RelationShip</option>
+                    <option value="Relationship">Relationship</option>
                   </select>
                 </td>
                 <td><input type="checkbox" name="nullCheck" /><input type="hidden" name="allowNull" value="false" /></td>
@@ -201,7 +201,7 @@
         </tr>
       </table>
       <br /><input type="button" value="등록하기" onclick="goSubmit()" />
-      <a href="/analysis/list"><input type="button" value="목록보기" /></a>
+      <a href="/new/list"><input type="button" value="목록보기" /></a>
     </form>
   </body>
 </html>

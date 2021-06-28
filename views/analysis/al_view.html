@@ -9,12 +9,12 @@
   <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
   <script>
     function goEdit(box) {
-      var thisName = document.getElementsByName("editId")[0].value.split(",");
-      var editInput = "<input type='text' name='colName' value='" + thisName[1] + "' />";
-      var origin = thisName[1];
-      if (box.checked == true) {
+      var thisName = document.getElementsByName("editId")[0].value.split(',');
+      var editInput = "<input type='text' name='colName' value='"+thisName[1]+"' />";
+      var origin  = thisName[1];
+      if(box.checked ==  true){
         document.getElementById("columnName").innerHTML = editInput;
-      } else {
+      }else{
         document.getElementById("columnName").innerHTML = origin;
       }
       // $(':checkbox[name="editId"]').on({

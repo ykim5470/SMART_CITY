@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>분석 테이블 조회</title>
+  </head>
+  <body>
+    <h3>분석 테이블</h3>
+    <div>
+      <p>
+        테이블 이름 : <br />
+        {{analysis.al_name}} <br /><br />
+        Name Space : <br />
+        {{analysis.al_ns}} <br /><br />
+        테이블 내용 : <br />
+        {{analysis.al_des}} <br /><br />
+        Version : {{analysis.al_version}} <br />
+        context : <br />
+        {{analysis.al_context}}
+      </p>
+    </div>
+    {% if admin %}
+    <form action="/analysis/hardDel/{{analysis.al_id}}?_method=DELETE" method="POST">
+      <input type="submit" value="테이블 영구삭제" />
+      <a href="/analysis/admin/deleted"><input type="button" value="목록" /></a>
+    </form>
+    {% else %}
+    <form action="/new/softDel/{{analysis.al_id}}?_method=PUT" method="POST">
+      <a href="/new/edit/{{analysis.al_id}}"><input type="button" value="수정하기" /></a>
+      <input type="submit" value="삭제하기" />
+      <a href="/new/list"><input type="button" value="목록" /></a>
+    </form>
+    {% endif %}
+    {% if column|length %}
+    <h4>예측데이터 컬럼 리스트</h4>
+    <table>
+      <tr>
+        <th align="left">Attribute 타입&nbsp&nbsp&nbsp&nbsp</th>
+        <th align="left">데이터타입&nbsp&nbsp&nbsp&nbsp</th>
+        <th align="left">데이터크기&nbsp&nbsp&nbsp&nbsp</th>
+        <th align="left">컬럼명&nbsp&nbsp&nbsp&nbsp&nbsp</th>
+      </tr>
+      {% for colList in column %}
+      <tr>
+        <td>{{ colList.attributeType }}</td>
+        <td>{{ colList.data_type }}</td>
+        {% if colList.data_size %}
+        <td>{{ colList.data_size }}</td>
+        {% else %}
+        <td>(null)</td>
+        {% endif %}
+        <td>{{ colList.column_name }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </body>
+</html>

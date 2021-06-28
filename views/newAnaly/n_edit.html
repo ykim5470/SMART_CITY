@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>분석 테이블 수정</title>
+  </head>
+  <body>
+    <form action="/new/edited/{{analysis.al_id}}?_method=PUT" method="post">
+      <div>
+        <p>
+          테이블 이름 : <br />
+          <input type="text" name="editName" value="{{analysis.al_name}}" /><br /><br />
+          테이블 이름 : <br />
+          <input type="text" name="editNs" value="{{analysis.al_ns}}" /><br /><br />
+          테이블 내용 : <br />
+          <input type="text" name="editDes" value="{{analysis.al_des}}" />
+        </p>
+      </div>
+      <input type="submit" value="수정하기" />
+      <a href="/new/view/{{analysis.al_id}}"><input type="button" value="돌아가기" /></a>
+    </form>
+  </body>
+</html>

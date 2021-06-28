@@ -16,6 +16,11 @@ router.get("/analysis/admin/delview/:al_id", analysis.output.delView);
 router.get("/analysis/edit/:al_id", analysis.output.edit);
 
 router.get("/new/insert", newAnaly.output.insert);
+router.get("/new/list",paginate.middleware(10, 50), newAnaly.output.list);
+router.get("/new/list/:page",paginate.middleware(10, 50), newAnaly.output.list);
+router.get("/new/view/:al_id", newAnaly.output.view);
+router.get("/new/edit/:al_id", newAnaly.output.edit);
+router.get("/new/admin/deleted", newAnaly.output.viewDelList);
 
 router.get("/model_manage_board", auth.output.manage_board);
 router.get("/model_manage_board/:md_id", auth.output.manage_status);
@@ -42,6 +47,10 @@ router.put("/analysis/edited/:al_id", analysis.process.edit);
 router.put("/analysis/softDel/:al_id", analysis.process.tbSofeDel);
 router.put("/analysis/softListDelete", analysis.process.softDelList);
 router.put("/model_manage_board/:md_id", auth.process.edit);
+
+router.put("/new/softDel/:al_id", newAnaly.process.tbSofeDel);
+router.put("/new/softListDelete", newAnaly.process.softDelList);
+
 //router.delete = delete 관련
 router.delete("/analysis/hardDel/:al_id", analysis.process.tbHardDel);
 router.delete("/analysis/column/delete/:col_id", analysis.process.colDelete);
