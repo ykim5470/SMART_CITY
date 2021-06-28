@@ -22,7 +22,7 @@ router.get("/new/view/:al_id", newAnaly.output.view);
 router.get("/new/edit/:al_id", newAnaly.output.edit);
 router.get("/new/admin/deleted", newAnaly.output.viewDelList);
 
-router.get("/model_manage_board", auth.output.manage_board);
+router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage_board);
 router.get("/model_manage_board/:md_id", auth.output.manage_status);
 router.get("/model_register_board", auth.output.model_register_board);
 
