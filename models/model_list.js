@@ -9,11 +9,14 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
+			this.hasMany(models.model_input, { foreignKey: "ip_id" });
+			this.hasMany(models.atch_file_tb, { foreignKey: "filename" });
 		}
 	}
 	model_list.init(
-		{	id: {allowNull: false, type: DataTypes.INTEGER, autoIncrement: true},
-			md_id: { type: DataTypes.UUID, allowNull: false, defaultValue: UUIDV4, primaryKey: true, foreignKey: true },
+		{
+			id: { allowNull: false, type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+			md_id: { type: DataTypes.UUID, allowNull: false, defaultValue: UUIDV4, primaryKey: true },
 			al_time: { type: DataTypes.INTEGER, allowNull: true },
 			md_name: {
 				type: DataTypes.STRING,
@@ -22,6 +25,8 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			al_name_mo: { type: DataTypes.STRING, defaultValue: "no Model selected", allowNull: true },
 			run_status: { type: DataTypes.ENUM("running", "stop"), defaultValue: "실행중", allowNull: true },
+			encrypted_file: {
+				type: DataTypes.STRING, allowNull: false, defaultValue: 'encrypted', primaryKey: true },
 		},
 		{
 			sequelize,

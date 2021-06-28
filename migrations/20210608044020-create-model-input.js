@@ -2,13 +2,9 @@
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
 		await queryInterface.createTable("model_inputs", {
-			id: {
-				allowNull: false,
-				foreignKey: true,
-				type: Sequelize.INTEGER,
-			},
+			id: {allowNull: false, autoIncrement: true, type: Sequelize.INTEGER, primaryKey: true},
 			ip_id: {
-				type: Sequelize.STRING,
+				type: Sequelize.UUID,
 			},
 			ip_param: {
 				type: Sequelize.STRING,

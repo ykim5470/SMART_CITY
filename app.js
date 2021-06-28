@@ -54,6 +54,7 @@ let al_time_obj = {};
 let data_selection_obj = {};
 let input_param_obj = {};
 let output_param_obj = {}
+let al_name_mo_obj ={}
 
 
 io.on("connection", function (socket) {
@@ -71,7 +72,7 @@ io.on("connection", function (socket) {
 		const { dataset_info } = data;
 		console.log("데이터 선택 : " + dataset_info);
 		data_selection_obj = { ...data };
-		// console.log(data_selection_obj);
+		console.log(data_selection_obj);
 
 		// 선택 된 데이터 API calling; attributes GET
 		const attr_get = async () => {
@@ -90,9 +91,10 @@ io.on("connection", function (socket) {
 
 	socket.on("분석 모델 선택", (data) => {
 		const { al_name_mo } = data;
-		console.log("선택된 분석 모델 이름 : " + al_name_mo);
+		console.log("선택된 분석 모델 이름 : " + al_name_mo); // test1, dataset001, etc
+		al_name_mo_obj = {al_name_mo}
 
-		model_list.create({ al_name_mo: al_name_mo });
+		// model_list.create({ al_name_mo: al_name_mo });
 		const analysis_output = async () => {
 			const analysis_column = await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
 				const al_list_str = JSON.stringify(res);
@@ -122,10 +124,8 @@ io.on("connection", function (socket) {
 
 
 	socket.on("데이터 전송 요청", () => {
-		const data = {al_time_obj, data_selection_obj, input_param_obj}
-		axios.post('http://localhost:3000/model/register/complete', data, { headers: { Accept: "application/json" } })
-		console.log(al_time_obj)
+		const data = { al_time_obj, data_selection_obj, input_param_obj, al_name_mo_obj }
 		console.log(data_selection_obj)
-		console.log(input_param_obj)
+		axios.post('http://localhost:3000/model/register/complete', data, { headers: { Accept: "application/json" } })
 	});
 });

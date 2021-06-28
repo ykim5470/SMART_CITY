@@ -6,14 +6,14 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
-        type: DataTypes.INTEGER
+        type: Sequelize.INTEGER
       },
       al_id_col: {
         allowNull: false,
         foreignKey: true,
         onDelete:'CASCADE',
         references:{
-          model: 'analysis_list',
+          model: 'analysis_lists',
           key : 'al_id'
         },
         type: Sequelize.INTEGER

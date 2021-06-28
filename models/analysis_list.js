@@ -6,9 +6,9 @@ module.exports = (sequelize, DataTypes) => {
       analysis_list.hasMany(models.column_tb, {
         foreignKey: "al_id_col",
       });
-      this.hasMany(models.model_list, {
-        foreignKey: "md_id",
-      });
+      // this.hasMany(models.model_list, {
+      //   foreignKey: "md_id",
+      // });
     }
   }
   analysis_list.init(

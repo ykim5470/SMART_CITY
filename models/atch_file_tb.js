@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
+			this.belongsTo(models.model_list, { foreignKey: "filename" });
 		}
 	}
 	atch_file_tb.init(
@@ -16,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
 			originalname: { type: DataTypes.STRING, allowNull: false },
 			mimetype: { type: DataTypes.STRING, allowNull: false },
 			path: { type: DataTypes.STRING, allowNull: false },
-			filename: { type: DataTypes.STRING, allowNull: false },
+			filename: { type: DataTypes.STRING, allowNull: false, foreignKey: true },
 		},
 		{
 			sequelize,

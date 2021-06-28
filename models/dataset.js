@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.model_input, { foreignKey : 'ip_id' })
+      // this.belongsTo(models.model_input, { foreignKey : 'ip_id' })
     }
   };
   dataset.init({

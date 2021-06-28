@@ -84,14 +84,18 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 	const input_arr = Array.from(user_input_param);
 	const input_name_arr = Array.from(ip_attr_name);
 
-	console.log(input_arr + input_name_arr)
-	console.log(input_arr)
-	console.log(input_name_arr)
-
 	input_arr.map((el,index) => {
 		el.addEventListener("change", (e) => {
+			let input_mapping = input_name_arr.filter((el, idx) => 
+			{
+				if (idx === index) {
+					user_input_value.push({ key: el.value, value: e.target.value });
+				}
+				else {
+					return 
+				}
+			})
 			console.log(e.target.value)
-			user_input_value.push({ key: index, value: e.target.value });
 			socket.emit("입력 데이터 값", { user_input_value: user_input_value });
 		});
 	});

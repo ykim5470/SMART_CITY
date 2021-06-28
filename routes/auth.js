@@ -3,10 +3,6 @@ const axios = require("axios");
 
 // Get
 const output = {
-	// socket test
-	test: (req, res) => {
-		res.render("model/test");
-	},
 	// 모델 관리 보드
 	manage_board: async (req, res) => {
 		try {
@@ -46,8 +42,6 @@ const output = {
 
 	// 모델 등록 보드
 	model_register_board: async (req, res) => {
-		console.log("----------------------------------------------");
-		console.log("데이터 선택 전");
 		try {
 			await analysis_list
 				.findAll({
@@ -71,15 +65,11 @@ const output = {
 
 // Post
 const process = {
-	// Analysis file upload metadata create
+	// 파일 업로드 
 	file_add: async (req, res) => {
-		console.log("파일 포스트");
-		console.log("미리 보낸 파일 업로드 요청" + req.file);
-		console.log(req.file);
 		try {
 			if (req.file != undefined) {
 				const { originalname, mimetype, path, filename } = req.file;
-				// e.g. dataSoil.txt, text/plain, uploads/1623xx.txt, 1623xx.txt
 				await atch_file_tb.create({
 					originalname,
 					mimetype,
@@ -97,106 +87,59 @@ const process = {
 		}
 	},
 
-	// Input table add
-	input_add: async (req, res) => {
-		console.log("인풋");
-		const body = req.body;
 
-		//const dataset_obj = JSON.parse(dataset_id);
-		// const type = req.params.type;
-		// const namespace = req.params.namespace;
-		const get_input_attr = await axios.get(`http://203.253.128.184:18827/datamodels/${body.namespace}/${body.type}/1.0`, { headers: { Accept: "application/json" } }).then((res) => {
-			const analysis_models = res.data;
-			const input_attributes = analysis_models.attributes.map((el) => {
-				const attributes_name = el.name;
-				const attributes_value_type = el.valueType;
-				return { attributes_name, attributes_value_type };
-			});
-			return input_attributes;
-		});
-		console.log(get_input_attr);
-		// res.redirect('/model_register_board')
-		// console.log(get_input_attr)
-		//return get_input_attr;
-		return "dddddd";
-		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님께 여쭤보기
-	},
-
-	ip_mapping: (req, res) => {
-		console.log("인풋 매칭 완료 ");
-		const { user_input_param } = req.body;
-		// console.log(user_input_param)
-	},
-	// Output table add
-	output_add: async (req, res) => {
-		console.log("아웃풋");
-		const { al_name_mo } = req.body;
-		model_list.create({ al_name_mo: al_name_mo });
-		const analysis_output = await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
-			const al_list_str = JSON.stringify(res);
-			const al_list_value = JSON.parse(al_list_str);
-			const al_id = al_list_value.al_id;
-			const column_attr = column_tb.findOne({ where: { al_id_col: al_id } }).then((result) => {
-				const column_str = JSON.stringify(result);
-				const column_value = JSON.parse(column_str);
-				return column_value;
-			});
-			return column_attr;
-		});
-		console.log(analysis_output);
-		res.redirect("/model_register_board");
-		return analysis_output;
-		// 데이터를 다른 페이지로 보내 줄 지, 현재 페이지에 업데이트 할 지 창희 선임 연구원님게 여쭤보기
-	},
-
-	// Redirect to model manage board being registerd
+	// 등록 완료 
 	register_complete: async (req, res) => {
-		console.log("입력 완료 API");
-		console.log(req.body);
-		const { al_time_obj, input_param_obj, data_selection_obj } = req.body;
+		console.log('---------------------------start')
+		const { al_time_obj, input_param_obj, data_selection_obj, al_name_mo_obj } = req.body;
 		let al_time = al_time_obj.al_time;
-		let ip_param = input_param_obj.key
-		let ip_value = input_param_obj.value
+		let al_name_mo = al_name_mo_obj.al_name_mo
+		console.log('---------------------------middle')
 		await model_list.create({
 			al_time: al_time,
+			al_name_mo: al_name_mo
 		});
-
-		// new md_id
+		console.log('---------------------------middle1')
 		model_list.findAll({ limit: 1, where: { al_time: al_time }, order: [["createdAt", "DESC"]] }).then((res) => {
-			let md_id = res.getDataValue("md_id");
-			// model_input.create({
-			// 	ip_id: md_id,
-			// 	ip_param: ip_param ,
-			// 	ip_value: ip_value,
-			// })
+			let md_id_str = JSON.stringify(res);
+			let md_id_value = JSON.parse(md_id_str)[0];
+			const md_id = md_id_value.md_id
+			console.log('---------------------------middle2')
+			atch_file_tb.findAll({
+				limit: 1, order: [[
+					"CreatedAt", "DESC"]]
+			}).then(res => {
+				const model_from_file = JSON.stringify(res)
+				const model_from_file_value = JSON.parse(model_from_file)[0]
+				let md_name = model_from_file_value.originalname.split('.')[0]
+				console.log(model_from_file_value)
+				let encrypted_name = model_from_file_value.filename
+				console.log(encrypted_name)
+
+				console.log('---------------------------middle3')
+				model_list.update({md_name : md_name, encrypted_file: encrypted_name}, {where: {md_id : md_id}})
+			})
+
+			for (i in input_param_obj){
+				const l = input_param_obj[i]
+				model_input.create({ ip_id: md_id, ip_param: Object.values(l)[0], ip_value: Object.values(l)[1] })
+			}
 		});
-
-		// const file_md_name = process.file_add(req); // upload file info & return that originalname
-
-		// await file_md_name.then((resolve) => {
-		// 	const modified_md_name = resolve.split(".")[0]; // file.pb -> file
-
-		// 	model_list.findOne({ where: { al_time: al_time } }).then((res) => {
-		// 		const test_str = JSON.stringify(res);
-		// 		const test_value = JSON.parse(test_str);
-		// 		model_list.update({ md_name: modified_md_name }, { where: { id: test_value.id } });
-		// 	});
-		// });
-
-		// res.redirect("/model_manage_board");
 		return;
 	},
 
+	// 등록 페이지 이동
 	register_init: async (req, res) => {
 		res.redirect(`/model_register_board`);
 	},
-	// Identify selected model
+
+	// 모델 상태 관리 선택 페이지 이동
 	status_update: async (req, res) => {
 		const { md_id } = req.body;
 		const selected_model = await model_list.findOne({ where: { md_id: md_id } }).then((result) => result.run_status);
 		return res.redirect(`model_manage_board/${md_id}?status=${selected_model}`);
 	},
-	// Edit selected model status
+	// 모델 상태 관리 선택; 실행 Or 중지
 	edit: async (req, res) => {
 		try {
 			const { new_status } = req.body;
@@ -207,9 +150,9 @@ const process = {
 			console.log("model status error");
 		}
 	},
+	// 모델 삭제
 	delete: async (req, res) => {
 		const delModelList = req.body.delModel.split(",");
-		console.log(delModelList);
 		delModelList.map((el) => {
 			model_list.destroy({ where: { md_id: el } });
 		});

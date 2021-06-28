@@ -25,22 +25,18 @@ router.get("/new/admin/deleted", newAnaly.output.viewDelList);
 router.get("/model_manage_board", auth.output.manage_board);
 router.get("/model_manage_board/:md_id", auth.output.manage_status);
 router.get("/model_register_board", auth.output.model_register_board);
-router.get('/test', auth.output.test);
 
 
 //router.post
 router.post("/analysis/insert", analysis.process.insert);
 router.post("/analysis/column/:al_id", analysis.process.columnInsert);
-
 router.post("/new/insert", newAnaly.process.insert);
 
-router.post("/model/register/complete", uploadFile.single("atch_origin_file_name"), auth.process.register_complete);
 router.post("/model_manage_board", auth.process.status_update);
 router.post("/model/register", auth.process.register_init);
-router.post('/model_register_board', auth.process.input_add)
-router.post('/model/register/al_list', auth.process.output_add)
 router.post('/model/list/delete', auth.process.delete)
 router.post('/model/file_add',uploadFile.single("atch_origin_file_name"), auth.process.file_add)
+router.post('/model/register/complete', auth.process.register_complete)
 
 //router.put = update관련
 router.put("/analysis/edited/:al_id", analysis.process.edit);

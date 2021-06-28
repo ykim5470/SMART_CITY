@@ -11,7 +11,7 @@ module.exports = {
 			originalname: Sequelize.STRING,
 			mimetype: Sequelize.STRING,
 			path: Sequelize.STRING,
-			filename: Sequelize.STRING,
+			filename:{ type: Sequelize.STRING, allowNull: false },
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,
