@@ -1,21 +1,42 @@
-const { model_list, model_output, model_input, atch_file_tb, analysis_list, dataset, sequelize, column_tb } = require("../models");
+const { model_list, model_output, model_input, atch_file_tb, analysis_list, dataset, column_tb } = require("../models");
 const axios = require("axios");
+const analysis = require("./analysis.js");
+const moment = require('moment')
+
 
 // Get
 const output = {
 	// 모델 관리 보드
 	manage_board: async (req, res) => {
 		try {
+			const currentPage = req.query.page; // 현재 페이지
+			const temp = req.url; //현재 경로
+			let offset = 0;
+			if (currentPage > 1) {
+				offset = 10 * (currentPage - 1);
+			}
+			console.log(req.query.page);
+			console.log(req.query.limit);
 			await model_list
-				.findAll({
+				.findAndCountAll({
+					limit: req.query.limit,
+					offset: offset,
 					attributes: {
 						exclude: ["updatedAt"],
 					},
 				})
 				.then((result) => {
-					const str = JSON.stringify(result);
-					const new_value = JSON.parse(str);
-					return res.render(`model/model_manage_board`, { list_data: new_value });
+					const itemCount = result.count; //총 게시글 갯수
+					const pageCount = Math.ceil(itemCount / req.query.limit); //페이지 갯수
+					const base = "model_manage_board"; // base url
+					const pageArray = analysis.paging.makeArray(base, currentPage, pageCount, temp);
+					const hasMore = currentPage < pageCount ? `${base}?page=${currentPage + 1}&limit=10` : `${base}?page=${currentPage}&limit=10`;
+					const hasprev = currentPage > 1 ? `${base}?page=${currentPage - 1}&limit=10` : `${base}?page=${currentPage}&limit=10`;
+					model_list.prototype.dateFormat = (date) => moment(date).format("YYYY.MMM.DD - hh:mm A");
+					// const str = JSON.stringify(result);
+					// const new_value = JSON.parse(str);
+					console.log(result.rows)
+					return res.render(`model/model_manage_board`, { list_data: result.rows, pages: pageArray, nextUrl: hasMore, prevUrl: hasprev });
 				});
 		} catch (err) {
 			return res.status(500).json({
@@ -65,7 +86,7 @@ const output = {
 
 // Post
 const process = {
-	// 파일 업로드 
+	// 파일 업로드
 	file_add: async (req, res) => {
 		try {
 			if (req.file != undefined) {
@@ -77,9 +98,9 @@ const process = {
 					filename,
 				});
 				return res.redirect("/model_manage_board");
+			} else {
+				return;
 			}
-			else{return}
-			
 		} catch (err) {
 			return res.status(500).json({
 				error: "file upload failed",
@@ -87,42 +108,43 @@ const process = {
 		}
 	},
 
-
-	// 등록 완료 
+	// 등록 완료
 	register_complete: async (req, res) => {
-		console.log('---------------------------start')
+		console.log("---------------------------start");
 		const { al_time_obj, input_param_obj, data_selection_obj, al_name_mo_obj } = req.body;
 		let al_time = al_time_obj.al_time;
-		let al_name_mo = al_name_mo_obj.al_name_mo
-		console.log('---------------------------middle')
+		let al_name_mo = al_name_mo_obj.al_name_mo;
+		console.log("---------------------------middle");
 		await model_list.create({
 			al_time: al_time,
-			al_name_mo: al_name_mo
+			al_name_mo: al_name_mo,
 		});
-		console.log('---------------------------middle1')
+		console.log("---------------------------middle1");
 		model_list.findAll({ limit: 1, where: { al_time: al_time }, order: [["createdAt", "DESC"]] }).then((res) => {
 			let md_id_str = JSON.stringify(res);
 			let md_id_value = JSON.parse(md_id_str)[0];
-			const md_id = md_id_value.md_id
-			console.log('---------------------------middle2')
-			atch_file_tb.findAll({
-				limit: 1, order: [[
-					"CreatedAt", "DESC"]]
-			}).then(res => {
-				const model_from_file = JSON.stringify(res)
-				const model_from_file_value = JSON.parse(model_from_file)[0]
-				let md_name = model_from_file_value.originalname.split('.')[0]
-				console.log(model_from_file_value)
-				let encrypted_name = model_from_file_value.filename
-				console.log(encrypted_name)
+			const md_id = md_id_value.md_id;
+			console.log("---------------------------middle2");
+			atch_file_tb
+				.findAll({
+					limit: 1,
+					order: [["CreatedAt", "DESC"]],
+				})
+				.then((res) => {
+					const model_from_file = JSON.stringify(res);
+					const model_from_file_value = JSON.parse(model_from_file)[0];
+					let md_name = model_from_file_value.originalname.split(".")[0];
+					console.log(model_from_file_value);
+					let encrypted_name = model_from_file_value.filename;
+					console.log(encrypted_name);
 
-				console.log('---------------------------middle3')
-				model_list.update({md_name : md_name, encrypted_file: encrypted_name}, {where: {md_id : md_id}})
-			})
+					console.log("---------------------------middle3");
+					model_list.update({ md_name: md_name, encrypted_file: encrypted_name }, { where: { md_id: md_id } });
+				});
 
-			for (i in input_param_obj){
-				const l = input_param_obj[i]
-				model_input.create({ ip_id: md_id, ip_param: Object.values(l)[0], ip_value: Object.values(l)[1] })
+			for (i in input_param_obj) {
+				const l = input_param_obj[i];
+				model_input.create({ ip_id: md_id, ip_param: Object.values(l)[0], ip_value: Object.values(l)[1] });
 			}
 		});
 		return;

@@ -5,11 +5,18 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>모델 관리</title>
+			<!-- Bootstrap CSS -->
+			<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
 		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script>
 			function ListDelete() {
 				var chkArray = new Array();
-				$("input:checkbox[name=md_id]:checked").each(function() {
+				$("input:checkbox[name=md_id]:checked").each(function () {
 					chkArray.push(this.value);
 				});
 				console.log(chkArray);
@@ -17,8 +24,10 @@
 				$("#confirm").submit();
 			}
 		</script>
-		<script src='/socket.io/socket.io.js'></script>
-		<script>const socket = io()</script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			const socket = io();
+		</script>
 	</head>
 	<body>
 		<h1>모델 관리</h1>
@@ -46,7 +55,7 @@
 				<td>{{ item.al_time }}</td>
 				<td>{{item.md_name}}</td>
 				<td>{{item.al_name_mo}}</td>
-				<td>{{item.createdAt}}</td>
+				<td>{{item.dateFormat(item.createdAt)}}</td>
 				<td>{{item.run_status}}</td>
 				<td>
 					<form action="/model_manage_board" method="post"><button type="submit" name="md_id" value="{{item.md_id}}">관리</button></form>
@@ -54,5 +63,24 @@
 			</tr>
 			{% endfor %}
 		</table>
+		<nav aria-label="Page navigation example">
+			<ul class="pagination">
+				<li class="page-item">
+					<a class="page-link" href="{{prevUrl}}" aria-label="Previous">
+						<span aria-hidden="true">&laquo;</span>
+						<span class="sr-only">Previous</span>
+					</a>
+				</li>
+				{% for pagesNav in pages %}
+				<li class="page-item"><a class="page-link" href="{{pagesNav.url}}">{{pagesNav.number}}</a></li>
+				{%endfor%}
+				<li class="page-item">
+					<a class="page-link" href="{{nextUrl}}" aria-label="Next">
+						<span aria-hidden="true">&raquo;</span>
+						<span class="sr-only">Next</span>
+					</a>
+				</li>
+			</ul>
+		</nav>
 	</body>
 </html>

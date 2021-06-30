@@ -1,6 +1,10 @@
 "use strict";
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
+		(Sequelize.DATE.prototype._stringify = function (date, options) {
+			date = this._applyTimezone(date, options);
+			return date.format("YYYY.MM.DD - hh:mm A");
+		}.bind(Sequelize.DATE.prototype)),
 		await queryInterface.createTable("model_lists", {
 			id: { allowNull: false, autoIncrement: true, type: Sequelize.INTEGER, primaryKey: true },
 			md_id: {
@@ -24,12 +28,10 @@ module.exports = {
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,
-				defaultValue: Sequelize.fn("NOW"),
 			},
 			updatedAt: {
 				allowNull: false,
 				type: Sequelize.DATE,
-				defaultValue: Sequelize.fn("NOW"),
 			},
 		});
 	},
