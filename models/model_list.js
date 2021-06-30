@@ -8,16 +8,16 @@ module.exports = (sequelize, DataTypes) => {
 			this.hasMany(models.model_output, {foreignKey: 'op_id'})
 			this.hasMany(models.atch_file_tb, { foreignKey: "file_id" });
 			this.hasMany(models.model_des, { foreignKey: "des_id" });
-			// this.belongsTo(models.analysis_list, {
-			// 	foreignKey: {name:'al_id_model', allowNull:false},
-			// 	onDelete:"CASCADE"
-			// })
+			this.belongsTo(models.analysis_list, {
+				foreignKey: {name:'al_id', allowNull:false},
+				onDelete:"CASCADE"
+			})
 		}
 	}
 	model_list.init(
 		{
 			md_id: { type: DataTypes.UUID, allowNull: false, defaultValue: UUIDV4, primaryKey: true },
-			al_time: { type: DataTypes.INTEGER, allowNull: true },
+			al_time: { type: DataTypes.INTEGER, allowNull: false },
 			md_name: {
 				type: DataTypes.STRING,
 				defaultValue: "test",
@@ -31,9 +31,9 @@ module.exports = (sequelize, DataTypes) => {
 				defaultValue: "encrypted",
 			},
 			data_model_name: { type: DataTypes.STRING, allowNull: false },
-			al_id_model:  {
+			al_id:  {
 				allowNull: false,
-				// foreignKey: true,
+				foreignKey: true,
 				type: DataTypes.INTEGER
 			  },
 		},

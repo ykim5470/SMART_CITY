@@ -66,7 +66,6 @@ io.on("connection", function (socket) {
 		const { al_time } = data;
 		console.log("분석 시간 :" + al_time);
 		al_time_obj = { ...data };
-		// console.log(al_time_obj);
 	});
 
 	socket.on("데이터 선택", (data) => {

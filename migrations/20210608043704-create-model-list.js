@@ -21,8 +21,14 @@ module.exports = {
 			},
 			encrypted_file: { type: Sequelize.STRING, allowNull: false },
 			data_model_name: { type: Sequelize.STRING, allowNull: false },
-			al_id_model:  {
+			al_id:  {
 				allowNull: false,
+				foreignKey: true,
+				onDelete:'CASCADE',
+				references:{
+				  model: 'analysis_lists',
+				  key : 'al_id'
+				},
 				type: Sequelize.INTEGER
 			  },
 			createdAt: {

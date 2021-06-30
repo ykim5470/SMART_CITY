@@ -59,15 +59,42 @@ const output = {
 
 	register_edit: (req, res) => {
 		const md_id = req.params.md_id;
-		model_list.findAll({ where: { md_id: md_id }, include: [{ model: model_des, required: false }, { model: model_input, required: false }], raw: true }).then(result => {
-			console.log(JSON.parse(JSON.stringify(result)))
-			// console.log(result.al_time)
-			// console.log(result.model_des.des_text)
-			
-			res.render(`model/model_register_board_edit`, { md_id: md_id });
-		})
+		let al_time_prev
+		let md_name_prev
+		let al_name_mo_prev
+		model_list
+			.findAll({
+				attributes: {
+					exclude: ["updatedAt", "createdAt"],
+				},
+				where: { md_id: md_id },
+				include: [
+					{ model: model_des, required: false, attributes: ["des_text"] },
+					{ model: atch_file_tb, required: false, attributes: ["originalname"] },
+					{ model: analysis_list, required: false, attributes: ["al_context"] },
+				],
+				raw: true,
+			})
+			.then((result) => {
+				const model_edit_str = JSON.stringify(result);
+				const model_edit_value = JSON.parse(model_edit_str)[0];
+				console.log(model_edit_value); // md_id, al_time, md_name, al_name_mo, run_status, data_model_name, al_id, des_text, originalname, al_context
+				al_time_prev = model_edit_value.al_time
+				md_name_prev = model_edit_value.md_name
+				al_name_mo_prev = model_edit_value.al_name_mo
 
-		
+				model_input.findAll({ where: { ip_id: md_id }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
+					const model_input_info_str = JSON.stringify(results);
+					const model_input_info_value = JSON.parse(model_input_info_str);
+					console.log(model_input_info_value);
+					console.log(al_time_prev)
+					const dataset_name = output.dataset_select();
+					dataset_name.then(outcome => {
+						return res.render(`model/model_register_board_edit`, { md_id: md_id, al_time: al_time_prev, md_name: md_name_prev, al_name_mo: al_name_mo_prev, dataset_name: outcome });
+					})
+				
+				});
+			});
 	},
 
 	// 모델 등록 보드
@@ -99,13 +126,27 @@ const process = {
 	file_add: async (req, res) => {
 		try {
 			if (req.file != undefined) {
-				const { originalname, mimetype, path, filename } = req.file;
-				await atch_file_tb.create({
-					file_id: '84b4de91-bec1-46c4-a78f-406248d4d76c',
-					originalname,
-					mimetype,
-					path,
-					filename,
+				model_list.findOne({ order: [["updatedAt", "DESC"]] }).then((res) => {
+					const file_str = JSON.stringify(res);
+					const file_value = JSON.parse(file_str);
+					console.log(file_value);
+					let file_id = file_value.md_id;
+					const { originalname, mimetype, path, filename } = req.file;
+					atch_file_tb
+						.create({
+							file_id: file_id,
+							originalname,
+							mimetype,
+							path,
+							filename,
+						})
+						.then((res) => {
+							const model_from_file = JSON.stringify(res);
+							const model_from_file_value = JSON.parse(model_from_file);
+							let md_name = model_from_file_value.originalname.split(".")[0];
+							let encrypted_name = model_from_file_value.filename;
+							model_list.update({ md_name: md_name, encrypted_file: encrypted_name }, { where: { md_id: file_id } });
+						});
 				});
 				return res.redirect("/model_manage_board");
 			} else {
@@ -124,12 +165,20 @@ const process = {
 		let al_time = al_time_obj.al_time;
 		let al_name_mo = al_name_mo_obj.al_name_mo;
 		let data_model_name = data_selection_obj.dataset_info;
+		let al_id;
+
+		await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
+			const al_list_str = JSON.stringify(res);
+			const al_list_value = JSON.parse(al_list_str);
+			al_id = al_list_value.al_id;
+		});
+		console.log(al_time);
 
 		await model_list.create({
 			al_time: al_time,
 			al_name_mo: al_name_mo,
 			data_model_name: data_model_name,
-			al_id_model: 1
+			al_id: al_id,
 		});
 
 		await model_list.findAll({ limit: 1, where: { al_time: al_time }, order: [["createdAt", "DESC"]] }).then(async (res) => {
@@ -145,22 +194,6 @@ const process = {
 				const l = input_param_obj[i];
 				model_input.create({ ip_id: md_id, ip_param: Object.values(l)[0], ip_value: Object.values(l)[1] });
 			}
-
-			await atch_file_tb
-				.findAll({
-					limit: 1,
-					order: [["CreatedAt", "DESC"]],
-				})
-				.then(async(res) => {
-					const model_from_file = JSON.stringify(res);
-					const model_from_file_value = JSON.parse(model_from_file)[0];
-					let md_name = model_from_file_value.originalname.split(".")[0];
-					console.log(model_from_file_value);
-					let encrypted_name = model_from_file_value.filename;
-					console.log(encrypted_name);
-
-					await model_list.update({ md_name: md_name, encrypted_file: encrypted_name }, { where: { md_id: md_id } });
-				});
 		});
 		return;
 	},

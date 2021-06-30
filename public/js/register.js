@@ -139,7 +139,6 @@ socket.on("입력 데이터 값 반환", (data) => {
 
 const register_submit = (isTrue) => {
 	register_complete.addEventListener("click", async (e) => {
-		document.querySelector(".encripted_file").submit();
 		e.preventDefault();
 		console.log(!isNaN(al_time_input.value) && al_time_input.value !== "");
 		console.log(isTrue);
@@ -149,7 +148,8 @@ const register_submit = (isTrue) => {
 		if (!isNaN(al_time_input.value) && al_time_input.value !== "" && analysis_select_input.value !== "" && isTrue && file_select_input.value !== "") {
 			alert("등록 준비 완료");
 			// 서버에 필요 데이터 전송 및 처리
-			return await socket.emit("데이터 전송 요청");
+			 await socket.emit("데이터 전송 요청");
+			return document.querySelector(".encripted_file").submit();
 		} else {
 			alert("필수 값 입력 필요");
 			return;

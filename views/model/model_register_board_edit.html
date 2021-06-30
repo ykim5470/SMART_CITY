@@ -14,7 +14,7 @@
 				<tbody>
 					<td>
 						초 :
-						<input type="text" id="al_time" name="al_time" placeholder="{{al_time}}" />
+						<input type="text" id="al_time" name="al_time" value='{{al_time}}'/>
 					</td>
 				</tbody>
 			</table>
@@ -22,11 +22,9 @@
 				<thead>
 					데이터 선택
 				</thead>
-
 				<tbody>
 					<td>
 						<select name="dataset_id" id="data_select">
-						
 							{% for name in dataset_name%}
 							<option value="{{name.value.id}},{{name.value.dataModelType}},{{name.value.dataModelNamespace}},{{name.value.dataModelVersion}}">{{name.key}}</option>
 							{% endfor %}
@@ -55,7 +53,7 @@
 					<td>
 						<label for="al_name_mo">/분석 테이블/</label>
 						<select name="al_name_mo" id="al_select">
-							<option value="">-선택-</option>
+							<option value="">{{al_name_mo}}</option>
 							{% for el in al_name_mo %}
 							<option value="{{el.al_name}}">{{el.al_name}}</option>
 							{% endfor %}
