@@ -14,7 +14,7 @@ const { model_list, model_output, model_input, atch_file_tb, analysis_list, colu
 const index_router = require("./routes/index");
 
 models.sequelize
-	.sync()
+	.sync({ force: false })
 	.then(() => {
 		console.log("DB connected");
 	})

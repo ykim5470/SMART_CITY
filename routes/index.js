@@ -3,7 +3,7 @@ const router = express.Router();
 const auth = require("./auth");
 const analysis = require("./analysis");
 const newAnaly = require("./newAnaly");
-const uploadFile = require("../helpers/upload_dir");
+const uploadFile = require('../public/js/helpers/upload_dir');
 const paginate = require('express-paginate')
 
 //router.get
@@ -21,6 +21,7 @@ router.get("/new/list/:page",paginate.middleware(10, 50), newAnaly.output.list);
 router.get("/new/view/:al_id", newAnaly.output.view);
 router.get("/new/edit/:al_id", newAnaly.output.edit);
 router.get("/new/admin/deleted", newAnaly.output.viewDelList);
+router.get('/model_manage_board/edit/:md_id', auth.output.register_edit)
 
 router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage_board);
 router.get("/model_manage_board/:md_id", auth.output.manage_status);

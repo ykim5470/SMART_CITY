@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>모델 수정 {{md_id}}</title>
+	</head>
+	<body>
+		<div>
+			<table>
+				<thead>
+					분석시간
+				</thead>
+				<tbody>
+					<td>
+						초 :
+						<input type="text" id="al_time" name="al_time" placeholder="{{al_time}}" />
+					</td>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					데이터 선택
+				</thead>
+
+				<tbody>
+					<td>
+						<select name="dataset_id" id="data_select">
+						
+							{% for name in dataset_name%}
+							<option value="{{name.value.id}},{{name.value.dataModelType}},{{name.value.dataModelNamespace}},{{name.value.dataModelVersion}}">{{name.key}}</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tbody>
+			</table>
+
+			<table>
+				<thead>
+					input 파라미터 매칭
+				</thead>
+				<tbody>
+					<th>값 타입</th>
+					<th>속성</th>
+					<th>파라미터</th>
+
+					<table class="input_params_insert"></table>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					분석결과 테이블
+				</thead>
+				<tbody>
+					<td>
+						<label for="al_name_mo">/분석 테이블/</label>
+						<select name="al_name_mo" id="al_select">
+							<option value="">-선택-</option>
+							{% for el in al_name_mo %}
+							<option value="{{el.al_name}}">{{el.al_name}}</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					분석 모델
+				</thead>
+				<tbody>
+					<form action='/model/file_add' method='POST' class="encripted_file" enctype="multipart/form-data">
+						<input type="file" id="file_select" name="atch_origin_file_name"/>
+					</form>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					output 파라미터 매칭
+				</thead>
+				<tbody>
+					<th>속성 타입</th>
+					<th>속성 이름</th>
+					<th>아웃풋 값</th>
+					<table class="output_params_insert"></table>
+				</tbody>
+			</table>
+			<table>
+				<thead>
+					내용 (500자 내외로 작성해주세요)
+					<div></div>
+					<input style="width: 200px; height: 100px" />
+				</thead>
+			</table>
+			<button type="button" id="submitBtn">등록 완료</button>
+		</div>
+	</body>
+</html>

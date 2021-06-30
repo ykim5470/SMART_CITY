@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: true,
 			},
 			al_name_mo: { type: DataTypes.STRING, defaultValue: "no Model selected", allowNull: true },
-			run_status: { type: DataTypes.ENUM("running", "stop"), defaultValue: "실행중", allowNull: true },
+			run_status: { type: DataTypes.ENUM("running", "stop"), defaultValue: "running", allowNull: true },
 			encrypted_file: {
 				type: DataTypes.STRING,
 				allowNull: false,
