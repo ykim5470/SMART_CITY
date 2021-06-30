@@ -27,16 +27,16 @@
       var cell5 = oRow.insertCell();
       //삽입될 Form Tag
       var frmTag1 =
-        "<select name='colType'><option value='String'>STRING</option><option value='Integer'>INTEGER</option>" +
+        "<select name='attribute' onchange='attrChange(this)'><option value='Property'>Property</option><option value='GeoProperty'>GeoProperty</option>" +
+        "<option value='Relationship'>Relationship</option></select>";
+      var frmTag2 =
+        "<select name='colType' style='width:140px;'><option value='String'>STRING</option><option value='Integer'>INTEGER</option>" +
         "<option value='Double'>DOUBLE</option> <option value='Object'>OBJECT</option>" +
         "<option value='Date'>DATE</option><option value='ArrayString'>ARRAY STRING</option>" +
         "<option value='ArrayInteger'>ARRAY INTEGER</option> <option value='ArrayDouble'>ARRAY DOUBLE</option>" +
         "<option value='ArrayObject'>ARRAY OBJECT</option></select>";
-      var frmTag2 = "<input type='text' name='dataSize' placeholder='데이터 사이즈를 입력해주세요' />";
-      var frmTag3 = "<input type='text' name='colName' placeholder=' 컬럼이름을 입력하세요.' />";
-      var frmTag4 =
-        "<select name='attribute' onchange='attrChange()'><option value='Property'>Property</option><option value='GeoProperty'>GeoProperty</option>" +
-        "<option value='Relationship'>Relationship</option></select>";
+      var frmTag3 = "<input type='text' name='dataSize' placeholder='데이터 사이즈를 입력해주세요' />";
+      var frmTag4 = "<input type='text' name='colName' placeholder=' 컬럼이름을 입력하세요.' />";
       var frmTag5 = "<input type='checkbox' name='nullCheck' /><input type='hidden' name='allowNull' value='false'/>";
       frmTag5 += "&nbsp&nbsp<input type=button value='삭제' onClick='removeRow()' style='cursor:hand'>";
       cell1.innerHTML = frmTag1;
@@ -49,21 +49,25 @@
     function removeRow() {
       oTbl.deleteRow(oTbl.clickedRowIndex);
     }
-    function attrChange() {
+    function attrChange(idx) {
+      var index;
+      var elements = document.getElementsByName(idx.name);
       var valueType = document.getElementsByName("colType");
-      var attrType = document.getElementsByName("attribute");
-      for (var i = 0; i < valueType.length; i++) {
-        if (attrType[i].value == "GeoProperty") {
-          valueType[i].innerHTML = " <option value='GeoJson'>GeoJson</option>";
-        } else if (attrType[i].value == "Relationship") {
-          valueType[i].innerHTML = " <option value='String'>STRING</option>";
-        } else {
-          valueType[i].innerHTML =
-            "<option value='String'>STRING</option><option value='Integer'>INTEGER</option>" +
-            "<option value='Double'>DOUBLE</option> <option value='Object'>OBJECT</option>" +
-            "<option value='Date'>DATE</option><option value='ArrayString'>ARRAY STRING</option>" +
-            "<option value='ArrayInteger'>ARRAY INTEGER</option> <option value='ArrayDouble'>ARRAY DOUBLE</option>" +
-            "<option value='ArrayObject'>ARRAY OBJECT</option> ";
+      for (var i = 0; i < elements.length; i++) {
+        if (elements[i] == idx) {
+          if (elements[i].value == "GeoProperty") {
+            valueType[i].innerHTML = " <option value='GeoJson'>GeoJson</option>";
+          } else if (elements[i].value == "Relationship") {
+            valueType[i].innerHTML = " <option value='String'>STRING</option>";
+          } else {
+            valueType[i].innerHTML =
+              "<option value='String'>STRING</option><option value='Integer'>INTEGER</option>" +
+              "<option value='Double'>DOUBLE</option> <option value='Object'>OBJECT</option>" +
+              "<option value='Date'>DATE</option><option value='ArrayString'>ARRAY STRING</option>" +
+              "<option value='ArrayInteger'>ARRAY INTEGER</option> <option value='ArrayDouble'>ARRAY DOUBLE</option>" +
+              "<option value='ArrayObject'>ARRAY OBJECT</option> ";
+          }
+          break;
         }
       }
     }
@@ -83,9 +87,10 @@
       } else {
         frm.version.value = frm.first.value + "." + frm.middle.value + "." + frm.last.value;
         var checkValue = document.getElementsByName("nullCheck");
+        var nullValue = document.getElementsByName("allowNull");
         for (var i = 0; i < checkValue.length; i++) {
-          if (checkValue.checked) {
-            frm.allowNull[i].value = "true";
+          if (checkValue[i].checked) {
+            nullValue[i].value = "true";
           }
         }
         frm.submit();
@@ -111,43 +116,23 @@
         <tr>
           <td>
             <p>버전선택</p>
+            {% set verBox = [0,1,2,3,4,5,6,7,8,9] %}
             <select name="first">
-              <option value="0">0</option>
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
+              {% for items in verBox %}
+              <option value="{{items}}">{{items}}</option>
+              {% endfor %}
             </select>
             <span>.</span>
             <select name="middle">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
+              {% for items in verBox %}
+              <option value="{{items}}">{{items}}</option>
+              {% endfor %}
             </select>
             <span>.</span>
             <select name="last">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
+              {% for items in verBox %}
+              <option value="{{items}}">{{items}}</option>
+              {% endfor %}
             </select>
             <input type="hidden" name="version" id="version" />
           </td>
@@ -165,15 +150,22 @@
           <td>
             <table id="addTable">
               <tr>
-                <th>데이터타입</th>
-                <th>데이터사이즈</th>
-                <th>컬럼명</th>
-                <th>Attribute타입</th>
+                <th>Attribute Type</th>
+                <th>Data Type</th>
+                <th>Data Size</th>
+                <th>Column Name</th>
                 <th>Null 허용여부</th>
               </tr>
               <tr>
                 <td>
-                  <select name="colType">
+                  <select name="attribute" onchange="attrChange(this)">
+                    <option value="Property">Property</option>
+                    <option value="GeoProperty">GeoProperty</option>
+                    <option value="Relationship">Relationship</option>
+                  </select>
+                </td>
+                <td>
+                  <select name="colType" style="width:140px;">
                     <option value="String">STRING</option>
                     <option value="Integer">INTEGER</option>
                     <option value="Double">DOUBLE</option>
@@ -187,13 +179,6 @@
                 </td>
                 <td><input type="text" name="dataSize" placeholder="데이터 사이즈를 입력해주세요" /></td>
                 <td><input type="text" name="colName" placeholder=" 컬럼이름을 입력하세요." /></td>
-                <td>
-                  <select name="attribute" onchange="attrChange()">
-                    <option value="Property">Property</option>
-                    <option value="GeoProperty">GeoProperty</option>
-                    <option value="Relationship">Relationship</option>
-                  </select>
-                </td>
                 <td><input type="checkbox" name="nullCheck" /><input type="hidden" name="allowNull" value="false" /></td>
               </tr>
             </table>

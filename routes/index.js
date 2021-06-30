@@ -46,6 +46,7 @@ router.put("/model_manage_board/:md_id", auth.process.edit);
 
 router.put("/new/softDel/:al_id", newAnaly.process.tbSofeDel);
 router.put("/new/softListDelete", newAnaly.process.softDelList);
+router.put("/new/edited/:al_id", newAnaly.process.edit);
 
 //router.delete = delete 관련
 router.delete("/analysis/hardDel/:al_id", analysis.process.tbHardDel);

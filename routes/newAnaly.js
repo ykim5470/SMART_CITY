@@ -32,6 +32,15 @@ const dataRequest = {
     console.log("========DATA MODEL LIST DELETE REQUEST==========");
     await axios.delete(`http://203.253.128.184:18827/datamodels/${ns}/${name}/${version}`, { headers: { Accept: "application/json" } });
   },
+  edit: async (result) => {
+    console.log("========DATA MODEL EDIT REQUEST==========");
+    let colList = [];
+    const colTemp = JSON.parse(JSON.stringify(result));
+    await colTemp.map((el) => {
+      colList.push(el.column_tbs);
+    });
+    console.log(colList[0])
+  },
 };
 
 const paging = {
@@ -114,18 +123,30 @@ const output = {
   //테이블 수정 화면
   edit: async (req, res) => {
     let analysisId = req.params.al_id;
-    await analysis_list
-      .findOne({
-        where: { al_id: analysisId },
-      })
-      .then((result) => {
-        res.render("newAnaly/n_edit", { analysis: result });
-      });
+    try {
+      await analysis_list
+        .findOne({
+          where: { al_id: analysisId },
+        })
+        .then(async (result) => {
+          const ana = result;
+          await column_tb
+            .findAll({
+              where: { al_id_col: analysisId },
+            })
+            .then((result) => {
+              res.render("newAnaly/n_edit", { analysis: ana, column: result });
+            });
+        });
+    } catch (err) {
+      console.log(err);
+    }
   },
 };
 
 // post
 const process = {
+  //데이터 생성
   insert: async (req, res) => {
     const body = req.body;
     let size = [];
@@ -156,7 +177,14 @@ const process = {
           const conList = result.al_context.split(",");
           for (var i = 0; i < body.colType.length; i++) {
             nullTF = body.allowNull[i] == "true" ? false : true;
-            await column_tb.create({ al_id_col: result.al_id,data_type: body.colType[i],data_size: size[i],column_name: body.colName[i],allowNull: body.allowNull[i],attributeType: body.attribute[i]});
+            await column_tb.create({
+              al_id_col: result.al_id,
+              data_type: body.colType[i],
+              data_size: size[i],
+              column_name: body.colName[i],
+              allowNull: body.allowNull[i],
+              attributeType: body.attribute[i],
+            });
             temp = { name: body.colName[i], isRequired: nullTF, attributeType: body.attribute[i], maxLength: body.dataSize[i], valueType: body.colType[i] };
             column.push(JSON.parse(JSON.stringify(temp)));
           }
@@ -225,6 +253,95 @@ const process = {
         });
     } catch (err) {
       console.log("data list soft delete failed");
+      console.log(err);
+    }
+  },
+  //테이블 수정
+  edit: async (req, res) => {
+    const analyId = req.params.al_id;
+    const body = req.body;
+    let size = [];
+    try {
+      //conId 값이 없는경우 빈객체로 선언 > 전부 새로 만드는 컬럼일 경우
+      if (!body.colId) {
+        body.colId = [];
+      }
+      //컬럼이 하나일 경우 배열로 변환
+      if (typeof body.colName == "string") {
+        body.colName = body.colName.split();
+        body.colType = body.colType.split();
+        body.dataSize = body.dataSize.split();
+        body.allowNull = body.allowNull.split();
+        body.attribute = body.attribute.split();
+        if (body.colId.length > 0) {
+          body.colId = body.colId.split();
+        }
+      }
+      // data size null 처리
+      for (var i = 0; i < body.dataSize.length; i++) {
+        size.push(null);
+        if (body.dataSize[i] != "") {
+          size[i] = body.dataSize[i];
+        }
+      }
+      //분석 테이블 DB 수정
+      await analysis_list.update({ al_context: body.editContext, al_des: body.editDes }, { where: { al_id: analyId } });
+      for (var i = 0; i < body.colName.length; i++) {
+        if (body.colId[i]) {
+          // colId가 있는경우 => 이미 전에 생성이 되어있는 경우 컬럼 수정
+          await column_tb.update(
+            {
+              attributeType: body.attribute[i],
+              data_type: body.colType[i],
+              data_size: size[i],
+              column_name: body.colName[i],
+              allowNull: body.allowNull[i],
+            },
+            { where: { col_id: body.colId[i] } }
+          );
+        } else {
+          // colId가 없는 경우 => 새로운 컬럼 생성
+          await column_tb
+            .create({
+              al_id_col: analyId,
+              attributeType: body.attribute[i],
+              data_type: body.colType[i],
+              data_size: size[i],
+              column_name: body.colName[i],
+              allowNull: body.allowNull[i],
+            }) // 삭제한 배열값과 비교하기 위해 새로 생성된 id값 배열에 부여
+            .then(async (result) => {
+              body.colId.push(result.col_id.toString);
+            });
+        }
+      }
+      // DB 검색해서 현재 남아있는 id 외에 DB에만 남아있는 id를 가진 컬럼 삭제
+      await column_tb.findAll({ attributes: ["col_id"], where: { al_id_col: analyId } }).then(async (result) => {
+        let idList = [];
+        let delList = [];
+        const idTemp = JSON.parse(JSON.stringify(result));
+        await idTemp.map((el) => {
+          idList.push(el.col_id.toString());
+        });
+        delList = idList.filter((x) => !body.colId.includes(x));
+        await column_tb.destroy({ where: { col_id: { [Op.in]: delList } } });
+      });
+      await analysis_list
+        .findAll({
+          where: { al_id: analyId },
+          include: [
+            {
+              model: column_tb,
+              require: false,
+            },
+          ],
+        })
+        .then((result) => {
+          dataRequest.edit(result);
+        });
+      //res.redirect("/new/view/" + analyId);
+    } catch (err) {
+      console.log("Data update failed");
       console.log(err);
     }
   },

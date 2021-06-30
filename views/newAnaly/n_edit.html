@@ -6,19 +6,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>분석 테이블 수정</title>
   </head>
+  <script>
+    var oTbl;
+    //Row 추가
+    function insRow() {
+      oTbl = document.getElementById("addTable");
+      var oRow = oTbl.insertRow();
+      oRow.onmouseover = function () {
+        oTbl.clickedRowIndex = this.rowIndex;
+      }; //clickedRowIndex - 클릭한 Row의 위치를 확인;
+      var cell1 = oRow.insertCell();
+      var cell2 = oRow.insertCell();
+      var cell3 = oRow.insertCell();
+      var cell4 = oRow.insertCell();
+      var cell5 = oRow.insertCell();
+      var cell6 = oRow.insertCell();
+      //삽입될 Form Tag
+      var frmTag1 =
+        "<select name='attribute' onchange='attrChange(this)'><option value='Property'>Property</option><option value='GeoProperty'>GeoProperty</option>" +
+        "<option value='Relationship'>Relationship</option></select>";
+      var frmTag2 =
+        "<select name='colType' style='width:140px;'><option value='String'>STRING</option><option value='Integer'>INTEGER</option>" +
+        "<option value='Double'>DOUBLE</option> <option value='Object'>OBJECT</option>" +
+        "<option value='Date'>DATE</option><option value='ArrayString'>ARRAY STRING</option>" +
+        "<option value='ArrayInteger'>ARRAY INTEGER</option> <option value='ArrayDouble'>ARRAY DOUBLE</option>" +
+        "<option value='ArrayObject'>ARRAY OBJECT</option></select>";
+      var frmTag3 = "<input type='text' name='dataSize' placeholder='데이터 사이즈를 입력해주세요' />";
+      var frmTag4 = "<input type='text' name='colName' placeholder=' 컬럼이름을 입력하세요.' />";
+      var frmTag5 = "<input type='checkbox' name='nullCheck' onclick='nullTf(this)'/><input type='hidden' name='allowNull' value='false'/>";
+      var frmTag6 = "<input type=button value='삭제' onclick='removeRow()' style='cursor:hand'>";
+      cell1.innerHTML = frmTag1;
+      cell2.innerHTML = frmTag2;
+      cell3.innerHTML = frmTag3;
+      cell4.innerHTML = frmTag4;
+      cell5.innerHTML = frmTag5;
+      cell6.innerHTML = frmTag6;
+    }
+    //Row 삭제
+    function removeRow() {
+      oTbl.deleteRow(oTbl.clickedRowIndex);
+    }
+    function deleteRow(idx) {
+      var index;
+      var elements = document.getElementsByName(idx.name);
+      for (var i = 0; i < elements.length; i++) {
+        if (elements[i] == idx) {
+          document.getElementById("addTable").deleteRow(i + 1);
+          break;
+        }
+      }
+    }
+    function attrChange(idx) {
+      var index;
+      var elements = document.getElementsByName(idx.name);
+      var valueType = document.getElementsByName("colType");
+      for (var i = 0; i < elements.length; i++) {
+        if (elements[i] == idx) {
+          if (elements[i].value == "GeoProperty") {
+            valueType[i].innerHTML = " <option value='GeoJson'>GeoJson</option>";
+          } else if (elements[i].value == "Relationship") {
+            valueType[i].innerHTML = " <option value='String'>STRING</option>";
+          } else {
+            valueType[i].innerHTML =
+              "<option value='String'>STRING</option><option value='Integer'>INTEGER</option>" +
+              "<option value='Double'>DOUBLE</option> <option value='Object'>OBJECT</option>" +
+              "<option value='Date'>DATE</option><option value='ArrayString'>ARRAY STRING</option>" +
+              "<option value='ArrayInteger'>ARRAY INTEGER</option> <option value='ArrayDouble'>ARRAY DOUBLE</option>" +
+              "<option value='ArrayObject'>ARRAY OBJECT</option> ";
+          }
+          break;
+        }
+      }
+    }
+    function nullTf(idx){
+      var index;
+      var elements = document.getElementsByName(idx.name);
+      var nullVal = document.getElementsByName("allowNull");
+      for(var i=0; i<elements.length; i++){
+        if(elements[i]==idx){
+          if(nullVal[i].value =="true"){
+            nullVal[i].value ="false"
+          }else{
+            nullVal[i].value ="true"
+          }
+        }
+      }
+    }
+    function goSubmit() {
+      var columnName = document.getElementsByName("colName");
+      if (columnName.length < 1) {
+        window.alert("컬럼은 하나 이상 입력해야합니다");
+        return "#";
+      }
+      for (var i = 0; i < columnName.length; i++) {
+        if (columnName[i].value == "") {
+          window.alert("빈칸을 모두 입력해주세요");
+          columnName[i].focus();
+          return "#";
+        }
+      }
+      var frm = document.edit;
+      if (frm.editDes.value == "" || frm.editContext.value == "") {
+        window.alert("빈칸을 모두 입력해주세요");
+        return "#";
+      } else {
+        frm.editVersion.value = frm.first.value + "." + frm.middle.value + "." + frm.last.value;
+        frm.submit();
+      }
+    }
+  </script>
   <body>
-    <form action="/new/edited/{{analysis.al_id}}?_method=PUT" method="post">
+    <form name="edit" action="/new/edited/{{analysis.al_id}}?_method=PUT" method="post">
       <div>
         <p>
           테이블 이름 : <br />
-          <input type="text" name="editName" value="{{analysis.al_name}}" /><br /><br />
-          테이블 이름 : <br />
-          <input type="text" name="editNs" value="{{analysis.al_ns}}" /><br /><br />
-          테이블 내용 : <br />
-          <input type="text" name="editDes" value="{{analysis.al_des}}" />
+          <input type="text" name="editName" value="{{analysis.al_name}}" disabled/><br /><br />
+          Namespace : <br />
+          <input type="text" name="editNs" value="{{analysis.al_ns}}" disabled/><br /><br />
+          테이블 설명 : <br />
+          <input type="text" name="editDes" value="{{analysis.al_des}}" /><br /><br />
+          Context : <br />
+          <input type="text" name="editContext" value="{{analysis.al_context}}" /><br /><br />
+          Version : <br />
+          {% set ver = analysis.al_version|replace(".","") %} {% set verBox = [0,1,2,3,4,5,6,7,8,9] %}
+          <select name="first" disabled>
+            {% for items in verBox %} {% if (items == ver[0])%}
+            <option value="{{items}}" selected>{{items}}</option>
+            {% else %}
+            <option value="{{items}}">{{items}}</option>
+            {% endif %} {% endfor %}
+          </select>
+          <span>.</span>
+          <select name="middle" disabled>
+            {% for items in verBox %} {% if (items == ver[1])%}
+            <option value="{{items}}" selected>{{items}}</option>
+            {% else %}
+            <option value="{{items}}">{{items}}</option>
+            {% endif %} {% endfor %}
+          </select>
+          <span>.</span>
+          <select name="last" disabled>
+            {% for items in verBox %} {% if (items == ver[2])%}
+            <option value="{{items}}" selected>{{items}}</option>
+            {% else %}
+            <option value="{{items}}">{{items}}</option>
+            {% endif %} {% endfor %}
+          </select>
+          <input type="hidden" name="editVersion" value="{{analysis.al_version}}">
         </p>
+        <h4>예측데이터 컬럼 리스트</h4>
+        <table>
+          <tr>
+            <td>
+              <input name="addButton" type="button" style="cursor: hand" onClick="insRow()" value="추가" />
+              필요한 만큼 추가 버튼을 클릭하세요.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <table id="addTable">
+                <tr>
+                  <th align="left">Attribute type</th>
+                  <th align="left">Data Type</th>
+                  <th align="left">Data Size</th>
+                  <th align="left">Column Name</th>
+                  <th align="left">Null 허용여부</th>
+                </tr>
+                {% for colList in column %}
+                <tr>
+                  <td>
+                    {% set attrType = ["Property" , "GeoProperty" , "Relationship" ] %} {% set attr = colList.attributeType %}
+                    <select name="attribute" onchange="attrChange(this)">
+                      {% for items in attrType %} {% if(items == attr)%}
+                      <option value="{{items}}" selected>{{items}}</option>
+                      {% else %}
+                      <option value="{{items}}">{{items}}</option>
+                      {% endif %} {% endfor %}
+                    </select>
+                  </td>
+                  <td>
+                    {% set proType = [ "String","Integer","Double","Object","Date","ArrayString","ArrayInteger","ArrayDouble","ArrayObject" ] %} {% set geoType = [ "GeoJson" ]%} {% set relType = [ "String" ] %}
+                    {% set colType = colList.data_type %}
+                    <select name="colType" style="width:140px;">
+                      {% if( attr == "Property" )%} {% for items in proType %}{% if( items == colType ) %}
+                      <option value="{{items}}" selected>{{items|upper|replace("RRAY","RRAY ")}}</option>
+                      {% else %}
+                      <option value="{{items}}">{{items|upper|replace("RRAY","RRAY ")}}</option>
+                      {% endif %} {% endfor %} {% elseif (attr == "GeoProperty") %} {% for items in geoType %}{% if( items == colType ) %}
+                      <option value="{{items}}" selected>{{items}}</option>
+                      {% else %}
+                      <option value="{{items}}">{{items}}</option>
+                      {% endif %} {% endfor %} {% else %} {% for items in relType %}{% if( items == colType ) %}
+                      <option value="{{items}}" selected>{{items|upper}}</option>
+                      {% else %}
+                      <option value="{{items}}">{{items|upper}}</option>
+                      {% endif %} {% endfor %}{% endif %}
+                    </select>
+                  </td>
+                  {% if colList.data_size %}
+                  <td><input type="text" name="dataSize" value="{{ colList.data_size }}" /></td>
+                  {% else %}
+                  <td><input type="text" name="dataSize" placeholder="(null)" /></td>
+                  {% endif %}
+                  <td><input type="text" name="colName" value="{{ colList.column_name }}" /></td>
+                  {% if(colList.allowNull=='true') %}
+                  <td><input type="checkbox" name="nullCheck" onclick="nullTf(this)" checked /><input type="hidden" name="allowNull" value="true" /></td>
+                  {% else %}
+                  <td><input type="checkbox" name="nullCheck" onclick="nullTf(this)"/><input type="hidden" name="allowNull" value="false" /></td>
+                  {% endif %}
+                  <td><input type="hidden" name="colId" value="{{colList.col_id}}"><input type="button" name="deleteBtn" value="삭제" onclick="deleteRow(this)" /></td>
+                </tr>
+                {% endfor %}
+              </table>
+            </td>
+          </tr>
+        </table>
       </div>
-      <input type="submit" value="수정하기" />
+      <br />
+      <input type="button" onclick="goSubmit()" value="수정하기" />
       <a href="/new/view/{{analysis.al_id}}"><input type="button" value="돌아가기" /></a>
     </form>
   </body>
