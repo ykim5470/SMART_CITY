@@ -4,6 +4,7 @@ const auth = require("./auth");
 const analysis = require("./analysis");
 const newAnaly = require("./newAnaly");
 const uploadFile = require('../public/js/helpers/upload_dir');
+const ui = require('./ui');
 const paginate = require('express-paginate')
 
 //router.get
@@ -53,5 +54,8 @@ router.put("/new/edited/:al_id", newAnaly.process.edit);
 router.delete("/analysis/hardDel/:al_id", analysis.process.tbHardDel);
 router.delete("/analysis/column/delete/:col_id", analysis.process.colDelete);
 router.delete("/analysis/listDelete", analysis.process.deleteList);
+
+
+router.use("/ui", ui);
 
 module.exports = router;
