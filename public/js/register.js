@@ -18,6 +18,7 @@ const file_select_input = document.querySelector("#file_select");
 const input_params_insert = document.querySelector(".input_params_insert");
 const output_params_insert = document.querySelector(".output_params_insert");
 const register_complete = document.querySelector("#submitBtn");
+const model_description = document.querySelector(".md_desc");
 
 const user_input_value = [];
 let isTrue = false;
@@ -26,9 +27,10 @@ let isInput = [];
 /* emit event */
 // 분석 시간 입력 값 전송
 al_time_input.addEventListener("keyup", () => {
+	var al_time = al_time_input.value;
 	socket.emit("분석 시간 입력", {
 		isTyping: al_time_input.value.length > 0,
-		al_time: al_time_input.value,
+		al_time: +al_time,
 	});
 });
 
@@ -57,8 +59,11 @@ analysis_select_input.addEventListener("change", (e) => {
 	});
 });
 
-console.log("처음 숨겨진 친구" + input_params_insert.childNodes);
-console.log(input_params_insert.childNodes);
+// 모델 설명
+model_description.addEventListener("change", (e) => {
+	socket.emit("분석 모델 설명", e.target.value
+	);
+});
 
 /* Event listen */
 // input params GET & add to page
@@ -80,22 +85,20 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 
 	// 데이터 선택 후 유저 입력 여부 확인 및 테이블 데이터 INSERT
 	const user_input_param = document.getElementsByClassName("user_input_param");
-	const ip_attr_name = document.getElementsByClassName('ip_attr_name')
+	const ip_attr_name = document.getElementsByClassName("ip_attr_name");
 	const input_arr = Array.from(user_input_param);
 	const input_name_arr = Array.from(ip_attr_name);
 
-	input_arr.map((el,index) => {
+	input_arr.map((el, index) => {
 		el.addEventListener("change", (e) => {
-			let input_mapping = input_name_arr.filter((el, idx) => 
-			{
+			let input_mapping = input_name_arr.filter((el, idx) => {
 				if (idx === index) {
 					user_input_value.push({ key: el.value, value: e.target.value });
+				} else {
+					return;
 				}
-				else {
-					return 
-				}
-			})
-			console.log(e.target.value)
+			});
+			console.log(e.target.value);
 			socket.emit("입력 데이터 값", { user_input_value: user_input_value });
 		});
 	});
@@ -116,13 +119,12 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
         `;
 	});
 	output_params_insert.innerHTML = output_box.join("");
-	
-	const user_output_param = document.getElementsByClassName('user_output_param')
-	// 해당 output_value를 어떻게 할 것인가? 
+
+	const user_output_param = document.getElementsByClassName("user_output_param");
+	// 해당 output_value를 어떻게 할 것인가?
 });
 
 socket.on("입력 데이터 값 반환", (data) => {
-	console.log(data)
 	isInput = [...data];
 	console.log(isInput);
 	if (isInput === []) {
@@ -136,8 +138,8 @@ socket.on("입력 데이터 값 반환", (data) => {
 });
 
 const register_submit = (isTrue) => {
-	register_complete.addEventListener("click", async(e) => {
-		document.querySelector('.encripted_file').submit()
+	register_complete.addEventListener("click", async (e) => {
+		document.querySelector(".encripted_file").submit();
 		e.preventDefault();
 		console.log(!isNaN(al_time_input.value) && al_time_input.value !== "");
 		console.log(isTrue);
@@ -147,10 +149,10 @@ const register_submit = (isTrue) => {
 		if (!isNaN(al_time_input.value) && al_time_input.value !== "" && analysis_select_input.value !== "" && isTrue && file_select_input.value !== "") {
 			alert("등록 준비 완료");
 			// 서버에 필요 데이터 전송 및 처리
-			return await socket.emit('데이터 전송 요청')
+			return await socket.emit("데이터 전송 요청");
 		} else {
 			alert("필수 값 입력 필요");
-			return
+			return;
 		}
 	});
 };

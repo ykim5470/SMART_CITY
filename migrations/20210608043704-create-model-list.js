@@ -1,19 +1,14 @@
 "use strict";
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
-		(Sequelize.DATE.prototype._stringify = function (date, options) {
-			date = this._applyTimezone(date, options);
-			return date.format("YYYY.MM.DD - hh:mm A");
-		}.bind(Sequelize.DATE.prototype)),
 		await queryInterface.createTable("model_lists", {
-			id: { allowNull: false, autoIncrement: true, type: Sequelize.INTEGER, primaryKey: true },
 			md_id: {
 				allowNull: false,
-				primaryKey: true,
 				type: Sequelize.UUID,
+				primaryKey: true,
 			},
 			al_time: {
-				type: Sequelize.STRING,
+				type: Sequelize.INTEGER,
 			},
 			md_name: {
 				type: Sequelize.STRING,
@@ -24,7 +19,12 @@ module.exports = {
 			run_status: {
 				type: Sequelize.STRING,
 			},
-			encrypted_file: { type: Sequelize.STRING, allowNull: false, primaryKey: true },
+			encrypted_file: { type: Sequelize.STRING, allowNull: false },
+			data_model_name: { type: Sequelize.STRING, allowNull: false },
+			al_id_model:  {
+				allowNull: false,
+				type: Sequelize.INTEGER
+			  },
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,

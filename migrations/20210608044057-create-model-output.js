@@ -9,9 +9,15 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       op_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
+				allowNull: false,
+				foreignKey: true,
+				onDelete: "CASCADE",
+				references: {
+					model: "model_lists",
+					key: "md_id",
+				},
+				type: Sequelize.UUID,
+			},
       op_param: {
         type: Sequelize.STRING,
         allowNull: false

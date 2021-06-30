@@ -53,7 +53,6 @@ const output = {
 			const hasMore = currentPage < pageCount ? `list?page=${currentPage + 1}&limit=10` : `list?page=${currentPage}&limit=10`;
 			const hasprev = currentPage > 1 ? `list?page=${currentPage - 1}&limit=10` : `list?page=${currentPage}&limit=10`;
       analysis_list.prototype.dateFormat = (date) => moment(date).format("YYYY.MMM.DD - hh:mm A");
-      console.log(results.rows)
 			res.render("analysis/al_list", { anaList: results.rows, pages: pageArray, nextUrl: hasMore, prevUrl: hasprev });
 		});
 	},

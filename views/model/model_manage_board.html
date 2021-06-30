@@ -5,8 +5,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>모델 관리</title>
-			<!-- Bootstrap CSS -->
-			<link
+		<!-- Bootstrap CSS -->
+		<link
 			rel="stylesheet"
 			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
 			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
@@ -43,6 +43,7 @@
 				<th>상태</th>
 				<th>관리</th>
 			</tr>
+			
 			{% for item in list_data %}
 			<tr>
 				<td>
@@ -50,18 +51,21 @@
 						<input type="checkbox" name="md_id" value="{{item.md_id}}" />
 						<input type="hidden" name="delModel" id="delModel" value="" />
 					</form>
-				</td>
-				<td>{{item.id}}</td>
+				</td>	
+				<td>{{list_data.indexOf(item)+1}}</td>	
 				<td>{{ item.al_time }}</td>
-				<td>{{item.md_name}}</td>
+				<td><a href="http://localhost:3000/model_manage_board/edit/{{item.md_id}}">{{item.md_name}}</a></td>
 				<td>{{item.al_name_mo}}</td>
 				<td>{{item.dateFormat(item.createdAt)}}</td>
 				<td>{{item.run_status}}</td>
+
 				<td>
 					<form action="/model_manage_board" method="post"><button type="submit" name="md_id" value="{{item.md_id}}">관리</button></form>
 				</td>
 			</tr>
+
 			{% endfor %}
+			
 		</table>
 		<nav aria-label="Page navigation example">
 			<ul class="pagination">

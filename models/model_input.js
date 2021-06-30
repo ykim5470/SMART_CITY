@@ -10,18 +10,14 @@ module.exports = (sequelize, DataTypes) => {
 		static associate(models) {
 			// define association here
 			this.belongsTo(models.model_list, {
-				foreignKey: 'ip_id'
-			})
+				foreignKey: "ip_id",
+			});
 		}
 	}
 	model_input.init(
 		{
 			id: { allowNull: false, autoIncrement: true, type: DataTypes.INTEGER, primaryKey: true },
-			ip_id: {
-				type: DataTypes.UUID,
-				foreignKey: true,
-				allowNull: false,
-			},
+			ip_id: { type: DataTypes.UUID, foreignKey: true, allowNull: false },
 			ip_param: { type: DataTypes.STRING, allowNull: true },
 			ip_value: { type: DataTypes.STRING, allowNull: true },
 		},

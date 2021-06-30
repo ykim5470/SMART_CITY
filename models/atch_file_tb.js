@@ -9,11 +9,12 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
-			this.belongsTo(models.model_list, { foreignKey: "filename" });
+			this.belongsTo(models.model_list, {foreignKey: { name: 'file_id', allowNull: false }, onDelete: 'CASCADE'});
 		}
 	}
 	atch_file_tb.init(
 		{
+			file_id :{ type: DataTypes.UUID, foreignKey:true, allowNull:false },
 			originalname: { type: DataTypes.STRING, allowNull: false },
 			mimetype: { type: DataTypes.STRING, allowNull: false },
 			path: { type: DataTypes.STRING, allowNull: false },

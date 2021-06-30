@@ -11,11 +11,12 @@ module.exports = (sequelize, DataTypes) => {
 			// define association here
 			// this.belongsTo(models.analysis_list, { foreignKey: "md_id" });
 			// this.belongsTo(models.column_tb, { foreignKey: "al_id_col" });
+			this.belongsTo(models.model_list, { foreignKey: { name: 'des_id', allowNull: false }, onDelete: 'CASCADE' })
 		}
 	}
 	model_output.init(
 		{
-			op_id: { type: DataTypes.INTEGER, allowNull: true, foreginkey: true },
+			op_id: { type: DataTypes.UUID, foreignKey:true, allowNull:false },
 			op_param: { type: DataTypes.STRING, allowNull: true },
 			op_value: { type: DataTypes.STRING, allowNull: true },
 		},

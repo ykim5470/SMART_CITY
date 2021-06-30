@@ -4,6 +4,13 @@ module.exports = {
 		await queryInterface.createTable("model_inputs", {
 			id: {allowNull: false, autoIncrement: true, type: Sequelize.INTEGER, primaryKey: true},
 			ip_id: {
+				allowNull: false,
+				foreignKey: true,
+				onDelete: "CASCADE",
+				references: {
+					model: "model_lists",
+					key: "md_id",
+				},
 				type: Sequelize.UUID,
 			},
 			ip_param: {

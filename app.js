@@ -54,7 +54,8 @@ let al_time_obj = {};
 let data_selection_obj = {};
 let input_param_obj = {};
 let output_param_obj = {}
-let al_name_mo_obj ={}
+let al_name_mo_obj = {}
+let md_desc = ''
 
 
 io.on("connection", function (socket) {
@@ -88,6 +89,10 @@ io.on("connection", function (socket) {
 			socket.emit("데이터 선택 완료 및 인풋 calling", res.attributes);
 		});
 	});
+
+	socket.on('분석 모델 설명', (data) => {
+		 md_desc = data
+	})
 
 	socket.on("분석 모델 선택", (data) => {
 		const { al_name_mo } = data;
@@ -124,8 +129,7 @@ io.on("connection", function (socket) {
 
 
 	socket.on("데이터 전송 요청", () => {
-		const data = { al_time_obj, data_selection_obj, input_param_obj, al_name_mo_obj }
-		console.log(data_selection_obj)
+		const data = { al_time_obj, data_selection_obj, input_param_obj, al_name_mo_obj, md_desc }
 		axios.post('http://localhost:3000/model/register/complete', data, { headers: { Accept: "application/json" } })
 	});
 });

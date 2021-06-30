@@ -8,6 +8,16 @@ module.exports = {
 				primaryKey: true,
 				type: Sequelize.INTEGER,
 			},
+			file_id: {
+				allowNull: false,
+				foreignKey: true,
+				onDelete: "CASCADE",
+				references: {
+					model: "model_lists",
+					key: "md_id",
+				},
+				type: Sequelize.UUID,
+			},
 			originalname: Sequelize.STRING,
 			mimetype: Sequelize.STRING,
 			path: Sequelize.STRING,
