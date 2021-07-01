@@ -21,18 +21,26 @@ const register_complete = document.querySelector("#submitBtn");
 const model_description = document.querySelector(".md_desc");
 
 const user_input_value = [];
-let isTrue = false;
-let isInput = [];
+// let isTrue = false;
+// let isInput = [];
+
+// let a // 분석 시간; 3600
+// let b // 데이터 선택 값; 상가
+// let c // 분석 테이블 선택; lewis-lewis
+// let d // 모델 설명; test description
+// let e = user_input_value // 유저 인풋 값; Double flux 유량, GeoJson location 위치, ... , String refWaterReservoir 저수지
+
 
 /* emit event */
 // 분석 시간 입력 값 전송
-al_time_input.addEventListener("keyup", () => {
-	var al_time = al_time_input.value;
-	socket.emit("분석 시간 입력", {
-		isTyping: al_time_input.value.length > 0,
-		al_time: +al_time,
-	});
-});
+// al_time_input.addEventListener("keyup", () => {
+// 	var al_time = al_time_input.value;
+// 	a = +al_time
+// 	socket.emit("분석 시간 입력", {
+// 		isTyping: al_time_input.value.length > 0,
+// 		al_time: +al_time,
+// 	});
+// });
 
 // 데이터 선택 값 전송
 data_select_input.addEventListener("change", (e) => {
@@ -40,7 +48,8 @@ data_select_input.addEventListener("change", (e) => {
 	if (data_select_input.value == undefined) {
 		return;
 	}
-	console.log(data_select_input.value);
+	// console.log(data_select_input.value);
+	// b = data_select_input.value
 
 	socket.emit("데이터 선택", {
 		dataset_info: data_select_input.value,
@@ -53,31 +62,32 @@ analysis_select_input.addEventListener("change", (e) => {
 	if (analysis_select_input.value == undefined) {
 		return;
 	}
-
+	c = analysis_select_input.value
 	socket.emit("분석 모델 선택", {
 		al_name_mo: analysis_select_input.value,
 	});
 });
 
 // 모델 설명
-model_description.addEventListener("change", (e) => {
-	socket.emit("분석 모델 설명", e.target.value
-	);
-});
+// model_description.addEventListener("change", (e) => {
+// 	d = e.target.value
+// 	socket.emit("분석 모델 설명", e.target.value
+// 	);
+// });
 
 /* Event listen */
 // input params GET & add to page
 socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 	const data_model = attr;
-	console.log(data_model);
-	console.log("API 반환 데이터 : " + data_model);
+	// console.log(data_model);
+	// console.log("API 반환 데이터 : " + data_model);
 
 	const input_box = data_model.map((items, index) => {
 		return `
         <tr>
-            <td><input name="ip_attr_value_type" value="${items.valueType}" disabled /></td>
-            <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" disabled /></td>
-            <td><input class="user_input_param" name="user_input_param${index}"/></td>
+            <td><input name="ip_attr_value_type" value="${items.valueType}" readonly /></td>
+            <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" readonly /></td>
+            <td><input class="user_input_param" name="user_input_param"/></td>
         </tr>
         `;
 	});
@@ -98,7 +108,7 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 					return;
 				}
 			});
-			console.log(e.target.value);
+			// console.log(e.target.value);
 			socket.emit("입력 데이터 값", { user_input_value: user_input_value });
 		});
 	});
@@ -107,13 +117,13 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 // output params GET & add to page
 socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
 	const model_column = data;
-	console.log("DB 반환 데이터 : " + data);
+	// console.log("DB 반환 데이터 : " + data);
 
 	const output_box = model_column.map((items) => {
 		return `
         <tr>
-        <td><input name="op_attr_value_type" value="${items.attributeType}" disabled /></td>
-        <td><input name="op_attr_name" value="${items.column_name}" disabled /></td>
+        <td><input name="op_attr_value_type" value="${items.attributeType}" readonly /></td>
+        <td><input name="op_attr_name" value="${items.column_name}" readonly /></td>
         <td><input name="user_output_param" placeholder="TF로 자동 채워질 예정"" /></td>
         </tr>
         `;
@@ -124,36 +134,38 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
 	// 해당 output_value를 어떻게 할 것인가?
 });
 
-socket.on("입력 데이터 값 반환", (data) => {
-	isInput = [...data];
-	console.log(isInput);
-	if (isInput === []) {
-		isTrue = false;
-	} else {
-		isTrue = true;
-		console.log("유저 입력 함");
-	}
-	register_submit(isTrue);
-});
+// socket.on("입력 데이터 값 반환", (data) => {
+// 	isInput = [...data];
+// 	// console.log(isInput);
+// 	if (isInput === []) {
+// 		isTrue = false;
+// 	} else {
+// 		isTrue = true;
+// 		// console.log("유저 입력 함");
+// 	}
+// 	register_submit(isTrue);
+// });
 
-const register_submit = (isTrue) => {
+const register_submit = () => {
 	register_complete.addEventListener("click", async (e) => {
-		e.preventDefault();
-		console.log(!isNaN(al_time_input.value) && al_time_input.value !== "");
-		console.log(isTrue);
-		console.log(analysis_select_input.value != ""); // ""
-		console.log(file_select_input.value !== ""); // ""
+		// e.preventDefault();
+		// console.log(!isNaN(al_time_input.value) && al_time_input.value !== "");
+		// console.log(isTrue);
+		// console.log(analysis_select_input.value != ""); // ""
+		// console.log(file_select_input.value !== ""); // ""
 		// 분석 시간 숫자인지 아닌지, 데이터 선택이 되었는지 아닌지, 인풋이 1개 이상 있는 지 없는지, 분석 테이블이 선택 되었는지 아닌지, 파일이 선택 되었는지 아닌지
-		if (!isNaN(al_time_input.value) && al_time_input.value !== "" && analysis_select_input.value !== "" && isTrue && file_select_input.value !== "") {
+		// if (!isNaN(al_time_input.value) && al_time_input.value !== "" && analysis_select_input.value !== "" && isTrue && file_select_input.value !== "") {
 			alert("등록 준비 완료");
 			// 파일 정보 post
-			document.querySelector(".encripted_file").submit()
+			return document.querySelector("#register_complete").submit()
 			// 서버에 필요 데이터 전송 및 처리
-			await socket.emit("데이터 전송 요청")
-		} else {
-			alert("필수 값 입력 필요");
-			return;
-		}
+			// (socket.emit("데이터 전송 요청"))
+			
+		// } else {
+		// 	alert("필수 값 입력 필요");
+		// 	return;
+		// }
 	});
 };
 
+register_submit()

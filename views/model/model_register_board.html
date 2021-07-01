@@ -7,6 +7,7 @@
 		<title>모델 등록</title>
 	</head>
 	<body>
+		<form action='/model/register/complete' method='POST' id="register_complete" enctype="multipart/form-data">
 		<div>
 			<table>
 				<thead>
@@ -69,9 +70,9 @@
 					분석 모델
 				</thead>
 				<tbody>
-					<form action='/model/register/complete' method='POST' class="encripted_file" enctype="multipart/form-data">
+					
 						<input type="file" id="file_select" name="atch_origin_file_name"/>
-					</form>
+				
 				</tbody>
 			</table>
 			<table>
@@ -89,7 +90,7 @@
 				<thead>
 					내용 (500자 내외로 작성해주세요)
 					<div></div>
-					<input class='md_desc' style="width: 200px; height: 100px" />
+					<input type ='text' class='md_desc' name='model_desc' style="width: 200px; height: 100px" />
 				</thead>
 			</table>
 			<button type="button" id="submitBtn">등록 완료</button>
@@ -97,5 +98,6 @@
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/js/register.js"></script>
 		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	</form>
 	</body>
 </html>

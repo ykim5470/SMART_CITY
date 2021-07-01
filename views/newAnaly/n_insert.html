@@ -81,10 +81,10 @@
       }
     }
     function goSubmit() {
-      if (nameCheck == false) {
-        window.alert("테이블명 중복 체크를 진행해주세요");
-        return "#";
-      }
+      // if (nameCheck == false) {
+      //   window.alert("테이블명 중복 체크를 진행해주세요");
+      //   return "#";
+      // }
       var columnName = document.getElementsByName("colName");
       for (var i = 0; i < columnName.length; i++) {
         if (columnName[i].value == "") {

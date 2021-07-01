@@ -20,7 +20,6 @@ module.exports = {
 				type: Sequelize.STRING,
 			},
 			file_id: {
-				allowNull: false,
 				foreignKey: true,
 				onDelete: "CASCADE",
 				references: {

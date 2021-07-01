@@ -62,6 +62,7 @@ const output = {
 		let al_time_prev;
 		let md_name_prev;
 		let al_name_mo_prev;
+
 		model_list
 			.findAll({
 				attributes: {
@@ -82,6 +83,8 @@ const output = {
 				al_time_prev = model_edit_value.al_time;
 				md_name_prev = model_edit_value.md_name;
 				al_name_mo_prev = model_edit_value.al_name_mo;
+				md_desc_prev = model_edit_value['model_des.des_text']
+				
 
 				model_input.findAll({ where: { ip_id: md_id }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
 					const model_input_info_str = JSON.stringify(results);
@@ -90,7 +93,7 @@ const output = {
 					console.log(al_time_prev);
 					const dataset_name = output.dataset_select();
 					dataset_name.then((outcome) => {
-						return res.render(`model/model_register_board_edit`, { md_id: md_id, al_time: al_time_prev, md_name: md_name_prev, al_name_mo: al_name_mo_prev, dataset_name: outcome });
+						return res.render(`model/model_register_board_edit`, { md_id: md_id, al_time: al_time_prev, md_name: md_name_prev, al_name_mo: al_name_mo_prev, dataset_name: outcome,md_desc:md_desc_prev });
 					});
 				});
 			});
@@ -121,102 +124,81 @@ const output = {
 
 // Post
 const process = {
-	// 파일 업로드
+	// 파일 TB Create
 	file_add: async (req, res) => {
-		try {
-			console.log("파일 업로드");
-			const { originalname, mimetype, path, filename } = req.file;
-			atch_file_tb.create({
-				file_id,
-				originalname,
-				mimetype,
-				path,
-				filename,
-			});
-			console.log("파일 처리 완료");
-			return;
-			// model_list.findOne({ order: [["createdAt", "DESC"]] }).then((res) => {
-			// 	console.log("최근 등록한 모델 찾기");
-			// 	const file_str = JSON.stringify(res);
-			// 	const file_value = JSON.parse(file_str);
-			// 	console.log("찾았나?");
-			// 	console.log(file_value);
-			// 	console.log("--------------------");
-			// 	let file_id = file_value.md_id;
-			// 	const { originalname, mimetype, path, filename } = req.file;
-			// 	atch_file_tb.create({
-			// 		file_id: file_id,
-			// 		originalname,
-			// 		mimetype,
-			// 		path,
-			// 		filename,
-			// 	});
-			// .then((res) => {
-			// 	const model_from_file = JSON.stringify(res);
-			// 	const model_from_file_value = JSON.parse(model_from_file);
-			// 	let md_name = model_from_file_value.originalname.split(".")[0];
-			// 	console.log('해당 모델 업데이트')
-			// 	console.log(md_name)
-			// 	console.log(file_id)
-			// 	let encrypted_name = model_from_file_value.filename;
-			// 	model_list.update({ md_name: md_name, encrypted_file: encrypted_name }, { where: { md_id: file_id } });
-			// });
-			// return res.redirect("/model_manage_board");
-		} catch (err) {
-			return res.status(500).json({
-				error: "file upload failed",
-			});
-		}
+		const { originalname, mimetype, path, filename } = req.file;
+		atch_file_tb.create({
+			originalname,
+			mimetype,
+			path,
+			filename,
+		});
 	},
 
-	// 등록 완료
+	// 모델 등록 Complete
 	register_complete: async (req, res) => {
-		if (req.file !== undefined) {
-			console.log("일단 파일 업로드 부터 실행");
-			process.file_add(req);
-			return;
-		} else {
-			console.log("다음으로 요청이 오긴 하나?");
-			console.log(req.body);
-			const { al_time_obj, input_param_obj, data_selection_obj, al_name_mo_obj, md_desc } = req.body;
-			let al_time = al_time_obj.al_time;
-			let al_name_mo = al_name_mo_obj.al_name_mo;
-			let data_model_name = data_selection_obj.dataset_info;
-			let al_id;
-			console.log("등록 완료 클릭 후 클릭한 데이터 모델을 이용한 al_id가져오기");
-			console.log(al_name_mo);
+		const { al_name_mo, al_time, dataset_id, model_desc, ip_attr_name, user_input_param } = req.body;
+		let al_id;
+		let file_id;
+		let md_id;
+		let user_obj = new Object();
 
-			await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
-				const al_list_str = JSON.stringify(res);
-				const al_list_value = JSON.parse(al_list_str);
-				al_id = al_list_value.al_id;
-			});
-			console.log(al_time);
+		// 파일 TB Create
+		await process.file_add(req, res);
+		// 분석 모델 TB al_id GET
+		await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
+			const al_list_str = JSON.stringify(res);
+			const al_list_value = JSON.parse(al_list_str);
+			return (al_id = al_list_value.al_id);
+		});
+		// 데이터 셋 TB Create
+		/* dataset_id Required */
 
-			await model_list.create({
+		// 데이터 셋 TB dataset_id GET
+
+		// 파일 TB file_id GET
+		await atch_file_tb.findOne({ order: [["createdAt", "DESC"]] }).then((res) => {
+			const model_from_file = JSON.stringify(res);
+			const model_from_file_value = JSON.parse(model_from_file);
+			file_id = model_from_file_value.file_id;
+		});
+
+		// 모델 리스트 TB Create
+		await model_list
+			.create({
+									// User ID will be applied to md_name later
+				file_id: file_id,
 				al_time: al_time,
 				al_name_mo: al_name_mo,
-				data_model_name: data_model_name,
+				data_model_name: dataset_id,
 				al_id: al_id,
-				dataset_id: "test9999_dataset",
-			});
-			// 여기서 파일 등록 및 수정이 이뤄저야 한다.
-			await model_list.findAll({ limit: 1, where: { al_time: al_time }, order: [["createdAt", "DESC"]] }).then(async (res) => {
-				let md_id_str = JSON.stringify(res);
-				let md_id_value = JSON.parse(md_id_str)[0];
-				const md_id = md_id_value.md_id;
-
-				model_des.create({
-					des_id: md_id,
-					des_text: md_desc,
+				dataset_id: "test9999_dataset", // dataset_id will be applied later
+			})
+			.then(() => {
+				// 생성된 모델 리스트 TB의 md_id GET
+				model_list.findAll({ limit: 1, where: { al_time: al_time }, order: [["createdAt", "DESC"]] }).then(async (res) => {
+					let md_id_str = JSON.stringify(res);
+					let md_id_value = JSON.parse(md_id_str)[0];
+					md_id = md_id_value.md_id;
+					// 모델 설명 TB Create
+					console.log(model_desc)
+					model_des.create({
+						des_id: md_id,
+						des_text: model_desc,
+					});
+					// 인풋 파람 TB 생성
+					user_input_param.filter((el, index) => {
+						if (el != "") {
+							user_obj[ip_attr_name[index]] = el;
+						}
+					});
+					for (i in user_obj) {
+						model_input.create({ip_id: md_id, ip_param: i, ip_value:user_obj[i]})
+					}
 				});
-				for (i in input_param_obj) {
-					const l = input_param_obj[i];
-					model_input.create({ ip_id: md_id, ip_param: Object.values(l)[0], ip_value: Object.values(l)[1] });
-				}
 			});
-			return;
-		}
+
+		return res.redirect("/model_manage_board");
 	},
 
 	// 등록 페이지 이동
