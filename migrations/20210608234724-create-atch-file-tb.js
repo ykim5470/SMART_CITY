@@ -2,21 +2,11 @@
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
 		await queryInterface.createTable("atch_file_tbs", {
-			id: {
+			file_id: {
 				allowNull: false,
 				autoIncrement: true,
 				primaryKey: true,
 				type: Sequelize.INTEGER,
-			},
-			file_id: {
-				allowNull: false,
-				foreignKey: true,
-				onDelete: "CASCADE",
-				references: {
-					model: "model_lists",
-					key: "md_id",
-				},
-				type: Sequelize.UUID,
 			},
 			originalname: Sequelize.STRING,
 			mimetype: Sequelize.STRING,

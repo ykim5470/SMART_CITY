@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
       analysis_list.hasMany(models.model_list, {
         foreignKey: "al_id",
       });
+      analysis_list.hasMany(models.dataset, {
+        foreignKey: 'al_id'
+      })
     }
   }
   analysis_list.init(

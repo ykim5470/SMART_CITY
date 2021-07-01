@@ -127,8 +127,9 @@ io.on("connection", function (socket) {
 	socket.emit("입력 데이터 값 반환",  user_input_list );
 
 
-	socket.on("데이터 전송 요청", () => {
+	socket.on("데이터 전송 요청", async (file_add_callback) => {
+		console.log(file_add_callback)
 		const data = { al_time_obj, data_selection_obj, input_param_obj, al_name_mo_obj, md_desc }
-		axios.post('http://localhost:3000/model/register/complete', data, { headers: { Accept: "application/json" } })
+		await axios.post('http://localhost:3000/model/register/complete', data, { headers: { Accept: "application/json" } })
 	});
 });

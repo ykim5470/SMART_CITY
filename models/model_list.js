@@ -6,10 +6,17 @@ module.exports = (sequelize, DataTypes) => {
 			// define association here
 			this.hasMany(models.model_input, { foreignKey: "ip_id" });
 			this.hasMany(models.model_output, {foreignKey: 'op_id'})
-			this.hasMany(models.atch_file_tb, { foreignKey: "file_id" });
 			this.hasMany(models.model_des, { foreignKey: "des_id" });
+			this.belongsTo(models.atch_file_tb, {
+				foreignKey: { name: 'file_id', allowNull: false },
+				onDelete: "CASCADE"
+			});
 			this.belongsTo(models.analysis_list, {
 				foreignKey: {name:'al_id', allowNull:false},
+				onDelete:"CASCADE"
+			})
+			this.belongsTo(models.dataset, {
+				foreignKey: {name:'dataset_id', allowNull:false},
 				onDelete:"CASCADE"
 			})
 		}
@@ -25,17 +32,22 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			al_name_mo: { type: DataTypes.STRING, defaultValue: "no Model selected", allowNull: true },
 			run_status: { type: DataTypes.ENUM("running", "stop"), defaultValue: "running", allowNull: true },
-			encrypted_file: {
-				type: DataTypes.STRING,
+			file_id: {
+				type: DataTypes.INTEGER,
 				allowNull: false,
-				defaultValue: "encrypted",
+				foreignKey: true
 			},
 			data_model_name: { type: DataTypes.STRING, allowNull: false },
 			al_id:  {
 				allowNull: false,
 				foreignKey: true,
 				type: DataTypes.INTEGER
-			  },
+			},
+			dataset_id: {
+				allowNull: false,
+				foreignKey: true,
+				type: DataTypes.STRING
+			}
 		},
 
 

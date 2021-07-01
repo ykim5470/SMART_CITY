@@ -19,18 +19,37 @@ module.exports = {
 			run_status: {
 				type: Sequelize.STRING,
 			},
-			encrypted_file: { type: Sequelize.STRING, allowNull: false },
-			data_model_name: { type: Sequelize.STRING, allowNull: false },
-			al_id:  {
+			file_id: {
 				allowNull: false,
 				foreignKey: true,
-				onDelete:'CASCADE',
-				references:{
-				  model: 'analysis_lists',
-				  key : 'al_id'
+				onDelete: "CASCADE",
+				references: {
+					model: "atch_file_tbs",
+					key: "file_id",
 				},
-				type: Sequelize.INTEGER
-			  },
+				type: Sequelize.INTEGER,
+			},
+			data_model_name: { type: Sequelize.STRING, allowNull: false },
+			al_id: {
+				allowNull: false,
+				foreignKey: true,
+				onDelete: "CASCADE",
+				references: {
+					model: "analysis_lists",
+					key: "al_id",
+				},
+				type: Sequelize.INTEGER,
+			},
+			dataset_id: {
+				allowNull: false,
+				foreignKey: true,
+				onDelete: "CASCADE",
+				references: {
+					model: "dataset",
+					key: "dataset_id",
+				},
+				type: Sequelize.STRING,
+			},
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,

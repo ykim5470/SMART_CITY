@@ -133,7 +133,6 @@ socket.on("입력 데이터 값 반환", (data) => {
 		isTrue = true;
 		console.log("유저 입력 함");
 	}
-
 	register_submit(isTrue);
 });
 
@@ -147,12 +146,14 @@ const register_submit = (isTrue) => {
 		// 분석 시간 숫자인지 아닌지, 데이터 선택이 되었는지 아닌지, 인풋이 1개 이상 있는 지 없는지, 분석 테이블이 선택 되었는지 아닌지, 파일이 선택 되었는지 아닌지
 		if (!isNaN(al_time_input.value) && al_time_input.value !== "" && analysis_select_input.value !== "" && isTrue && file_select_input.value !== "") {
 			alert("등록 준비 완료");
+			// 파일 정보 post
+			document.querySelector(".encripted_file").submit()
 			// 서버에 필요 데이터 전송 및 처리
-			 await socket.emit("데이터 전송 요청");
-			return document.querySelector(".encripted_file").submit();
+			await socket.emit("데이터 전송 요청")
 		} else {
 			alert("필수 값 입력 필요");
 			return;
 		}
 	});
 };
+
