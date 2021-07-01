@@ -5,6 +5,29 @@ const axios = require("axios");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
 const moment = require("moment");
+const paging = {
+  makeArray: function (current, totalPg, path) {
+    let start = current % 10 == 0 ? Math.floor((current - 1) / 10) * 10 + 1 : Math.floor(current / 10) * 10 + 1; // 페이징 시작 번호
+    let end = current % 10 == 0 ? Math.ceil((current - 1) / 10) * 10 : Math.ceil(current / 10) * 10; // 페이징 끝 번호
+    if (end > totalPg) {
+      end = totalPg;
+    }
+    let pageArray = []; // 페이징 번호 담는 배열
+    let newPath = "";
+    for (var i = start; i <= end; i++) {
+      if (path.indexOf("?page=") > -1) {
+        newPath = path.replace("page=" + current, "page=" + i); // 현재경로를 해당 페이징 넘버 경로로 바꾸기
+      } else {
+        newPath = `list?page=${i}&limit=10`;
+      }
+      pageArray.push({
+        number: i,
+        url: newPath,
+      });
+    }
+    return pageArray;
+  },
+};
 
 //post url
 const dataRequest = {
@@ -33,38 +56,48 @@ const dataRequest = {
     await axios.delete(`http://203.253.128.184:18827/datamodels/${ns}/${name}/${version}`, { headers: { Accept: "application/json" } });
   },
   edit: async (result) => {
-    console.log("========DATA MODEL EDIT REQUEST==========");
-    let colList = [];
-    const colTemp = JSON.parse(JSON.stringify(result));
-    await colTemp.map((el) => {
-      colList.push(el.column_tbs);
-    });
-    console.log(colList[0])
-  },
-};
-
-const paging = {
-  makeArray: function (current, totalPg, path) {
-    let start = current % 10 == 0 ? Math.floor((current - 1) / 10) * 10 + 1 : Math.floor(current / 10) * 10 + 1; // 페이징 시작 번호
-    let end = current % 10 == 0 ? Math.ceil((current - 1) / 10) * 10 : Math.ceil(current / 10) * 10; // 페이징 끝 번호
-    if (end > totalPg) {
-      end = totalPg;
-    }
-    let pageArray = []; // 페이징 번호 담는 배열
-    let newPath = "";
-    for (var i = start; i <= end; i++) {
-      if (path.indexOf("?page=") > -1) {
-        newPath = path.replace("page=" + current, "page=" + i); // 현재경로를 해당 페이징 넘버 경로로 바꾸기
-      } else {
-        newPath = `list?page=${i}&limit=10`;
+    console.log("===========DATA MODEL EDIT REQUEST=============");
+    try {
+      const colTemp = JSON.parse(JSON.stringify(result))[0]; // result 담기
+      const conList = colTemp.al_context.split(","); //context 배열
+      const colList = colTemp.column_tbs;
+      let nullTF = "";
+      let temp = "";
+      let requestCol = [];
+      for (var i = 0; i < colList.length; i++) {
+        nullTF = colList[i].allowNull == "true" ? false : true;
+        temp = { name: colList[i].column_name, isRequired: nullTF, attributeType: colList[i].attributeType, maxLength: colList[i].data_size, valueType: colList[i].data_type };
+        requestCol.push(JSON.parse(JSON.stringify(temp)));
       }
-      pageArray.push({
-        number: i,
-        url: newPath,
+      await axios({
+        method: "PUT",
+        url: `http://203.253.128.184:18827/datamodels/${colTemp.al_ns}/${colTemp.al_name}/${colTemp.al_version}`,
+        data: {
+          context: conList,
+          description: colTemp.al_des,
+          attributes: requestCol,
+        },
+        headers: { "Content-Type": "application/json" },
       });
+    } catch (err) {
+      console.log(err);
     }
-    return pageArray;
   },
+  getTypeList : async (name)=>{
+    console.log("===========DATA MODEL LIST REQUEST=============");
+    let typeList =[];
+    let reValue = "false";
+    await axios.get("http://203.253.128.184:18827/datamodels",{ headers: { Accept: "application/json" } }).then((result)=>{
+      result.data.map((el)=>{typeList.push(el.type)})
+      for(var i=0; i<typeList.length; i++){
+        if(typeList[i]===name){
+          reValue = "true";
+          return reValue;
+        }
+      }
+      return reValue;
+    })
+  }
 };
 
 // get
@@ -142,6 +175,11 @@ const output = {
       console.log(err);
     }
   },
+  dupCheck : async(req,res)=>{
+    const tbName = req.params.checkName;
+    const result = dataRequest.getTypeList(tbName);
+    console.log();
+  }
 };
 
 // post
@@ -189,7 +227,7 @@ const process = {
             column.push(JSON.parse(JSON.stringify(temp)));
           }
           //데이터 생성요청
-          //dataRequest.insert(result, conList, column);
+          dataRequest.insert(result, conList, column);
           res.redirect("/new/list");
         });
       } else {
@@ -209,7 +247,7 @@ const process = {
         .then(async (result) => {
           const name = result.al_name;
           //데이터 삭제 요청
-          //dataRequest.delOne(result);
+          dataRequest.delOne(result);
           console.log("data delete request succeed");
           await analysis_list.update({ al_name: "deleted_" + name, al_delYn: "Y" }, { where: { al_id: analyId } });
         })
@@ -265,7 +303,10 @@ const process = {
       //conId 값이 없는경우 빈객체로 선언 > 전부 새로 만드는 컬럼일 경우
       if (!body.colId) {
         body.colId = [];
+      }else if(typeof body.colId == "string"){ // 새로만드는 컬럼이 많은 경우 다른 값은 배열이어도 id값은 string 일 수 있기 때문에 따로 확인
+        body.colId = body.colId.split();
       }
+      console.log(body.colId);
       //컬럼이 하나일 경우 배열로 변환
       if (typeof body.colName == "string") {
         body.colName = body.colName.split();
@@ -273,10 +314,8 @@ const process = {
         body.dataSize = body.dataSize.split();
         body.allowNull = body.allowNull.split();
         body.attribute = body.attribute.split();
-        if (body.colId.length > 0) {
-          body.colId = body.colId.split();
-        }
       }
+      console.log(typeof body.colId);
       // data size null 처리
       for (var i = 0; i < body.dataSize.length; i++) {
         size.push(null);
@@ -311,7 +350,7 @@ const process = {
               allowNull: body.allowNull[i],
             }) // 삭제한 배열값과 비교하기 위해 새로 생성된 id값 배열에 부여
             .then(async (result) => {
-              body.colId.push(result.col_id.toString);
+              body.colId.push(result.col_id.toString());
             });
         }
       }
@@ -332,6 +371,7 @@ const process = {
           include: [
             {
               model: column_tb,
+              attributes: ["data_type", "column_name", "data_size", "allowNull", "attributeType"],
               require: false,
             },
           ],
@@ -339,7 +379,7 @@ const process = {
         .then((result) => {
           dataRequest.edit(result);
         });
-      //res.redirect("/new/view/" + analyId);
+      res.redirect("/new/view/" + analyId);
     } catch (err) {
       console.log("Data update failed");
       console.log(err);

@@ -13,7 +13,16 @@
       }
     };
     var oTbl;
+    var nameCheck = false;
     //Row 추가
+    function dupCheck() {
+      var tbName = document.getElementsByName("tableName")[0];
+      // ajax를 하기 위한 XmlHttpRequest 객체
+      let xhttp = new XMLHttpRequest();
+      // http 요청 타입과 주소, 동기식 여부
+      xhttp.open("GET", `/new/duplication/check/${tbName.value}`, true);
+      xhttp.send();
+    }
     function insRow() {
       oTbl = document.getElementById("addTable");
       var oRow = oTbl.insertRow();
@@ -72,6 +81,10 @@
       }
     }
     function goSubmit() {
+      if (nameCheck == false) {
+        window.alert("테이블명 중복 체크를 진행해주세요");
+        return "#";
+      }
       var columnName = document.getElementsByName("colName");
       for (var i = 0; i < columnName.length; i++) {
         if (columnName[i].value == "") {
@@ -103,6 +116,7 @@
       <table>
         <tr>
           <td><input type="text" name="tableName" placeholder="테이블이름을 입력하세요." /></td>
+          <td><input type="button" onclick="dupCheck()" value="중복확인" /></td>
         </tr>
         <tr>
           <td><input type="text" name="nameSpace" placeholder="nameSpace를 입력하세요." /></td>
@@ -165,7 +179,7 @@
                   </select>
                 </td>
                 <td>
-                  <select name="colType" style="width:140px;">
+                  <select name="colType" style="width: 140px">
                     <option value="String">STRING</option>
                     <option value="Integer">INTEGER</option>
                     <option value="Double">DOUBLE</option>
