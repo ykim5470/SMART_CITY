@@ -22,20 +22,35 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   dataset.init({
+    ds_id: {type :DataTypes.INTEGER , allowNull: false},
     dataset_id:  {type :DataTypes.STRING , allowNull: false , primaryKey: true}, // PK model_list
-    dataset_des: { type : DataTypes.STRING, allowNull: false }, 
-    dataset_name: { type: DataTypes.STRING, allowNull: false },
-    updatedInterval: { type: DataTypes.STRING, allowNull: false},
-    categroy: { type: DataTypes.STRING, allowNull: false},
-    datasetItems: { type: DataTypes.STRING, allowNull: false},
-    targetRegions: { type: DataTypes.STRING, allowNull: false},
+    name: { type: DataTypes.STRING, allowNull: false },
+    description: { type : DataTypes.STRING}, 
+    updateInterval: { type: DataTypes.STRING, allowNull: false},
+    category: { type: DataTypes.STRING, allowNull: false},
+    providerSystem: { type: DataTypes.STRING, allowNull: false},
+    isProcessed: { type: DataTypes.STRING, allowNull: false, defaultValue: "원천데이터"},
+    ownership: { type: DataTypes.STRING, allowNull: false},
+    keywords: { type: DataTypes.STRING},
+    license: { type: DataTypes.STRING, allowNull: false},
+    providingApiUri: { type: DataTypes.STRING},
+    restrictions: { type: DataTypes.STRING},
+    datasetExtension: { type: DataTypes.STRING},
+    datasetItems: { type: DataTypes.STRING,allowNull: false},
+    targetRegions: { type: DataTypes.STRING,allowNull: false},
+    sourceDatasetIds: { type: DataTypes.STRING},
+    qualityCheckEnabled: { type: DataTypes.STRING, allowNull: false},
+    dataIdentifierType: { type: DataTypes.STRING},
     al_id:  {
       allowNull: false,
       foreignKey: true,
       type: DataTypes.INTEGER
       }, // FK analysis_list
-    provisioningRequestedId: {type: DataTypes.STRING, allowNull: false}
-    
+    datamodelType: { type: DataTypes.STRING, allowNull: false},
+    datamodelNamespace: { type: DataTypes.STRING, allowNull: false},
+    datamodelVersion: { type: DataTypes.STRING, allowNull: false},
+    storageRetention: { type: DataTypes.INTEGER},
+    topicRetention: { type: DataTypes.INTEGER}
   }, {
     sequelize,
     modelName: 'dataset',

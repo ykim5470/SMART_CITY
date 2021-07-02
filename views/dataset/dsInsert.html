@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DATASET 등록</title>
+  </head>
+  <script></script>
+  <style type="text/css">body input[type="text"],[type="number"]{width:270px;}</style>
+  <body>
+    <h1>DATASET 등록</h1>
+    <form action="/ds/insert" method="POST" name="register">
+      <p>&Star;표시 항목은 필수 입니다</p>
+      <p>&Star;DATASET ID : <input type="text" name="dataId" placeholder="ID를 입력하세요" />&nbsp;<input type="button" onclick="dupCheck()" name="dupBtn" value="중복확인" /></p>
+      <p>&Star;DATASET NAME : <input type="text" name="name" placeholder="NAME을 입력하세요." /></p>
+
+      <p>DATASET DESCRIPTION : <input type="text" name="description" placeholder="설명을 입력하세요" /></p>
+
+      <p>&Star;DATASET INTERVAL : <input type="text" name="updateInterval" placeholder="갱신주기를 입력하세요" /></p>
+
+      <p>&Star;DATASET CATEGORY : <input type="text" name="category" placeholder="분류체계(코드)를 입력하세요" /></p>
+
+      <p>&Star;DATASET PROVIDER ORGANIZATION : <input type="text" name="providerOrganization" placeholder="제공기관을 입력하세요" /></p>
+
+      <p>&Star;DATASET PROVIDER SYSTEM : <input type="text" name="providerSystem" placeholder="제공시스템을 입력하세요" /></p>
+
+      <p>DATASET PROCESS : <input type="text" name="isProcessed" placeholder="데이터 가공여부를 입력하세요" />
+      <span style="font-size: 12px"> * 입력하지 않을 경우 원천데이터로 판단함</span></p>
+
+      <p>&Star;DATASET OWNERSHIP : <input type="text" name="ownership" placeholder="소유권을 입력하세요" /></p>
+
+      <p>DATASET KEYWORDS : <input type="text" name="keywords" placeholder="키워드(코드)를 입력하세요" /></p>
+
+      <p>&Star;DATASET LICENSE : <input type="text" name="license" placeholder="라이센스를 입력하세요" /></p>
+
+      <p>DATASET API URL : <input type="text" name="providingApiUri" placeholder="제공 API 주소를 입력하세요" /></p>
+
+      <p>DATASET RESTRICTIONS : <input type="text" name="restrictions" placeholder="제약사항을 입력하세요" /></p>
+
+      <p>DATASET EXTENSION : <input type="text" name="datasetExtension" placeholder="확장자를 입력하세요" /></p>
+
+      <p>&Star;DATASET ITEMS : <input type="text" name="datasetItems" placeholder="제공항목을 입력하세요" /></p>
+
+      <p>&Star;DATASET REGIONS : <input type="text" name="targetRegions" placeholder="지역범위를 입력하세요" /></p>
+
+      <p>DATASET IDENTIFIER : <input type="text" name="sourceDatasetIds" placeholder="가공데이터셋 식별자를 입력하세요" /></p>
+
+      <p>DATASET 품질 검증 여부 : <select name="qualityCheckEnabled"> <option value="true">TRUE</option> <option value="false" selected>FALSE</option> </select></p>
+
+      <p>DATASET IDENTIFIER TYPE : <input type="text" name="dataIdentifierType" placeholder="데이터 식별자 타입(코드)를 입력하세요" /></p>
+
+      <p>DATASET STORAGE RETENTION : <input type="number" name="storageRetention" placeholder="데이터 저장 유효기간를 입력하세요(DAYS)" /></p>
+
+      <p>DATASET TOPIC RETENTION : <input type="number" name="topicRetention" placeholder="토픽 저장 유효기간을 입력하세요(ms)" /></p>
+      
+      <input type="button" value="등록하기" onclick="goSubmit()" />
+      <a href="/new/list"><input type="button" value="목록보기" /></a>
+    </form>
+  </body>
+</html>
