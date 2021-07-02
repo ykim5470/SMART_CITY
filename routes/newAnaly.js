@@ -82,7 +82,7 @@ const dataRequest = {
     } catch (err) {
       console.log(err);
     }
-  },
+  },   
   getTypeList : async (name)=>{
     console.log("===========DATA MODEL LIST REQUEST=============");
     let typeList =[];
@@ -95,8 +95,8 @@ const dataRequest = {
           return reValue;
         }
       }
-      return reValue;
     })
+    return reValue
   }
 };
 
@@ -177,8 +177,9 @@ const output = {
   },
   dupCheck : async(req,res)=>{
     const tbName = req.params.checkName;
-    const result = dataRequest.getTypeList(tbName);
-    console.log();
+    dataRequest.getTypeList(tbName).then(result => {
+      res.send(result);
+    });
   }
 };
 
@@ -187,6 +188,7 @@ const process = {
   //데이터 생성
   insert: async (req, res) => {
     const body = req.body;
+    console.log(body);
     let size = [];
     try {
       if (typeof body.colName == "string") {
