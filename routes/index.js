@@ -27,7 +27,8 @@ router.post("/model_manage_board", auth.process.status_update);
 router.post("/model/register", auth.process.register_init);
 router.post('/model/list/delete', auth.process.delete)
 router.post('/model/file_add',uploadFile.single("atch_origin_file_name"), auth.process.file_add)
-router.post('/model/register/complete',uploadFile.single("atch_origin_file_name"), auth.process.register_complete)
+router.post('/model/register/complete', uploadFile.single("atch_origin_file_name"), auth.process.register_complete)
+router.post('/model/register/edit', uploadFile.single("atch_origin_file_name"), auth.process.register_edit)
 
 //router.put = update관련
 router.put("/model_manage_board/:md_id", auth.process.edit);

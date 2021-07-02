@@ -6,7 +6,7 @@ const sequelize = require("sequelize");
 const Op = sequelize.Op;
 const moment = require("moment");
 const paging = {
-  makeArray: function (current, totalPg, path) {
+  makeArray: function (base, current, totalPg, path) {
     let start = current % 10 == 0 ? Math.floor((current - 1) / 10) * 10 + 1 : Math.floor(current / 10) * 10 + 1; // 페이징 시작 번호
     let end = current % 10 == 0 ? Math.ceil((current - 1) / 10) * 10 : Math.ceil(current / 10) * 10; // 페이징 끝 번호
     if (end > totalPg) {
@@ -18,7 +18,7 @@ const paging = {
       if (path.indexOf("?page=") > -1) {
         newPath = path.replace("page=" + current, "page=" + i); // 현재경로를 해당 페이징 넘버 경로로 바꾸기
       } else {
-        newPath = `list?page=${i}&limit=10`;
+        newPath = `${base}?page=${i}&limit=10`;
       }
       pageArray.push({
         number: i,
@@ -114,12 +114,14 @@ const output = {
     if (currentPage > 1) {
       offset = 10 * (currentPage - 1);
     }
+    
     await analysis_list.findAndCountAll({ limit: req.query.limit, offset: offset, where: { al_delYn: "N" }, order: [["createdAt", "DESC"]] }).then((results) => {
       const itemCount = results.count; //총 게시글 갯수
       const pageCount = Math.ceil(itemCount / req.query.limit); //페이지 갯수
-      const pageArray = paging.makeArray(currentPage, pageCount, temp);
-      const hasMore = currentPage < pageCount ? `list?page=${currentPage + 1}&limit=10` : `list?page=${currentPage}&limit=10`;
-      const hasprev = currentPage > 1 ? `list?page=${currentPage - 1}&limit=10` : `list?page=${currentPage}&limit=10`;
+      const base = 'list'
+      const pageArray = paging.makeArray(base, currentPage, pageCount, temp);
+      const hasMore = currentPage < pageCount ? `${base}?page=${currentPage + 1}&limit=10` : `${base}?page=${currentPage}&limit=10`;
+      const hasprev = currentPage > 1 ? `${base}?page=${currentPage - 1}&limit=10` : `${base}?page=${currentPage}&limit=10`;
       analysis_list.prototype.dateFormat = (date) => moment(date).format("YYYY.MMM.DD - hh:mm A");
       res.render("newAnaly/n_list", { anaList: results.rows, pages: pageArray, nextUrl: hasMore, prevUrl: hasprev });
     });
@@ -392,4 +394,5 @@ const process = {
 module.exports = {
   output,
   process,
+  paging
 };

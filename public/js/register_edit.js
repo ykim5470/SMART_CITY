@@ -17,36 +17,47 @@ const analysis_select_input = document.querySelector("#al_select");
 const file_select_input = document.querySelector("#file_select");
 const input_params_insert = document.querySelector(".input_params_insert");
 const output_params_insert = document.querySelector(".output_params_insert");
-const register_complete = document.querySelector("#submitBtn");
+const register_edit = document.querySelector("#submitBtn");
 const model_description = document.querySelector(".md_desc");
 
 const user_input_value = [];
 
-console.log(data_select_input.value === '')
-
 // 데이터 선택 값 전송
-data_select_input.addEventListener("change", (e) => {
-	e.preventDefault();
-	if (data_select_input.value == undefined) {
-		return;
-	}
-
-	socket.emit("데이터 선택", {
+if (data_select_input.value !== "") {
+    socket.emit("데이터 선택", {
 		dataset_info: data_select_input.value,
-	});
-});
+    });
+    data_select_input.addEventListener("change", (e) => {
+        e.preventDefault();
+        if (data_select_input.value == undefined) {
+            return;
+        }
+    
+        socket.emit("데이터 선택", {
+            dataset_info: data_select_input.value,
+        });
+    });
+}
+
 
 // 분석 데이터 선택
-analysis_select_input.addEventListener("change", (e) => {
-	e.preventDefault();
-	if (analysis_select_input.value == undefined) {
-		return;
-	}
-	c = analysis_select_input.value
-	socket.emit("분석 모델 선택", {
+if (analysis_select_input.value !== "") {
+    socket.emit("분석 모델 선택", {
 		al_name_mo: analysis_select_input.value,
-	});
-});
+    });
+
+
+    analysis_select_input.addEventListener("change", (e) => {
+        e.preventDefault();
+        if (analysis_select_input.value == undefined) {
+            return;
+        }
+    
+        socket.emit("분석 모델 선택", {
+            al_name_mo: analysis_select_input.value,
+        });
+    });
+}
 
 
 /* Event listen */
@@ -79,7 +90,6 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 					return;
 				}
 			});
-			// console.log(e.target.value);
 			socket.emit("입력 데이터 값", { user_input_value: user_input_value });
 		});
 	});
@@ -107,10 +117,10 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
 
 
 const register_submit = () => {
-	register_complete.addEventListener("click", async (e) => {
-			alert("등록 준비 완료");
+	register_edit.addEventListener("click", async (e) => {
+			alert("수정 준비 완료");
 			// 파일 정보 post
-			return document.querySelector("#register_complete").submit()
+			return document.querySelector("#register_edit").submit()
 	});
 };
 

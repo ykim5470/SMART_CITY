@@ -2,10 +2,13 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>모델 수정 {{md_id}}</title>
 	</head>
 	<body>
+		<form action='/model/register/edit' method='post' id="register_edit"  enctype="multipart/form-data">
+			<input name="md_id" value="{{md_id}}" hidden>
 		<div>
 			<table>
 				<thead>
@@ -25,7 +28,9 @@
 				<tbody>
 					<td>
 						<select name="dataset_id" id="data_select">
+							<option value="{{data_model_name}}">{{ dataset_name_prev}}</option>
 							{% for name in dataset_name%}
+							
 							<option value="{{name.value.id}},{{name.value.dataModelType}},{{name.value.dataModelNamespace}},{{name.value.dataModelVersion}}">{{name.key}}</option>
 							{% endfor %}
 						</select>
@@ -42,7 +47,8 @@
 					<th>속성</th>
 					<th>파라미터</th>
 
-					<table class="input_params_insert"></table>
+					<table class="input_params_insert">
+					</table>
 				</tbody>
 			</table>
 			<table>
@@ -53,7 +59,7 @@
 					<td>
 						<label for="al_name_mo">/분석 테이블/</label>
 						<select name="al_name_mo" id="al_select">
-							<option value="">{{al_name_mo}}</option>
+							<option value="{{al_name_mo_prev}}">{{al_name_mo_prev}}</option>
 							{% for el in al_name_mo %}
 							<option value="{{el.al_name}}">{{el.al_name}}</option>
 							{% endfor %}
@@ -89,7 +95,10 @@
 					<input style="width: 200px; height: 100px" value='{{md_desc}}'/>
 				</thead>
 			</table>
-			<button type="button" id="submitBtn">등록 완료</button>
+			<button type="button" id="submitBtn">수정 완료</button>
 		</div>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="/js/register_edit.js"></script>
+	</form>
 	</body>
 </html>
