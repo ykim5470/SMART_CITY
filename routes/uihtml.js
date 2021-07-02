@@ -1,6 +1,6 @@
 const { model_list, model_output, model_des, model_input, atch_file_tb, analysis_list, dataset, column_tb, sequelize } = require("../models");
 const axios = require("axios");
-const analysis = require("./analysis.js");
+const analysis = require("./newAnaly.js");
 const moment = require("moment");
 
 // Get
