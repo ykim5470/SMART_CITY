@@ -310,7 +310,6 @@ const process = {
       }else if(typeof body.colId == "string"){ // 새로만드는 컬럼이 많은 경우 다른 값은 배열이어도 id값은 string 일 수 있기 때문에 따로 확인
         body.colId = body.colId.split();
       }
-      console.log(body.colId);
       //컬럼이 하나일 경우 배열로 변환
       if (typeof body.colName == "string") {
         body.colName = body.colName.split();
@@ -319,7 +318,17 @@ const process = {
         body.allowNull = body.allowNull.split();
         body.attribute = body.attribute.split();
       }
-      console.log(typeof body.colId);
+      // DB 검색해서 현재 남아있는 id 외에 DB에만 남아있는 id를 가진 컬럼 삭제
+      await column_tb.findAll({ attributes: ["col_id"], where: { al_id_col: analyId } }).then(async (result) => {
+        let idList = [];
+        let delList = [];
+        const idTemp = JSON.parse(JSON.stringify(result));
+        await idTemp.map((el) => {
+          idList.push(el.col_id.toString());
+        });
+        delList = idList.filter((x) => !body.colId.includes(x));
+        await column_tb.destroy({ where: { col_id: { [Op.in]: delList } } });
+      });
       // data size null 처리
       for (var i = 0; i < body.dataSize.length; i++) {
         size.push(null);
@@ -352,23 +361,9 @@ const process = {
               data_size: size[i],
               column_name: body.colName[i],
               allowNull: body.allowNull[i],
-            }) // 삭제한 배열값과 비교하기 위해 새로 생성된 id값 배열에 부여
-            .then(async (result) => {
-              body.colId.push(result.col_id.toString());
-            });
+            }) 
         }
       }
-      // DB 검색해서 현재 남아있는 id 외에 DB에만 남아있는 id를 가진 컬럼 삭제
-      await column_tb.findAll({ attributes: ["col_id"], where: { al_id_col: analyId } }).then(async (result) => {
-        let idList = [];
-        let delList = [];
-        const idTemp = JSON.parse(JSON.stringify(result));
-        await idTemp.map((el) => {
-          idList.push(el.col_id.toString());
-        });
-        delList = idList.filter((x) => !body.colId.includes(x));
-        await column_tb.destroy({ where: { col_id: { [Op.in]: delList } } });
-      });
       await analysis_list
         .findAll({
           where: { al_id: analyId },

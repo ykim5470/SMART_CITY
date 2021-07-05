@@ -47,7 +47,6 @@
       oTbl.deleteRow(oTbl.clickedRowIndex);
     }
     function deleteRow(idx) {
-      var index;
       var elements = document.getElementsByName(idx.name);
       for (var i = 0; i < elements.length; i++) {
         if (elements[i] == idx) {
@@ -57,7 +56,6 @@
       }
     }
     function attrChange(idx) {
-      var index;
       var elements = document.getElementsByName(idx.name);
       var valueType = document.getElementsByName("colType");
       for (var i = 0; i < elements.length; i++) {
@@ -79,7 +77,6 @@
       }
     }
     function nullTf(idx){
-      var index;
       var elements = document.getElementsByName(idx.name);
       var nullVal = document.getElementsByName("allowNull");
       for(var i=0; i<elements.length; i++){

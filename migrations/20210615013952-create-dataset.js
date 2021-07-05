@@ -6,6 +6,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         type: Sequelize.INTEGER,
+        unique:true
       },
       dataset_id: {
         type: Sequelize.STRING,
@@ -16,8 +17,9 @@ module.exports = {
       description: { type: Sequelize.STRING },
       updateInterval: { type: Sequelize.STRING, allowNull: false },
       category: { type: Sequelize.STRING, allowNull: false },
+      providerOrganization: { type: Sequelize.STRING, allowNull: false },
       providerSystem: { type: Sequelize.STRING, allowNull: false },
-      isProcessed: { type: Sequelize.STRING, allowNull: false, defaultValue: "원천데이터" },
+      isProcessed: { type: Sequelize.STRING, allowNull: false, defaultValue: "가공데이터" },
       ownership: { type: Sequelize.STRING, allowNull: false },
       keywords: { type: Sequelize.STRING },
       license: { type: Sequelize.STRING, allowNull: false },
@@ -37,8 +39,8 @@ module.exports = {
       datamodelType: { type: Sequelize.STRING, allowNull: false },
       datamodelNamespace: { type: Sequelize.STRING, allowNull: false },
       datamodelVersion: { type: Sequelize.STRING, allowNull: false },
-      storageRetention: { type: Sequelize.INTEGER },
-      topicRetention: { type: Sequelize.INTEGER },
+      storageRetention: { type: Sequelize.STRING },
+      topicRetention: { type: Sequelize.STRING },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

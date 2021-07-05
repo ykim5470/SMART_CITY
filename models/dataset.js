@@ -22,14 +22,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   dataset.init({
-    ds_id: {type :DataTypes.INTEGER , allowNull: false},
+    ds_id: {type :DataTypes.INTEGER , allowNull: false, autoIncrement:true, unique:true},
     dataset_id:  {type :DataTypes.STRING , allowNull: false , primaryKey: true}, // PK model_list
     name: { type: DataTypes.STRING, allowNull: false },
     description: { type : DataTypes.STRING}, 
     updateInterval: { type: DataTypes.STRING, allowNull: false},
     category: { type: DataTypes.STRING, allowNull: false},
+    providerOrganization: { type: DataTypes.STRING, allowNull: false},
     providerSystem: { type: DataTypes.STRING, allowNull: false},
-    isProcessed: { type: DataTypes.STRING, allowNull: false, defaultValue: "원천데이터"},
+    isProcessed: { type: DataTypes.STRING, allowNull: false, defaultValue: "가공데이터"},
     ownership: { type: DataTypes.STRING, allowNull: false},
     keywords: { type: DataTypes.STRING},
     license: { type: DataTypes.STRING, allowNull: false},
@@ -49,8 +50,8 @@ module.exports = (sequelize, DataTypes) => {
     datamodelType: { type: DataTypes.STRING, allowNull: false},
     datamodelNamespace: { type: DataTypes.STRING, allowNull: false},
     datamodelVersion: { type: DataTypes.STRING, allowNull: false},
-    storageRetention: { type: DataTypes.INTEGER},
-    topicRetention: { type: DataTypes.INTEGER}
+    storageRetention: { type: DataTypes.STRING},
+    topicRetention: { type: DataTypes.STRING}
   }, {
     sequelize,
     modelName: 'dataset',

@@ -6,13 +6,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DATASET 등록</title>
   </head>
-  <script></script>
-  <style type="text/css">body input[type="text"],[type="number"]{width:270px;}</style>
+  <style type="text/css">
+    body input[type="text"],
+    [type="number"] {
+      width: 270px;
+    }
+  </style>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script>
+    function showAl() {
+      var temp = document.getElementsByName("dataIdName")[0].value;
+      var idVer = temp.split(",");
+      fetch(`/ds/getNsVer/${idVer[0]}`)
+        .then((res) => res.json())
+        .then((data) => {
+          var ns = document.getElementById("selectedNs");
+          var ver = document.getElementById("selectedVer");
+          ns.innerHTML = `└SELECTED DATAMODEL NAMESPACE : <input type="text" name="datamodelNamespace" value="${data.al_ns}" readonly />`;
+          ver.innerHTML = `└SELECTED DATAMODEL VERSION : <input type="text" name="datamodelVersion" value="${data.al_version}" readonly/>`;
+        });
+      document.getElementsByName("al_id")[0].value = idVer[0];
+      document.getElementsByName("datamodelType")[0].value = idVer[1];
+    }
+    function goSubmit() {
+      var value = [];
+      $("#reFrm")
+        .find("input[type=text],input[type=hidden]")
+        .each(function (index, item) {
+          if ($(this).val() != "") {
+            value.push($(this).attr('name'));
+          }
+        });
+        value.push("qualityCheckEnabled");
+      $("#valArr").val(value)
+      console.log($("#valArr").val())
+      $("#reFrm").submit();
+    }
+  </script>
   <body>
     <h1>DATASET 등록</h1>
-    <form action="/ds/insert" method="POST" name="register">
+    <form action="/ds/inserted" method="POST" name="register" id="reFrm">
       <p>&Star;표시 항목은 필수 입니다</p>
-      <p>&Star;DATASET ID : <input type="text" name="dataId" placeholder="ID를 입력하세요" />&nbsp;<input type="button" onclick="dupCheck()" name="dupBtn" value="중복확인" /></p>
+      <p>&Star;DATASET ID : <input type="text" name="dataset_id" placeholder="ID를 입력하세요" />&nbsp;<input type="button" onclick="dupCheck()" name="dupBtn" value="중복확인" /></p>
       <p>&Star;DATASET NAME : <input type="text" name="name" placeholder="NAME을 입력하세요." /></p>
 
       <p>DATASET DESCRIPTION : <input type="text" name="description" placeholder="설명을 입력하세요" /></p>
@@ -25,8 +60,10 @@
 
       <p>&Star;DATASET PROVIDER SYSTEM : <input type="text" name="providerSystem" placeholder="제공시스템을 입력하세요" /></p>
 
-      <p>DATASET PROCESS : <input type="text" name="isProcessed" placeholder="데이터 가공여부를 입력하세요" />
-      <span style="font-size: 12px"> * 입력하지 않을 경우 원천데이터로 판단함</span></p>
+      <p>
+        DATASET PROCESS : <input type="text" name="isProcessed" placeholder="데이터 가공여부를 입력하세요" />
+        <span style="font-size: 12px"> * 입력하지 않을 경우 원천데이터로 판단함(지금은 일단 가공데이터)</span>
+      </p>
 
       <p>&Star;DATASET OWNERSHIP : <input type="text" name="ownership" placeholder="소유권을 입력하세요" /></p>
 
@@ -46,16 +83,39 @@
 
       <p>DATASET IDENTIFIER : <input type="text" name="sourceDatasetIds" placeholder="가공데이터셋 식별자를 입력하세요" /></p>
 
-      <p>DATASET 품질 검증 여부 : <select name="qualityCheckEnabled"> <option value="true">TRUE</option> <option value="false" selected>FALSE</option> </select></p>
+      <p>
+        DATASET 품질 검증 여부 :
+        <select name="qualityCheckEnabled">
+          <option value="true">TRUE</option>
+          <option value="false" selected>FALSE</option>
+        </select>
+      </p>
 
       <p>DATASET IDENTIFIER TYPE : <input type="text" name="dataIdentifierType" placeholder="데이터 식별자 타입(코드)를 입력하세요" /></p>
 
       <p>DATASET STORAGE RETENTION : <input type="number" name="storageRetention" placeholder="데이터 저장 유효기간를 입력하세요(DAYS)" /></p>
 
       <p>DATASET TOPIC RETENTION : <input type="number" name="topicRetention" placeholder="토픽 저장 유효기간을 입력하세요(ms)" /></p>
-      
+      {% if analy | length %}
+      <p>
+        DATAMODEL NAME SELECT :
+        <select name="dataIdName" onchange="showAl()">
+          {% for items in analy %}
+          <option value="{{items.al_id}},{{items.al_name}}">{{items.al_name}}</option>
+          {% endfor %}
+        </select>
+      </p>
+      <p id="selectedNs"></p>
+      <p id="selectedVer"></p>
+      <input type="hidden" name="datamodelType" value="" /><input type="hidden" name="al_id" value="" /><input type="hidden" name="getValue" id="valArr"value="" />
       <input type="button" value="등록하기" onclick="goSubmit()" />
+      {% else %}
+      <p>참조할 데이터 모델이 없습니다. 모델을 등록한 후 다시 진행해주세요</p>
+      {% endif %}
       <a href="/new/list"><input type="button" value="목록보기" /></a>
     </form>
   </body>
+  <script>
+    window.onload = showAl();
+  </script>
 </html>
