@@ -66,14 +66,14 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 	const data_model = attr;
 	const input_box = data_model.map((items, index) => {
 		return `
-        <tr>
+		<tr>
             <td><input name="ip_attr_value_type" value="${items.valueType}" readonly /></td>
             <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" readonly /></td>
             <td><input class="user_input_param" name="user_input_param"/></td>
-        </tr>
-        `;
+		</tr>
+		`;
 	});
-	input_params_insert.innerHTML = input_box.join("");
+	// input_params_insert.innerHTML = input_box.join("");
 
 	// 데이터 선택 후 유저 입력 여부 확인 및 테이블 데이터 INSERT
 	const user_input_param = document.getElementsByClassName("user_input_param");
@@ -118,7 +118,6 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
 
 const register_submit = () => {
 	register_edit.addEventListener("click", async (e) => {
-			alert("수정 준비 완료");
 			// 파일 정보 post
 			return document.querySelector("#register_edit").submit()
 	});

@@ -22,8 +22,6 @@ const model_description = document.querySelector(".md_desc");
 
 const user_input_value = [];
 
-console.log(data_select_input.value === '')
-
 // 데이터 선택 값 전송
 data_select_input.addEventListener("change", (e) => {
 	e.preventDefault();
@@ -42,12 +40,11 @@ analysis_select_input.addEventListener("change", (e) => {
 	if (analysis_select_input.value == undefined) {
 		return;
 	}
-	c = analysis_select_input.value
+	c = analysis_select_input.value;
 	socket.emit("분석 모델 선택", {
 		al_name_mo: analysis_select_input.value,
 	});
 });
-
 
 /* Event listen */
 // input params GET & add to page
@@ -105,13 +102,11 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
 	// 해당 output_value를 어떻게 할 것인가?
 });
 
-
 const register_submit = () => {
 	register_complete.addEventListener("click", async (e) => {
-			alert("등록 준비 완료");
-			// 파일 정보 post
-			return document.querySelector("#register_complete").submit()
+		// 파일 정보 post
+		return document.querySelector("#register_complete").submit();
 	});
 };
 
-register_submit()
+register_submit();

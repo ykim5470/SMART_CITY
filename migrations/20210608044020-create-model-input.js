@@ -19,6 +19,9 @@ module.exports = {
 			ip_value: {
 				type: Sequelize.STRING,
 			},
+			ip_type: {
+				type: Sequelize.STRING,
+			},
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,

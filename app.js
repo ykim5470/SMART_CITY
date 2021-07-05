@@ -77,7 +77,6 @@ io.on("connection", function (socket) {
 	// 선택 된 분석 모델 API calling; attributes GET
 	socket.on("분석 모델 선택", (data) => {
 		const { al_name_mo } = data;
-		console.log("선택된 분석 모델 이름 : " + al_name_mo); // test1, dataset001, etc
 		al_name_mo_obj = {al_name_mo}
 
 		const analysis_output = async () => {

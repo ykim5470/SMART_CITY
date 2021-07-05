@@ -2,6 +2,7 @@ const { model_list, model_output, model_des, model_input, atch_file_tb, analysis
 const axios = require("axios");
 const analysis = require("./newAnaly.js");
 const moment = require("moment");
+const errorHandling = require("../public/js/helpers/error_handling");
 
 // Get
 const output = {
@@ -60,7 +61,7 @@ const output = {
 		let al_time_prev;
 		let md_name_prev;
 		let al_name_mo_prev;
-		let dataset_name_prev
+		let dataset_name_prev;
 
 		model_list
 			.findAll({
@@ -78,42 +79,49 @@ const output = {
 			.then((result) => {
 				const model_edit_str = JSON.stringify(result);
 				const model_edit_value = JSON.parse(model_edit_str)[0];
-				console.log(model_edit_value); // md_id, al_time, md_name, al_name_mo, run_status, data_model_name, al_id, des_text, originalname, al_context
 				al_time_prev = model_edit_value.al_time;
 				md_name_prev = model_edit_value.md_name;
 				al_name_mo_prev = model_edit_value.al_name_mo;
 				md_desc_prev = model_edit_value["model_des.des_text"];
-				data_model_name_prev = model_edit_value.data_model_name // 'haemil_stormWater_01,WaterFlowMeter,kr.waterdna,1.0'
-				
+				data_model_name_prev = model_edit_value.data_model_name; // 'haemil_stormWater_01,WaterFlowMeter,kr.waterdna,1.0'
+				file_name_prev = model_edit_value["atch_file_tb.originalname"];
 
 				model_input.findAll({ where: { ip_id: md_id }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
 					const model_input_info_str = JSON.stringify(results);
 					const model_input_info_value = JSON.parse(model_input_info_str);
-					// console.log(model_input_info_value) // 이전에 유저가 입력했던 인풋 값들 나중에 value매칭할 때 사용할 것. 
 					analysis_list.findAll({ attributes: ["al_name"] }).then((result_edit) => {
 						const str_edit = JSON.stringify(result_edit);
 						let newValue_edit = JSON.parse(str_edit);
-						newValue_edit.filter(el => {
-							if(el.al_name != al_name_mo_prev)
-							  newValue_edit = el
-						})
-						
+						newValue_edit.filter((el) => {
+							if (el.al_name != al_name_mo_prev) newValue_edit = el;
+						});
+
 						const dataset_name = output.dataset_select();
-					
+
 						dataset_name.then((outcome) => {
-							outcome.filter(el => { if(el.value.id === data_model_name_prev.split(',')[0]){
-								dataset_name_prev = el.key
-								}})
+							outcome.filter((el) => {
+								if (el.value.id === data_model_name_prev.split(",")[0]) {
+									dataset_name_prev = el.key;
+								}
+							});
+							let outcome_except_prev = new Array();
+							outcome.filter((item) => {
+								if (item.value.id !== data_model_name_prev.split(",")[0]) {
+									outcome_except_prev.push(item);
+								}
+							});
 							return res.render(`model/model_register_board_edit`, {
-								al_name_mo_prev : al_name_mo_prev,
+								al_name_mo_prev: al_name_mo_prev,
 								md_id: md_id,
 								al_time: al_time_prev,
 								md_name: md_name_prev,
 								al_name_mo: [newValue_edit],
-								dataset_name: outcome,
+								dataset_name: outcome_except_prev,
 								dataset_name_prev: dataset_name_prev,
 								md_desc: md_desc_prev,
-								data_model_name : data_model_name_prev
+								data_model_name: data_model_name_prev,
+								model_input_info_value: model_input_info_value,
+								file_name_prev: file_name_prev,
 							});
 						});
 					});
@@ -149,7 +157,7 @@ const process = {
 	// 파일 TB Create
 	file_add: async (req, res) => {
 		const { originalname, mimetype, path, filename } = req.file;
-		atch_file_tb.create({
+		await atch_file_tb.create({
 			originalname,
 			mimetype,
 			path,
@@ -159,113 +167,158 @@ const process = {
 
 	// 모델 등록 Complete
 	register_complete: async (req, res) => {
-		const { al_name_mo, al_time, dataset_id, model_desc, ip_attr_name, user_input_param } = req.body;
-		let al_id;
-		let file_id;
-		let md_id;
-		let user_obj = new Object();
+		const { al_name_mo, al_time, dataset_id, model_desc, ip_attr_name, user_input_param, ip_attr_value_type } = req.body;
+		// Error handling from server
+		try {
+			errorHandling.al_time_handling(al_time); // 3600
+			errorHandling.dataset_handling(dataset_id); // dataset_0625,now test,kr.citydatahub,2.0
+			errorHandling.input_param_handling(user_input_param); // ['유량','','','','','',''] or ''
+			errorHandling.al_name_mo_handling(al_name_mo); // lewis-dataset111
+			errorHandling.file_upload_handling(req.file); // {file_name: '', mimtype: '', etc}
 
-		// 파일 TB Create
-		await process.file_add(req, res);
-		// 분석 모델 TB al_id GET
-		await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
-			const al_list_str = JSON.stringify(res);
-			const al_list_value = JSON.parse(al_list_str);
-			return (al_id = al_list_value.al_id);
-		});
-		// 데이터 셋 TB Create
-		/* dataset_id Required */
+			let al_id;
+			let file_id;
+			let md_id;
+			let user_obj = new Object();
 
-		// 데이터 셋 TB dataset_id GET
+			// 파일 TB Create
+			await process.file_add(req, res);
+			// 분석 모델 TB al_id GET
+			await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
+				const al_list_str = JSON.stringify(res);
+				const al_list_value = JSON.parse(al_list_str);
+				return (al_id = al_list_value.al_id);
+			});
+			// 데이터 셋 TB Create
+			/* dataset_id Required */
 
-		// 파일 TB file_id GET
-		await atch_file_tb.findOne({ order: [["createdAt", "DESC"]] }).then((res) => {
-			const model_from_file = JSON.stringify(res);
-			const model_from_file_value = JSON.parse(model_from_file);
-			file_id = model_from_file_value.file_id;
-		});
+			// 데이터 셋 TB dataset_id GET
 
-		// 모델 리스트 TB Create
-		await model_list
-			.create({
-				// User ID will be applied to md_name later
-				file_id: file_id,
-				al_time: al_time,
-				al_name_mo: al_name_mo,
-				data_model_name: dataset_id,
-				al_id: al_id,
-				dataset_id: "test9999_dataset", // dataset_id will be applied later
-			})
-			.then(() => {
-				// 생성된 모델 리스트 TB의 md_id GET
-				model_list.findAll({ limit: 1, where: { al_time: al_time }, order: [["createdAt", "DESC"]] }).then(async (res) => {
-					let md_id_str = JSON.stringify(res);
-					let md_id_value = JSON.parse(md_id_str)[0];
-					md_id = md_id_value.md_id;
-					// 모델 설명 TB Create
-					model_des.create({
-						des_id: md_id,
-						des_text: model_desc,
-					});
-					// 인풋 파람 TB 생성
-					user_input_param.filter((el, index) => {
-						if (el != "") {
-							user_obj[ip_attr_name[index]] = el;
-						}
-					});
-					for (i in user_obj) {
-						model_input.create({ ip_id: md_id, ip_param: i, ip_value: user_obj[i] });
-					}
-				});
+			// 파일 TB file_id GET
+			await atch_file_tb.findAll({ order: [["createdAt", "DESC"]] }).then((res) => {
+				const model_from_file = JSON.stringify(res);
+				const model_from_file_value = JSON.parse(model_from_file)[0];
+				return (file_id = model_from_file_value.file_id);
 			});
 
-		return res.redirect("/model_manage_board");
+			// 모델 리스트 TB Create
+			await model_list
+				.create({
+					// User ID will be applied to md_name later
+					file_id: file_id,
+					al_time: al_time,
+					al_name_mo: al_name_mo,
+					data_model_name: dataset_id,
+					al_id: al_id,
+					dataset_id: "test9999_dataset", // dataset_id will be applied later
+				})
+				.then(() => {
+					// 생성된 모델 리스트 TB의 md_id GET
+					model_list.findAll({ limit: 1, where: { al_time: al_time }, order: [["createdAt", "DESC"]] }).then(async (res) => {
+						let md_id_str = JSON.stringify(res);
+						let md_id_value = JSON.parse(md_id_str)[0];
+						md_id = md_id_value.md_id;
+						// 모델 설명 TB Create
+						model_des.create({
+							des_id: md_id,
+							des_text: model_desc,
+						});
+						// 인풋 파람 TB 생성
+						if (typeof user_input_param === "string") {
+							[user_input_param].filter((el, index) => {
+								if (el != "" && typeof ip_attr_value_type != "string") {
+									user_obj[ip_attr_name[index]] = [el, ip_attr_value_type[index]];
+								} else {
+									user_obj[ip_attr_name] = [el, ip_attr_value_type];
+								}
+							});
+						} else {
+							user_input_param.filter((el, index) => {
+								if (el != "") {
+									user_obj[ip_attr_name[index]] = [el, ip_attr_value_type[index]];
+								}
+							});
+						}
+						for (i in user_obj) {
+							model_input.create({ ip_id: md_id, ip_param: i, ip_value: user_obj[i][0], ip_type: user_obj[i][1] });
+						}
+					});
+				});
+
+			return res.redirect("/model_manage_board");
+		} catch (err) {
+			console.log(err);
+			return res.send(`<script>alert("${err}");location.href=history.back();</script>`);
+		}
 	},
 
 	// 등록 페이지 수정
 	register_edit: async (req, res) => {
-		const { md_id, al_name_mo, al_time, dataset_id, model_desc, ip_attr_name, user_input_param } = req.body;
-		let file_id;
-		let al_id;
-		let user_obj = new Object();
+		const { md_id, al_name_mo, al_time, dataset_id, model_desc, ip_attr_name, user_input_param, ip_attr_value_type } = req.body;
+		try {
+			// Error handling from server
+			errorHandling.al_time_handling(al_time); // 3600
+			errorHandling.dataset_handling(dataset_id); // dataset_0625,now test,kr.citydatahub,2.0
+			errorHandling.input_param_handling(user_input_param); // ['유량','','','','','',''] or ''
+			errorHandling.al_name_mo_handling(al_name_mo); // lewis-dataset111
 
-		// 파일 TB file_id GET and update
-		await atch_file_tb.findOne({ order: [["createdAt", "DESC"]] }).then((res) => {
-			const model_from_file = JSON.stringify(res);
-			const model_from_file_value = JSON.parse(model_from_file);
-			file_id = model_from_file_value.file_id;
-		});
-		await model_list.update({ file_id: file_id }, { where: { md_id: md_id } });
+			let file_id;
+			let al_id;
+			let user_obj = new Object();
 
-		// 분석 모델 TB al_id GET
-		await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
-			const al_list_str = JSON.stringify(res);
-			const al_list_value = JSON.parse(al_list_str);
-			return (al_id = al_list_value.al_id);
-		});
+			// 파일 TB file_id GET and update
+			await atch_file_tb.findOne({ order: [["createdAt", "DESC"]] }).then((res) => {
+				const model_from_file = JSON.stringify(res);
+				const model_from_file_value = JSON.parse(model_from_file);
+				file_id = model_from_file_value.file_id;
+			});
+			await model_list.update({ file_id: file_id }, { where: { md_id: md_id } });
 
-		// 모델 리스트 TB 수정
-		model_list.update({ al_time: al_time, al_name_mo: al_name_mo, data_model_name: dataset_id, al_id: al_id, dataset_id: "test9999_dataset" }, { where: { md_id: md_id } }).then(() => {
+			// 분석 모델 TB al_id GET
+			await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
+				const al_list_str = JSON.stringify(res);
+				const al_list_value = JSON.parse(al_list_str);
+				return (al_id = al_list_value.al_id);
+			});
+
+			// 모델 리스트 TB 수정
+			await model_list.update({ al_time: al_time, al_name_mo: al_name_mo, data_model_name: dataset_id, al_id: al_id, dataset_id: "test9999_dataset" }, { where: { md_id: md_id } });
+
 			// 모델 설명 TB update
-			model_des.update(
+			await model_des.update(
 				{
 					des_id: md_id,
 					des_text: model_desc,
 				},
 				{ where: { des_id: md_id } }
 			);
-			// 인풋 파람 TB update
-			user_input_param.filter((el, index) => {
-				if (el != "") {
-					user_obj[ip_attr_name[index]] = el;
-				}
-			});
-			for (i in user_obj) {
-				model_input.update({where: {ip_id: md_id}},{ ip_id: md_id, ip_param: i, ip_value: user_obj[i] });
-			}
-		});
 
-		return res.redirect("/model_manage_board");
+			// 인풋 파람 TB update
+			if (typeof user_input_param === "string") {
+				[user_input_param].filter((el, index) => {
+					if (el != "" && typeof ip_attr_value_type != "string") {
+						user_obj[ip_attr_name[index]] = [el, ip_attr_value_type[index]];
+					} else {
+						user_obj[ip_attr_name] = [el, ip_attr_value_type];
+					}
+				});
+			} else {
+				user_input_param.filter((el, index) => {
+					if (el != "") {
+						user_obj[ip_attr_name[index]] = [el, ip_attr_value_type[index]];
+					}
+				});
+			}
+
+			for (i in user_obj) {
+				model_input.update({ ip_id: md_id, ip_param: i, ip_value: user_obj[i][0], ip_type: user_obj[i][1] }, { where: { ip_id: md_id } });
+			}
+
+			return res.redirect("/model_manage_board");
+		} catch (err) {
+			console.log(err);
+			return res.send(`<script>alert("${err}");location.href=history.back();</script>`);
+		}
 	},
 
 	// 등록 페이지 이동

@@ -7,98 +7,105 @@
 		<title>모델 수정 {{md_id}}</title>
 	</head>
 	<body>
-		<form action='/model/register/edit' method='post' id="register_edit"  enctype="multipart/form-data">
-			<input name="md_id" value="{{md_id}}" hidden>
-		<div>
-			<table>
-				<thead>
-					분석시간
-				</thead>
-				<tbody>
-					<td>
-						초 :
-						<input type="text" id="al_time" name="al_time" value='{{al_time}}'/>
-					</td>
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					데이터 선택
-				</thead>
-				<tbody>
-					<td>
-						<select name="dataset_id" id="data_select">
-							<option value="{{data_model_name}}">{{ dataset_name_prev}}</option>
-							{% for name in dataset_name%}
-							
+		<form action="/model/register/edit" method="post" id="register_edit" enctype="multipart/form-data">
+			<input name="md_id" value="{{md_id}}" hidden />
+			<div>
+				<table>
+					<thead>
+						분석시간
+					</thead>
+					<tbody>
+						<td>
+							초 :
+							<input type="text" id="al_time" name="al_time" value="{{al_time}}" />
+						</td>
+					</tbody>
+				</table>
+				<table>
+					<thead>
+						데이터 선택
+					</thead>
+					<tbody>
+						<td>
+							<select name="dataset_id" id="data_select" disabled>
+								<option value="{{data_model_name}}">{{ dataset_name_prev}}</option>
+								<!-- {% for name in dataset_name%}
 							<option value="{{name.value.id}},{{name.value.dataModelType}},{{name.value.dataModelNamespace}},{{name.value.dataModelVersion}}">{{name.key}}</option>
-							{% endfor %}
-						</select>
-					</td>
-				</tbody>
-			</table>
+							{% endfor %} -->
+							</select>
+						</td>
+					</tbody>
+				</table>
 
-			<table>
-				<thead>
-					input 파라미터 매칭
-				</thead>
-				<tbody>
-					<th>값 타입</th>
-					<th>속성</th>
-					<th>파라미터</th>
+				<table>
+					<thead>
+						input 파라미터 매칭
+					</thead>
+					<tbody>
+						<th>값 타입</th>
+						<th>속성</th>
+						<th>파라미터</th>
 
-					<table class="input_params_insert">
-					</table>
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					분석결과 테이블
-				</thead>
-				<tbody>
-					<td>
-						<label for="al_name_mo">/분석 테이블/</label>
-						<select name="al_name_mo" id="al_select">
-							<option value="{{al_name_mo_prev}}">{{al_name_mo_prev}}</option>
-							{% for el in al_name_mo %}
-							<option value="{{el.al_name}}">{{el.al_name}}</option>
-							{% endfor %}
-						</select>
-					</td>
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					분석 모델
-				</thead>
-				<tbody>
-					<form action='/model/file_add' method='POST' class="encripted_file" enctype="multipart/form-data">
-						<input type="file" id="file_select" name="atch_origin_file_name"/>
-					</form>
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					output 파라미터 매칭
-				</thead>
-				<tbody>
-					<th>속성 타입</th>
-					<th>속성 이름</th>
-					<th>아웃풋 값</th>
-					<table class="output_params_insert"></table>
-				</tbody>
-			</table>
-			<table>
-				<thead>
-					내용 (500자 내외로 작성해주세요)
-					<div></div>
-					<input style="width: 200px; height: 100px" value='{{md_desc}}'/>
-				</thead>
-			</table>
-			<button type="button" id="submitBtn">수정 완료</button>
-		</div>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="/js/register_edit.js"></script>
-	</form>
+						<table class="input_params_insert">
+							<tr>
+								{%for input_collections in model_input_info_value%}
+							</tr>
+
+							<tr>
+								<td><input name="ip_attr_value_type" value="{{input_collections.ip_type}}" readonly /></td>
+								<td><input class="ip_attr_name" name="ip_attr_name" value="{{input_collections.ip_param}}" readonly /></td>
+								<td><input class="user_input_param" name="user_input_param" value="{{input_collections.ip_value}}" /></td>
+							</tr>
+							{%endfor%}
+						</table>
+					</tbody>
+				</table>
+				<table>
+					<thead>
+						분석결과 테이블
+					</thead>
+					<tbody>
+						<td>
+							<label for="al_name_mo">/분석 테이블/</label>
+							<select name="al_name_mo" id="al_select">
+								<option value="{{al_name_mo_prev}}">{{al_name_mo_prev}}</option>
+								{% for el in al_name_mo %}
+								<option value="{{el.al_name}}">{{el.al_name}}</option>
+								{% endfor %}
+							</select>
+						</td>
+					</tbody>
+				</table>
+				<table>
+					<thead>
+						분석 모델
+					</thead>
+					<tbody>
+						<input type="file" id="file_select" name="atch_origin_file_name" value='{{file_name_prev}}' />
+					</tbody>
+				</table>
+				<table>
+					<thead>
+						output 파라미터 매칭
+					</thead>
+					<tbody>
+						<th>속성 타입</th>
+						<th>속성 이름</th>
+						<th>아웃풋 값</th>
+						<table class="output_params_insert"></table>
+					</tbody>
+				</table>
+				<table>
+					<thead>
+						내용 (500자 내외로 작성해주세요)
+						<div></div>
+						<input style="width: 200px; height: 100px" name ='model_desc' value="{{md_desc}}" />
+					</thead>
+				</table>
+				<button type="button" id="submitBtn">수정 완료</button>
+			</div>
+			<script src="/socket.io/socket.io.js"></script>
+			<script src="/js/register_edit.js"></script>
+		</form>
 	</body>
 </html>

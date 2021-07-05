@@ -4,6 +4,7 @@
 # Modules
 node_modules/
 
+# uploads
 uploads/
 
 # Logs
@@ -14,5 +15,3 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# uploads
-uplodas

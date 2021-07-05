@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 			ip_id: { type: DataTypes.UUID, foreignKey: true, allowNull: false },
 			ip_param: { type: DataTypes.STRING, allowNull: true },
 			ip_value: { type: DataTypes.STRING, allowNull: true },
+			ip_type:{ type: DataTypes.STRING, allowNull: true },
 		},
 		{
 			sequelize,
