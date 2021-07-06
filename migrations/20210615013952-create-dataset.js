@@ -41,6 +41,11 @@ module.exports = {
       datamodelVersion: { type: Sequelize.STRING, allowNull: false },
       storageRetention: { type: Sequelize.STRING },
       topicRetention: { type: Sequelize.STRING },
+      ds_delYn: {
+        type: Sequelize.CHAR,
+        allowNull: false,
+        defaultValue:'N'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

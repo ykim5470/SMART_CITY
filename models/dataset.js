@@ -51,7 +51,8 @@ module.exports = (sequelize, DataTypes) => {
     datamodelNamespace: { type: DataTypes.STRING, allowNull: false},
     datamodelVersion: { type: DataTypes.STRING, allowNull: false},
     storageRetention: { type: DataTypes.STRING},
-    topicRetention: { type: DataTypes.STRING}
+    topicRetention: { type: DataTypes.STRING},
+    ds_delYn: { type: DataTypes.CHAR, allowNull: false, defaultValue: 'N' }
   }, {
     sequelize,
     modelName: 'dataset',

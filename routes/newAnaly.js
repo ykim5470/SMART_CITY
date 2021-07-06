@@ -114,7 +114,6 @@ const output = {
     if (currentPage > 1) {
       offset = 10 * (currentPage - 1);
     }
-    
     await analysis_list.findAndCountAll({ limit: req.query.limit, offset: offset, where: { al_delYn: "N" }, order: [["createdAt", "DESC"]] }).then((results) => {
       const itemCount = results.count; //총 게시글 갯수
       const pageCount = Math.ceil(itemCount / req.query.limit); //페이지 갯수
@@ -128,7 +127,7 @@ const output = {
   },
   viewDelList: function (req, res, next) {
     analysis_list.findAll({ where: { al_delYn: "Y" } }).then((result) => {
-      res.render("analysis/al_list", { anaList: result, admin: "admin" });
+      res.render("newAnaly/n_list", { anaList: result, admin: "admin" });
     });
   },
   //테이블 & 해당 컬럼 조회

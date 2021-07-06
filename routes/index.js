@@ -7,6 +7,7 @@ const uploadFile = require('../public/js/helpers/upload_dir');
 const ui = require('./ui');
 const paginate = require('express-paginate')
 
+router.get("/",function(req,res){res.render("index")})
 //================================GET==================================
 //Analysis 
 router.get("/new/insert", newAnaly.output.insert);
@@ -24,6 +25,9 @@ router.get("/model_register_board", auth.output.model_register_board);
 //Dataset
 router.get("/ds/insert", ds.output.insert);
 router.get("/ds/getNsVer/:id",ds.output.getNsVer);
+router.get("/ds/duplication/check/:checkId", ds.output.dupCheck);
+router.get("/ds/list",paginate.middleware(10, 50), ds.output.list);
+router.get("/ds/list/:page",paginate.middleware(10, 50), ds.output.list);
 
 
 //==============================POST======================================

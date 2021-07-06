@@ -30,11 +30,11 @@
 			<table>
 				<tr>
 					<td>선택 &nbsp</td>
-					<td>삭제된 테이블 이름 &nbsp&nbsp&nbsp&nbsp</td>
-					<td>삭제된 테이블 설명 &nbsp&nbsp&nbsp&nbsp</td>
+					<td>삭제된 dataset ID &nbsp&nbsp&nbsp&nbsp</td>
+					<td>삭제된 dataset NAME &nbsp&nbsp&nbsp&nbsp</td>
 					<td>등록일</td>
 				</tr>
-				{% for list in anaList %}
+				{% for list in dataList %}
 				<tr>
 					<form action="/new/listDelete?_method=DELETE" method="POST" id="delListFrm">
 						<td><input type="checkbox" name="delId" value="{{list.al_id}}" /></td>
@@ -53,19 +53,19 @@
 			<table>
 				<tr>
 					<td>선택 &nbsp</td>
-					<td>테이블 이름 &nbsp&nbsp&nbsp&nbsp</td>
-					<td>테이블 설명 &nbsp&nbsp&nbsp&nbsp</td>
-					<td>등록일</td>
+					<td>dataset ID &nbsp&nbsp&nbsp&nbsp</td>
+					<td>dataset NAME &nbsp&nbsp&nbsp&nbsp</td>
+					<td>등록일 &nbsp&nbsp&nbsp&nbsp</td>
 					<td>
-						<a href="/new/insert"><button>분석테이블 등록하기</button></a>
+						<a href="/ds/insert"><button>dataset 등록하기</button></a>
 					</td>
 				</tr>
-				{% for list in anaList %}
+				{% for list in dataList %}
 				<tr>
-					<form action="/new/softListDelete?_method=PUT" method="POST" id="delListFrm">
-						<td><input type="checkbox" name="delId" value="{{list.al_id}}" /></td>
-						<td><a href="/new/view/{{list.al_id}}">{{list.al_name}}</a></td>
-						<td><a href="/new/view/{{list.al_id}}">{{list.al_des}}</a></td>
+					<form action="/ds/softListDelete?_method=PUT" method="POST" id="delListFrm">
+						<td><input type="checkbox" name="delId" value="{{list.ds_id}}" /></td>
+						<td><a href="#">{{list.dataset_id}}</a></td>
+						<td><a href="#">{{list.name}}</a></td>
 						<td>{{list.dateFormat(list.createdAt)}}</td>
 						{% endfor %}
 						<input type="hidden" name="deleteList" id="deleteList" value="" />

@@ -13,36 +13,7 @@
     }
   </style>
   <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-  <script>
-    function showAl() {
-      var temp = document.getElementsByName("dataIdName")[0].value;
-      var idVer = temp.split(",");
-      fetch(`/ds/getNsVer/${idVer[0]}`)
-        .then((res) => res.json())
-        .then((data) => {
-          var ns = document.getElementById("selectedNs");
-          var ver = document.getElementById("selectedVer");
-          ns.innerHTML = `└SELECTED DATAMODEL NAMESPACE : <input type="text" name="datamodelNamespace" value="${data.al_ns}" readonly />`;
-          ver.innerHTML = `└SELECTED DATAMODEL VERSION : <input type="text" name="datamodelVersion" value="${data.al_version}" readonly/>`;
-        });
-      document.getElementsByName("al_id")[0].value = idVer[0];
-      document.getElementsByName("datamodelType")[0].value = idVer[1];
-    }
-    function goSubmit() {
-      var value = [];
-      $("#reFrm")
-        .find("input[type=text],input[type=hidden]")
-        .each(function (index, item) {
-          if ($(this).val() != "") {
-            value.push($(this).attr('name'));
-          }
-        });
-        value.push("qualityCheckEnabled");
-      $("#valArr").val(value)
-      console.log($("#valArr").val())
-      $("#reFrm").submit();
-    }
-  </script>
+  <script src="/js/dataset/insert.js"></script>
   <body>
     <h1>DATASET 등록</h1>
     <form action="/ds/inserted" method="POST" name="register" id="reFrm">
@@ -107,12 +78,12 @@
       </p>
       <p id="selectedNs"></p>
       <p id="selectedVer"></p>
-      <input type="hidden" name="datamodelType" value="" /><input type="hidden" name="al_id" value="" /><input type="hidden" name="getValue" id="valArr"value="" />
+      <input type="hidden" name="datamodelType" value="" /><input type="hidden" name="al_id" value="" /><input type="hidden" name="getValue" id="valArr" value="" />
       <input type="button" value="등록하기" onclick="goSubmit()" />
       {% else %}
       <p>참조할 데이터 모델이 없습니다. 모델을 등록한 후 다시 진행해주세요</p>
       {% endif %}
-      <a href="/new/list"><input type="button" value="목록보기" /></a>
+      <a href="/ds/list"><input type="button" value="목록보기" /></a>
     </form>
   </body>
   <script>

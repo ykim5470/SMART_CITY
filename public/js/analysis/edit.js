@@ -1,31 +1,4 @@
 var oTbl;
-var nameCheck = false;
-function dupCheck() {
-  var tbName = document.getElementsByName("tableName")[0];
-  if (tbName.value == "") {
-    window.alert("테이블명을 입력해주세요");
-    return "#";
-  } else {
-    fetch(`/new/duplication/check/${tbName.value}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        if (data == true) {
-          window.alert("사용 불가능한 테이블명입니다.");
-          tbName.value = "";
-          tbName.focus();
-        } else {
-          window.alert("사용 가능한 테이블명입니다.");
-          nameCheck = true;
-          tbName.readOnly = true;
-          tbName.style.backgroundColor = "#E5E5E5";
-          tbName.style.color = "#A5A5A5";
-          tbName.style.borderColor = "#E5E5E5";
-          document.getElementsByName("dupBtn")[0].disabled = true;
-        }
-      });
-  }
-}
 //Row 추가
 function insRow() {
   oTbl = document.getElementById("addTable");
@@ -38,6 +11,7 @@ function insRow() {
   var cell3 = oRow.insertCell();
   var cell4 = oRow.insertCell();
   var cell5 = oRow.insertCell();
+  var cell6 = oRow.insertCell();
   //삽입될 Form Tag
   var frmTag1 =
     "<select name='attribute' onchange='attrChange(this)'><option value='Property'>Property</option><option value='GeoProperty'>GeoProperty</option>" +
@@ -50,20 +24,29 @@ function insRow() {
     "<option value='ArrayObject'>ARRAY OBJECT</option></select>";
   var frmTag3 = "<input type='text' name='dataSize' placeholder='데이터 사이즈를 입력해주세요' />";
   var frmTag4 = "<input type='text' name='colName' placeholder=' 컬럼이름을 입력하세요.' />";
-  var frmTag5 = "<input type='checkbox' name='nullCheck' /><input type='hidden' name='allowNull' value='false'/>";
-  frmTag5 += "&nbsp&nbsp<input type=button value='삭제' onClick='removeRow()' style='cursor:hand'>";
+  var frmTag5 = "<input type='checkbox' name='nullCheck' onclick='nullTf(this)'/><input type='hidden' name='allowNull' value='false'/>";
+  var frmTag6 = "<input type=button value='삭제' onclick='removeRow()' style='cursor:hand'>";
   cell1.innerHTML = frmTag1;
   cell2.innerHTML = frmTag2;
   cell3.innerHTML = frmTag3;
   cell4.innerHTML = frmTag4;
   cell5.innerHTML = frmTag5;
+  cell6.innerHTML = frmTag6;
 }
 //Row 삭제
 function removeRow() {
   oTbl.deleteRow(oTbl.clickedRowIndex);
 }
+function deleteRow(idx) {
+  var elements = document.getElementsByName(idx.name);
+  for (var i = 0; i < elements.length; i++) {
+    if (elements[i] == idx) {
+      document.getElementById("addTable").deleteRow(i + 1);
+      break;
+    }
+  }
+}
 function attrChange(idx) {
-  var index;
   var elements = document.getElementsByName(idx.name);
   var valueType = document.getElementsByName("colType");
   for (var i = 0; i < elements.length; i++) {
@@ -84,12 +67,25 @@ function attrChange(idx) {
     }
   }
 }
+function nullTf(idx) {
+  var elements = document.getElementsByName(idx.name);
+  var nullVal = document.getElementsByName("allowNull");
+  for (var i = 0; i < elements.length; i++) {
+    if (elements[i] == idx) {
+      if (nullVal[i].value == "true") {
+        nullVal[i].value = "false";
+      } else {
+        nullVal[i].value = "true";
+      }
+    }
+  }
+}
 function goSubmit() {
-  if (nameCheck == false) {
-    window.alert("테이블명 중복 체크를 진행해주세요");
+  var columnName = document.getElementsByName("colName");
+  if (columnName.length < 1) {
+    window.alert("컬럼은 하나 이상 입력해야합니다");
     return "#";
   }
-  var columnName = document.getElementsByName("colName");
   for (var i = 0; i < columnName.length; i++) {
     if (columnName[i].value == "") {
       window.alert("빈칸을 모두 입력해주세요");
@@ -97,19 +93,12 @@ function goSubmit() {
       return "#";
     }
   }
-  var frm = document.register;
-  if (frm.tableName.value == "" || frm.nameSpace.value == "" || frm.description.value == "" || frm.context.value == "") {
+  var frm = document.edit;
+  if (frm.editDes.value == "" || frm.editContext.value == "") {
     window.alert("빈칸을 모두 입력해주세요");
     return "#";
   } else {
-    frm.version.value = frm.first.value + "." + frm.middle.value + "." + frm.last.value;
-    var checkValue = document.getElementsByName("nullCheck");
-    var nullValue = document.getElementsByName("allowNull");
-    for (var i = 0; i < checkValue.length; i++) {
-      if (checkValue[i].checked) {
-        nullValue[i].value = "true";
-      }
-    }
+    frm.editVersion.value = frm.first.value + "." + frm.middle.value + "." + frm.last.value;
     frm.submit();
   }
 }
