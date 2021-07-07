@@ -47,9 +47,9 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: true,
       type: DataTypes.INTEGER
       }, // FK analysis_list
-    datamodelType: { type: DataTypes.STRING, allowNull: false},
-    datamodelNamespace: { type: DataTypes.STRING, allowNull: false},
-    datamodelVersion: { type: DataTypes.STRING, allowNull: false},
+    dataModelType: { type: DataTypes.STRING, allowNull: false},
+    dataModelNamespace: { type: DataTypes.STRING, allowNull: false},
+    dataModelVersion: { type: DataTypes.STRING, allowNull: false},
     storageRetention: { type: DataTypes.STRING},
     topicRetention: { type: DataTypes.STRING},
     ds_delYn: { type: DataTypes.CHAR, allowNull: false, defaultValue: 'N' }

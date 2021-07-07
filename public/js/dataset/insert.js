@@ -33,11 +33,11 @@ function showAl() {
     .then((data) => {
       var ns = document.getElementById("selectedNs");
       var ver = document.getElementById("selectedVer");
-      ns.innerHTML = `└SELECTED DATAMODEL NAMESPACE : <input type="text" name="datamodelNamespace" value="${data.al_ns}" readonly />`;
-      ver.innerHTML = `└SELECTED DATAMODEL VERSION : <input type="text" name="datamodelVersion" value="${data.al_version}" readonly/>`;
+      ns.innerHTML = `└SELECTED DATAMODEL NAMESPACE : <input type="text" name="dataModelNamespace" value="${data.al_ns}" readonly />`;
+      ver.innerHTML = `└SELECTED DATAMODEL VERSION : <input type="text" name="dataModelVersion" value="${data.al_version}" readonly/>`;
     });
   document.getElementsByName("al_id")[0].value = idVer[0];
-  document.getElementsByName("datamodelType")[0].value = idVer[1];
+  document.getElementsByName("dataModelType")[0].value = idVer[1];
 }
 function goSubmit() {
   if (idCheck == false) {

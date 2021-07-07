@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DATASET</title>
+  </head>
+  <script></script>
+  <body>
+    <h1>DATASET</h1>
+    <p>DATASET ID : {{ds.dataset_id}}</p>
+    <p>DATASET NAME : {{ds.name}}</p>
+    <p>DATASET DESCRIPTION : {{ds.description}}</p>
+    <p>DATASET INTERVAL : {{ds.updateInterval}}</p>
+    <p>DATASET CATEGORY : {{ds.category}}</p>
+    <p>DATASET PROVIDER ORGANIZATION : {{ds.providerOrganization}}</p>
+    <p>DATASET PROVIDER SYSTEM : {{ds.providerSystem}}</p>
+    <p>DATASET PROCESS : {{ds.isProcessed}}</p>
+    <p>DATASET OWNERSHIP : {{ds.ownership}}</p>
+    <p>DATASET KEYWORDS : {{ds.keywords}}</p>
+    <p>DATASET LICENSE : {{ds.license}}</p>
+    <p>DATASET API URL : {{ds.providingApiUri}}</p>
+    <p>DATASET RESTRICTIONS : {{ds.restrictions}}</p>
+    <p>DATASET EXTENSION : {{ds.datasetExtension}}</p>
+    <p>DATASET ITEMS : {{ds.datasetItems}}</p>
+    <p>DATASET REGIONS : {{ds.targetRegions}}</p>
+    <p>DATASET IDENTIFIER : {{ds.sourceDatasetIds}}</p>
+    <p>DATASET 품질 검증 여부 :{{ds.qualityCheckEnabled}}</p>
+    <p>DATASET IDENTIFIER TYPE : {{ds.dataIdentifierType}}</p>
+    <p>DATASET STORAGE RETENTION :{{ds.storageRetention}} DAYS</p>
+    <p>DATASET TOPIC RETENTION : {{ds.topicRetention}} ms kjm</p>
+    <p>DATAMODEL NAME : {{ds.datamodelType}}</p>
+    <p>DATAMODEL NAMESPACE :{{ds.datamodelNamespace}}</p>
+    <p>DATAMODEL VERSION :{{ds.datamodelVersion}}</p>
+    <a href="/ds/list"><input type="button" value="목록보기" /></a>
+    {% if admin %}
+    <form action="/analysis/hardDel/{{analysis.al_id}}?_method=DELETE" method="POST">
+      <input type="submit" value="테이블 영구삭제" />
+      <a href="/analysis/admin/deleted"><input type="button" value="목록" /></a>
+    </form>
+    {% else %}
+    <form action="/new/softDel/{{analysis.al_id}}?_method=PUT" method="POST">
+      <a href="/new/edit/{{analysis.al_id}}"><input type="button" value="수정하기" /></a>
+      <input type="submit" value="삭제하기" />
+      <a href="/new/list"><input type="button" value="목록" /></a>
+    </form>
+    {% endif %}
+  </body>
+</html>

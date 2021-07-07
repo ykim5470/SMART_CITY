@@ -64,8 +64,8 @@
 				<tr>
 					<form action="/ds/softListDelete?_method=PUT" method="POST" id="delListFrm">
 						<td><input type="checkbox" name="delId" value="{{list.ds_id}}" /></td>
-						<td><a href="#">{{list.dataset_id}}</a></td>
-						<td><a href="#">{{list.name}}</a></td>
+						<td><a href="/ds/view/{{list.ds_id}}">{{list.dataset_id}}</a></td>
+						<td><a href="/ds/view/{{list.ds_id}}">{{list.name}}</a></td>
 						<td>{{list.dateFormat(list.createdAt)}}</td>
 						{% endfor %}
 						<input type="hidden" name="deleteList" id="deleteList" value="" />

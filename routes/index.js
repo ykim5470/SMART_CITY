@@ -28,6 +28,7 @@ router.get("/ds/getNsVer/:id",ds.output.getNsVer);
 router.get("/ds/duplication/check/:checkId", ds.output.dupCheck);
 router.get("/ds/list",paginate.middleware(10, 50), ds.output.list);
 router.get("/ds/list/:page",paginate.middleware(10, 50), ds.output.list);
+router.get("/ds/view/:ds_id", ds.output.view);
 
 
 //==============================POST======================================

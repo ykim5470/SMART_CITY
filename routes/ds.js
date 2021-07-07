@@ -5,12 +5,13 @@ const axios = require("axios");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
 const moment = require("moment");
-const newAnaly = require("./newAnaly")
+const newAnaly = require("./newAnaly");
 
 //post url
 const dataRequest = {
   insert: async (result) => {
     console.log("========DATASET CREATE REQUEST==========");
+    console.log(result)
     await axios({
       method: "post",
       url: "http://203.253.128.184:18827/datasets",
@@ -109,6 +110,20 @@ const output = {
       res.render("dataset/ds_list", { dataList: results.rows, pages: pageArray, nextUrl: hasMore, prevUrl: hasprev });
     });
   },
+  view: async (req, res) => {
+    let dsId = req.params.ds_id;
+    try {
+      await dataset
+        .findOne({
+          where: { ds_id: dsId },
+        })
+        .then(async (result) => {
+          res.render("dataset/ds_view", { ds : result });
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  },
 };
 const process = {
   insert: async (req, res) => {
@@ -143,11 +158,11 @@ const process = {
             "sourceDatasetIds",
             "qualityCheckEnabled",
             "dataIdentifierType",
-            "datamodelType",
-            "datamodelNamespace",
-            "datamodelVersion",
+            "dataModelType",
+            "dataModelNamespace",
+            "dataModelVersion",
           ],
-          where: { ds_id: JSON.stringify(result.ds_id)},
+          where: { ds_id: JSON.stringify(result.ds_id) },
         })
         .then((result) => {
           let newValue = "";
@@ -155,20 +170,21 @@ const process = {
           const inRequest = JSON.parse(JSON.stringify(result));
           Object.values(inRequest).map((el, index) => {
             if (el != null) {
-              if(Object.keys(inRequest)[index] == "sourceDatasetIds"){
-                sTemp = Object.values(inRequest)[index].split(",")
-                const sArr = JSON.stringify(sTemp)
-                newValue += `[${JSON.stringify(Object.keys(inRequest)[index])} : ${sArr}]`
-              }else{
-                newValue += JSON.stringify(Object.entries(inRequest)[index]).replace(",", ":")
+              if (Object.keys(inRequest)[index] == "sourceDatasetIds") {
+                sTemp = Object.values(inRequest)[index].split(",");
+                const sArr = JSON.stringify(sTemp);
+                newValue += `[${JSON.stringify(Object.keys(inRequest)[index])} : ${sArr}]`;
+              } else {
+                newValue += JSON.stringify(Object.entries(inRequest)[index]).replace(",", ":");
               }
             }
           });
           newValue = newValue.split("][").join(",");
           newValue = newValue.replace("[", "{");
-          newValue = (newValue.slice(0,-1))+"}";
+          newValue = newValue.slice(0, -1) + "}";
+          console.log(newValue)
           dataRequest.insert(newValue);
-          res.redirect("/ds/list")
+          res.redirect("/ds/list");
         });
     });
   },

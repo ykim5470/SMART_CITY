@@ -36,9 +36,9 @@ module.exports = {
         foreignKey: true,
         type: Sequelize.INTEGER,
       }, // FK analysis_list
-      datamodelType: { type: Sequelize.STRING, allowNull: false },
-      datamodelNamespace: { type: Sequelize.STRING, allowNull: false },
-      datamodelVersion: { type: Sequelize.STRING, allowNull: false },
+      dataModelType: { type: Sequelize.STRING, allowNull: false },
+      dataModelNamespace: { type: Sequelize.STRING, allowNull: false },
+      dataModelVersion: { type: Sequelize.STRING, allowNull: false },
       storageRetention: { type: Sequelize.STRING },
       topicRetention: { type: Sequelize.STRING },
       ds_delYn: {
