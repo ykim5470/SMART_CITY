@@ -29,7 +29,7 @@
 					<td>
 						<select name="dataset_id" id="data_select">
 							<option value="">-선택-</option>
-							{% for name in dataset_name%}
+							{% for name in raw_dataset_name%}
 							<option value="{{name.value.id}},{{name.value.dataModelType}},{{name.value.dataModelNamespace}},{{name.value.dataModelVersion}}">{{name.key}}</option>
 							{% endfor %}
 						</select>
@@ -58,8 +58,8 @@
 						<label for="al_name_mo">/분석 테이블/</label>
 						<select name="al_name_mo" id="al_select">
 							<option value="">-선택-</option>
-							{% for el in al_name_mo %}
-							<option value="{{el.al_name}}">{{el.al_name}}</option>
+							{% for el in processed_dataset %}
+							<option value="{{el['analysis_list.al_name']}},{{el.dataset_id}}">{{el.name}}</option>
 							{% endfor %}
 						</select>
 					</td>

@@ -4,10 +4,10 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>모델 수정 {{md_id}}</title>
+		<title>모델 {{md_id}}</title>
 	</head>
 	<body>
-		<form action="/model/register/edit" method="post" id="register_edit" enctype="multipart/form-data">
+		<form action="/model/redirect/edit" method="post">
 			<input name="md_id" value="{{md_id}}" hidden />
 			<div>
 				<table>
@@ -17,7 +17,7 @@
 					<tbody>
 						<td>
 							초 :
-							<input type="text" id="al_time" name="al_time" value="{{al_time}}" />
+							<input type="text" id="al_time" name="al_time" value="{{al_time}}" disabled />
 						</td>
 					</tbody>
 				</table>
@@ -50,9 +50,9 @@
 							</tr>
 
 							<tr>
-								<td><input name="ip_attr_value_type" value="{{input_collections.ip_type}}" readonly /></td>
-								<td><input class="ip_attr_name" name="ip_attr_name" value="{{input_collections.ip_param}}" readonly /></td>
-								<td><input class="user_input_param" name="user_input_param" value="{{input_collections.ip_value}}" /></td>
+								<td><input name="ip_attr_value_type" value="{{input_collections.ip_type}}" disabled /></td>
+								<td><input class="ip_attr_name" name="ip_attr_name" value="{{input_collections.ip_param}}" disabled /></td>
+								<td><input class="user_input_param" name="user_input_param" value="{{input_collections.ip_value}}" disabled/></td>
 							</tr>
 							{%endfor%}
 						</table>
@@ -65,7 +65,7 @@
 					<tbody>
 						<td>
 							<label for="al_name_mo">/분석 테이블/</label>
-							<select name="al_name_mo" id="al_select">
+							<select name="al_name_mo" id="al_select" disabled>
 								<option value="{{al_name_mo_prev}},{{dataset_id_prev}}">{{processed_selected_name}}</option>
 								{% for el in processed_dataset_edit_removed %}
 								<option value="{{el.dataModelType}},{{el.dataset_id}}">{{el.name}}</option>
@@ -79,7 +79,7 @@
 						분석 모델
 					</thead>
 					<tbody>
-						<input type="file" id="file_select" name="atch_origin_file_name" value='{{file_name_prev}}' />
+						<input type="file" id="file_select" name="atch_origin_file_name" value='{{file_name_prev}}' style='width:75px; opacity: 30;' disabled/>
 					</tbody>
 				</table>
 				<table>
@@ -97,10 +97,12 @@
 					<thead>
 						내용 (500자 내외로 작성해주세요)
 						<div></div>
-						<input style="width: 200px; height: 100px" name ='model_desc' value="{{md_desc}}" />
+						<input style="width: 200px; height: 100px" name ='model_desc' value="{{md_desc}}" disabled />
 					</thead>
 				</table>
-				<button type="button" id="submitBtn">수정 완료</button>
+				<!-- <button type="button" id="submitBtn">수정 완료</button> -->
+                <!-- <a href="http://localhost:3000/model_manage_board/edit/{{md_id}}">수정</a> -->
+                <button>수정</button>
 			</div>
 			<script src="/socket.io/socket.io.js"></script>
 			<script src="/js/register_edit.js"></script>

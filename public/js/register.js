@@ -22,27 +22,28 @@ const model_description = document.querySelector(".md_desc");
 
 const user_input_value = [];
 
-// 데이터 선택 값 전송
+// 원천 데이터 선택 값 전송
 data_select_input.addEventListener("change", (e) => {
 	e.preventDefault();
 	if (data_select_input.value == undefined) {
 		return;
 	}
-
+	console.log(data_select_input.value)
 	socket.emit("데이터 선택", {
 		dataset_info: data_select_input.value,
 	});
 });
 
-// 분석 데이터 선택
+// 가공 데이터 셋 선택
 analysis_select_input.addEventListener("change", (e) => {
 	e.preventDefault();
 	if (analysis_select_input.value == undefined) {
 		return;
 	}
-	c = analysis_select_input.value;
 	socket.emit("분석 모델 선택", {
-		al_name_mo: analysis_select_input.value,
+		al_name_mo: analysis_select_input.value.split(',')[0],
+		selected_processed_dataset_id : analysis_select_input.value.split(',')[1]
+		
 	});
 });
 

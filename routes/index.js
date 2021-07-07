@@ -22,6 +22,7 @@ router.get('/model_manage_board/edit/:md_id', auth.output.register_edit)
 router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage_board);
 router.get("/model_manage_board/:md_id", auth.output.manage_status);
 router.get("/model_register_board", auth.output.model_register_board);
+router.get('/model_registered_show/:md_id', auth.output.registered_show);
 //Dataset
 router.get("/ds/insert", ds.output.insert);
 router.get("/ds/getNsVer/:id",ds.output.getNsVer);
@@ -41,6 +42,7 @@ router.post('/model/list/delete', auth.process.delete)
 router.post('/model/file_add',uploadFile.single("atch_origin_file_name"), auth.process.file_add)
 router.post('/model/register/complete', uploadFile.single("atch_origin_file_name"), auth.process.register_complete)
 router.post('/model/register/edit', uploadFile.single("atch_origin_file_name"), auth.process.register_edit)
+router.post('/model/redirect/edit', auth.process.edit_redirect)
 //Dataset
 router.post("/ds/inserted" , ds.process.insert)
 

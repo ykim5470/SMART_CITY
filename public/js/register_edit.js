@@ -24,41 +24,43 @@ const user_input_value = [];
 
 // 데이터 선택 값 전송
 if (data_select_input.value !== "") {
-    socket.emit("데이터 선택", {
+	
+	socket.emit("데이터 선택", {
 		dataset_info: data_select_input.value,
-    });
-    data_select_input.addEventListener("change", (e) => {
-        e.preventDefault();
-        if (data_select_input.value == undefined) {
-            return;
-        }
-    
-        socket.emit("데이터 선택", {
-            dataset_info: data_select_input.value,
-        });
-    });
-}
+	});
+	data_select_input.addEventListener("change", (e) => {
+		e.preventDefault();
+		if (data_select_input.value == undefined) {
+			return;
+		}
 
+		socket.emit("데이터 선택", {
+			dataset_info: data_select_input.value,
+		});
+	});
+}
 
 // 분석 데이터 선택
+console.log('------------------------2')
+console.log(analysis_select_input.value)
 if (analysis_select_input.value !== "") {
-    socket.emit("분석 모델 선택", {
-		al_name_mo: analysis_select_input.value,
-    });
+	socket.emit("분석 모델 선택", {
+		al_name_mo: analysis_select_input.value.split(",")[0],
+		selected_processed_dataset_id: analysis_select_input.value.split(",")[1],
+	});
 
+	analysis_select_input.addEventListener("change", (e) => {
+		e.preventDefault();
+		if (analysis_select_input.value == undefined) {
+			return;
+		}
 
-    analysis_select_input.addEventListener("change", (e) => {
-        e.preventDefault();
-        if (analysis_select_input.value == undefined) {
-            return;
-        }
-    
-        socket.emit("분석 모델 선택", {
-            al_name_mo: analysis_select_input.value,
-        });
-    });
+		socket.emit("분석 모델 선택", {
+			al_name_mo: analysis_select_input.value.split(",")[0],
+			selected_processed_dataset_id: analysis_select_input.value.split(",")[1],
+		});
+	});
 }
-
 
 /* Event listen */
 // input params GET & add to page
@@ -97,9 +99,8 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 
 // output params GET & add to page
 socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
-	const model_column = data;
-	// console.log("DB 반환 데이터 : " + data);
 
+	const model_column = data;
 	const output_box = model_column.map((items) => {
 		return `
         <tr>
@@ -115,12 +116,14 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
 	// 해당 output_value를 어떻게 할 것인가?
 });
 
-
 const register_submit = () => {
-	register_edit.addEventListener("click", async (e) => {
+	if (register_edit != null) {
+		register_edit.addEventListener("click", async (e) => {
 			// 파일 정보 post
-			return document.querySelector("#register_edit").submit()
-	});
+			return document.querySelector("#register_edit").submit();
+		});
+	}
+	else return
 };
 
-register_submit()
+register_submit();

@@ -49,7 +49,7 @@ const io = socket(server, {
 });
 
 let data_selection_obj = {};
-let al_name_mo_obj = {}
+let al_name_mo_obj = {};
 
 io.on("connection", function (socket) {
 	console.log("Made socket connection");
@@ -57,6 +57,7 @@ io.on("connection", function (socket) {
 	// 데이터 셋 선택
 	socket.on("데이터 선택", (data) => {
 		const { dataset_info } = data;
+
 		data_selection_obj = { ...data };
 
 		// 선택 된 데이터 API calling; attributes GET
@@ -77,7 +78,7 @@ io.on("connection", function (socket) {
 	// 선택 된 분석 모델 API calling; attributes GET
 	socket.on("분석 모델 선택", (data) => {
 		const { al_name_mo } = data;
-		al_name_mo_obj = {al_name_mo}
+		al_name_mo_obj = { al_name_mo };
 
 		const analysis_output = async () => {
 			const analysis_column = await analysis_list.findOne({ where: { al_name: al_name_mo } }).then((res) => {
