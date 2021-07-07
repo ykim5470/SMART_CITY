@@ -53,6 +53,8 @@ router.put("/new/edited/:al_id", newAnaly.process.edit);
 //Model
 router.put("/model_manage_board/:md_id", auth.process.edit);
 //Dataset
+router.put("/ds/softDel/:dataset_id", ds.process.dsSofeDel);
+router.put("/ds/softListDelete", ds.process.softDelList);
 
 //==============================DELETE======================================
 

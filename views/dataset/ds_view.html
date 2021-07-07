@@ -30,20 +30,20 @@
     <p>DATASET IDENTIFIER TYPE : {{ds.dataIdentifierType}}</p>
     <p>DATASET STORAGE RETENTION :{{ds.storageRetention}} DAYS</p>
     <p>DATASET TOPIC RETENTION : {{ds.topicRetention}} ms kjm</p>
-    <p>DATAMODEL NAME : {{ds.datamodelType}}</p>
-    <p>DATAMODEL NAMESPACE :{{ds.datamodelNamespace}}</p>
-    <p>DATAMODEL VERSION :{{ds.datamodelVersion}}</p>
-    <a href="/ds/list"><input type="button" value="목록보기" /></a>
+    <p>DATAMODEL NAME : {{ds.dataModelType}}</p>
+    <p>DATAMODEL NAMESPACE :{{ds.dataModelNamespace}}</p>
+    <p>DATAMODEL VERSION :{{ds.dataModelVersion}}</p>
+    <br/>
     {% if admin %}
     <form action="/analysis/hardDel/{{analysis.al_id}}?_method=DELETE" method="POST">
       <input type="submit" value="테이블 영구삭제" />
       <a href="/analysis/admin/deleted"><input type="button" value="목록" /></a>
     </form>
     {% else %}
-    <form action="/new/softDel/{{analysis.al_id}}?_method=PUT" method="POST">
-      <a href="/new/edit/{{analysis.al_id}}"><input type="button" value="수정하기" /></a>
+    <form action="/ds/softDel/{{ds.dataset_id}}?_method=PUT" method="POST">
+      <a href="/ds/edit/{{ds.ds_id}}"><input type="button" value="수정하기" /></a>
       <input type="submit" value="삭제하기" />
-      <a href="/new/list"><input type="button" value="목록" /></a>
+      <a href="/ds/list"><input type="button" value="목록보기" /></a>
     </form>
     {% endif %}
   </body>

@@ -11,7 +11,7 @@ const newAnaly = require("./newAnaly");
 const dataRequest = {
   insert: async (result) => {
     console.log("========DATASET CREATE REQUEST==========");
-    console.log(result)
+    console.log(result);
     await axios({
       method: "post",
       url: "http://203.253.128.184:18827/datasets",
@@ -36,14 +36,14 @@ const dataRequest = {
     });
     return reValue;
   },
-  // delOne: async (result) => {
-  //   console.log("========ONE DATA MODEL DELETE REQUEST==========");
-  //   await axios.delete(`http://203.253.128.184:18827/datamodels/${result.al_ns}/${result.al_name}/${result.al_version}`, { headers: { Accept: "application/json" } });
-  // },
-  // delList: async (name, ns, version) => {
-  //   console.log("========DATA MODEL LIST DELETE REQUEST==========");
-  //   await axios.delete(`http://203.253.128.184:18827/datamodels/${ns}/${name}/${version}`, { headers: { Accept: "application/json" } });
-  // },
+  delOne: async (dsId) => {
+    console.log("========ONE DATA MODEL DELETE REQUEST==========");
+    await axios.delete(`http://203.253.128.184:18827/datasets/${dsId}`, { headers: { Accept: "application/json" } });
+  },
+  delList: async (dsId) => {
+    console.log("========DATASET LIST DELETE REQUEST==========");
+    await axios.delete(`http://203.253.128.184:18827/datasets/${dsId}`, { headers: { Accept: "application/json" } });
+  },
   // edit: async (result) => {
   //   console.log("===========DATA MODEL EDIT REQUEST=============");
   //   try {
@@ -118,7 +118,7 @@ const output = {
           where: { ds_id: dsId },
         })
         .then(async (result) => {
-          res.render("dataset/ds_view", { ds : result });
+          res.render("dataset/ds_view", { ds: result });
         });
     } catch (err) {
       console.log(err);
@@ -130,63 +130,69 @@ const process = {
     const body = req.body;
     const valArr = body.getValue.split(","); //값을 입력한 컬럼의 배열 생성
     let obj = {};
-    valArr.map((el) => {
-      obj[el] = body[el];
-    });
-    await dataset.create(obj).then(async (result) => {
-      await dataset
-        .findOne({
-          attributes: [
-            ["dataset_id", "id"],
-            "name",
-            "description",
-            "updateInterval",
-            "category",
-            "providerOrganization",
-            "providerSystem",
-            "isProcessed",
-            "ownership",
-            "keywords",
-            "license",
-            "providingApiUri",
-            "restrictions",
-            "datasetExtension",
-            "datasetItems",
-            "targetRegions",
-            "storageRetention",
-            "topicRetention",
-            "sourceDatasetIds",
-            "qualityCheckEnabled",
-            "dataIdentifierType",
-            "dataModelType",
-            "dataModelNamespace",
-            "dataModelVersion",
-          ],
-          where: { ds_id: JSON.stringify(result.ds_id) },
-        })
-        .then((result) => {
-          let newValue = "";
-          let sTemp = "";
-          const inRequest = JSON.parse(JSON.stringify(result));
-          Object.values(inRequest).map((el, index) => {
-            if (el != null) {
-              if (Object.keys(inRequest)[index] == "sourceDatasetIds") {
-                sTemp = Object.values(inRequest)[index].split(",");
-                const sArr = JSON.stringify(sTemp);
-                newValue += `[${JSON.stringify(Object.keys(inRequest)[index])} : ${sArr}]`;
-              } else {
-                newValue += JSON.stringify(Object.entries(inRequest)[index]).replace(",", ":");
+    try {
+      valArr.map((el) => {
+        obj[el] = body[el];
+      });
+      await dataset.create(obj).then(async (result) => {
+        await dataset
+          .findOne({ attributes: [["dataset_id", "id"],"name","description","updateInterval","category","providerOrganization","providerSystem","isProcessed","ownership",
+            "keywords","license","providingApiUri","restrictions","datasetExtension","datasetItems","targetRegions","storageRetention","topicRetention","sourceDatasetIds",
+            "qualityCheckEnabled","dataIdentifierType","dataModelType","dataModelNamespace","dataModelVersion"],where: { ds_id: JSON.stringify(result.ds_id) }})
+          .then((result) => {
+            let newValue = "";
+            let sTemp = "";
+            const inRequest = JSON.parse(JSON.stringify(result));
+            Object.values(inRequest).map((el, index) => {
+              if (el != null) {
+                if (Object.keys(inRequest)[index] == "sourceDatasetIds") {
+                  sTemp = Object.values(inRequest)[index].split(",");
+                  const sArr = JSON.stringify(sTemp);
+                  newValue += `[${JSON.stringify(Object.keys(inRequest)[index])} : ${sArr}]`;
+                } else {
+                  newValue += JSON.stringify(Object.entries(inRequest)[index]).replace(",", ":");
+                }
               }
-            }
+            });
+            newValue = newValue.split("][").join(",");
+            newValue = newValue.replace("[", "{");
+            newValue = newValue.slice(0, -1) + "}";
+            console.log(newValue);
+            dataRequest.insert(newValue);
+            res.redirect("/ds/list");
           });
-          newValue = newValue.split("][").join(",");
-          newValue = newValue.replace("[", "{");
-          newValue = newValue.slice(0, -1) + "}";
-          console.log(newValue)
-          dataRequest.insert(newValue);
-          res.redirect("/ds/list");
-        });
-    });
+      });
+    } catch (err) {}
+  },
+  //dataset 소프트 삭제
+  dsSofeDel: async (req, res) => {
+    const dsId = req.params.dataset_id;
+    const rand = "deleted_" + moment().format("YYMMDDHHmmss") + "_";
+    try {
+      await dataset.update({ ds_delYn: "Y", dataset_id: rand + dsId }, { where: { dataset_id: dsId } }).then(async (result) => {
+        //데이터 삭제 요청
+        dataRequest.delOne(dsId);
+        res.redirect("/ds/list/");
+      });
+    } catch (err) {
+      console.log(err);
+      console.log("data softdelete failed");
+    }
+  },
+  //dataset 소프트 일괄 삭제
+  softDelList: async (req, res) => {
+    var delListId = req.body.deleteList.split(",");
+    const rand = "deleted_" + moment().format("YYMMDDHHmmss") + "_";
+    try {
+      for(var i =0; i<delListId.length; i++){
+        await dataset.update({ds_delYn : "Y", dataset_id:rand+delListId[i]},{where:{dataset_id:delListId[i]}});
+        dataRequest.delList(delListId[i]);
+      }
+      res.redirect("/ds/list");
+    } catch (err) {
+      console.log("data list soft delete failed");
+      console.log(err);
+    }
   },
 };
 
