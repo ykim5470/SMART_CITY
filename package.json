@@ -20,6 +20,7 @@
 	"homepage": "https://github.com/jbookes/2021_SmartWater#readme",
 	"dependencies": {
 		"axios": "^0.21.1",
+		"child_process": "^1.0.2",
 		"dotenv": "^10.0.0",
 		"express": "^4.17.1",
 		"express-paginate": "^1.0.2",
@@ -32,6 +33,7 @@
 		"nunjucks": "^3.2.3",
 		"sequelize": "^6.6.2",
 		"session-file-store": "^1.5.0",
-		"socket.io": "^4.1.2"
+		"socket.io": "^4.1.2",
+		"unzipper": "^0.10.11"
 	}
 }

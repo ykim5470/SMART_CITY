@@ -1,10 +1,13 @@
-const { model_list, model_output, model_des, model_input, atch_file_tb, analysis_list, dataset, column_tb, sequelize } = require("../models");
+const { model_list, model_output, model_des, model_input, atch_file_tb, analysis_list, dataset, sequelize } = require("../models");
 const axios = require("axios");
 const analysis = require("./newAnaly.js");
 const moment = require("moment");
+const Path = require("path")
+const fs = require('fs'
+)
+const unzipper = require("unzipper");
 const errorHandling = require("../public/js/helpers/error_handling");
 const { INGEST_INTERFACE, DATA_MANAGER, DATA_SERVICE_BROKER } = require("../base");
-const { al_name_mo_handling } = require("../public/js/helpers/error_handling");
 
 // Get
 const output = {
@@ -83,7 +86,6 @@ const output = {
 					{ model: analysis_list, required: false, attributes: ["al_context"] },
 				],
 				raw: true,
-				
 			})
 			.then((result) => {
 				// 등록 된 모델 정보 변수 설정
@@ -100,8 +102,6 @@ const output = {
 				let processed_dataset_edit_removed = new Array();
 				let raw_data_model_key_prev;
 				let processed_selected_name;
-
-				
 
 				// 유저 인풋 값 GET
 				model_input.findAll({ where: { ip_id: md_id }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
@@ -142,7 +142,6 @@ const output = {
 										processed_dataset_edit_removed.push(el);
 									}
 								});
-							
 
 								return res.render(`model/model_register_board_edit`, {
 									md_id: md_id,
@@ -155,7 +154,7 @@ const output = {
 									file_name_prev: file_name_prev,
 									al_name_mo_prev: al_name_mo_prev,
 									processed_selected_name: processed_selected_name,
-									dataset_id_prev:dataset_id_prev
+									dataset_id_prev: dataset_id_prev,
 								});
 							});
 					});
@@ -180,7 +179,6 @@ const output = {
 					{ model: analysis_list, required: false, attributes: ["al_context"] },
 				],
 				raw: true,
-				
 			})
 			.then((result) => {
 				// 등록 된 모델 정보 변수 설정
@@ -197,8 +195,6 @@ const output = {
 				let processed_dataset_edit_removed = new Array();
 				let raw_data_model_key_prev;
 				let processed_selected_name;
-
-				
 
 				// 유저 인풋 값 GET
 				model_input.findAll({ where: { ip_id: md_id }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
@@ -300,6 +296,18 @@ const process = {
 	// 파일 TB Create
 	file_add: async (req, res) => {
 		const { originalname, mimetype, path, filename } = req.file;
+		
+		var uploadedFileDirectory = Path.resolve(__dirname, '../uploads/') //업로드 되는 파일 경로
+		var ExtractedFileDirectory = Path.resolve(__dirname, '../uploads/model/') // 압축 해제시 파일 경로
+		
+		// protocol buffer TF saved 모델을 업로드 했을 경우
+		if (mimetype == "application/x-zip-compressed") {
+			fs.createReadStream(uploadedFileDirectory + "/" + filename).pipe(unzipper.Extract({ path: ExtractedFileDirectory } )); // unzip 하고 폴더에 저장. 
+		}
+
+		// tensorflowjs_converter --input_format=tf_saved_model --output_format=tfjs_graph_model --signature_name=serving_default --saved_model_tags=serve ../uploads/model/half_plus_two/00000123 ../uploads/model/convert
+
+
 		await atch_file_tb.create({
 			originalname,
 			mimetype,
@@ -394,14 +402,14 @@ const process = {
 	// 등록 페이지 수정
 	register_edit: async (req, res) => {
 		const { md_id, al_name_mo, al_time, dataset_id, model_desc, ip_attr_name, user_input_param, ip_attr_value_type } = req.body;
-		console.log('-------------------1')
-		console.log(req.body.al_name_mo)
+		console.log("-------------------1");
+		console.log(req.body.al_name_mo);
 		try {
 			// Error handling from server
 			errorHandling.al_time_handling(al_time); // 3600
 			errorHandling.dataset_handling(dataset_id); // dataset_0625,now test,kr.citydatahub,2.0
 			errorHandling.input_param_handling(user_input_param); // ['유량','','','','','',''] or ''
-			errorHandling.al_name_mo_handling(al_name_mo.split(',')[0]); // lewis-dataset111
+			errorHandling.al_name_mo_handling(al_name_mo.split(",")[0]); // lewis-dataset111
 
 			let file_id;
 			let al_id;
@@ -416,13 +424,13 @@ const process = {
 			await model_list.update({ file_id: file_id }, { where: { md_id: md_id } });
 
 			// 분석 모델 TB al_id GET
-			await analysis_list.findOne({ where: { al_name: al_name_mo.split(',')[0] } }).then((res) => {
+			await analysis_list.findOne({ where: { al_name: al_name_mo.split(",")[0] } }).then((res) => {
 				const al_list_str = JSON.stringify(res);
 				const al_list_value = JSON.parse(al_list_str);
 				return (al_id = al_list_value.al_id);
 			});
 			// 모델 리스트 TB 수정
-			await model_list.update({ al_time: al_time, al_name_mo: al_name_mo.split(',')[0], data_model_name: dataset_id, al_id: al_id, dataset_id: al_name_mo.split(',')[1] }, { where: { md_id: md_id } });
+			await model_list.update({ al_time: al_time, al_name_mo: al_name_mo.split(",")[0], data_model_name: dataset_id, al_id: al_id, dataset_id: al_name_mo.split(",")[1] }, { where: { md_id: md_id } });
 
 			// 모델 설명 TB update
 			await model_des.update(
@@ -467,8 +475,8 @@ const process = {
 	},
 
 	edit_redirect: (req, res) => {
-		const { md_id} = req.body
-		res.redirect(`/model_manage_board/edit/${md_id}`)	
+		const { md_id } = req.body;
+		res.redirect(`/model_manage_board/edit/${md_id}`);
 	},
 
 	// 모델 상태 관리 선택 페이지 이동
