@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DATASET</title>
+  </head>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script>
+    function showAl() {
+      var temp = document.getElementsByName("dataIdName")[0].value;
+      var idVer = temp.split(",");
+      fetch(`/ds/getNsVer/${idVer[0]}`)
+        .then((res) => res.json())
+        .then((data) => {
+          var ns = document.getElementById("selectedNs");
+          var ver = document.getElementById("selectedVer");
+          ns.innerHTML = `└SELECTED DATAMODEL NAMESPACE : <input type="text" name="dataModelNamespace" value="${data.al_ns}" disabled />`;
+          ver.innerHTML = `└SELECTED DATAMODEL VERSION : <input type="text" name="dataModelVersion" value="${data.al_version}" disabled/>`;
+        });
+      document.getElementsByName("al_id")[0].value = idVer[0];
+    }
+    function goSubmit() {
+      document.getElementsByName("dataIdName")[0].disabled = true;
+      $("#edFrm").submit();
+    }
+  </script>
+  <body>
+    <h1>DATASET</h1>
+    <form id="edFrm" action="/ds/edited/{{ds.ds_id}}?_method=PUT" method="POST">
+      <p>DATASET ID : <input type="text" name="dataset_id" value="{{ds.dataset_id}}" disabled /></p>
+      <p>&Star;DATASET NAME : <input type="text" name="name" value="{{ds.name}}" /></p>
+      <p>DATASET DESCRIPTION : <input type="text" name="description" value="{{ds.description}}" /></p>
+      <p>&Star;DATASET INTERVAL : <input type="text" name="updateInterval" value="{{ds.updateInterval}}" /></p>
+      <p>&Star;DATASET CATEGORY : <input type="text" name="category" value="{{ds.category}}" /></p>
+      <p>&Star;DATASET PROVIDER ORGANIZATION : <input type="text" name="providerOrganization" value="{{ds.providerOrganization}}" /></p>
+      <p>&Star;DATASET PROVIDER SYSTEM : <input type="text" name="providerSystem" value="{{ds.providerSystem}}" /></p>
+      <p>DATASET PROCESS : <input type="text" name="isProcessed" value="{{ds.isProcessed}}" /></p>
+      <p>&Star;DATASET OWNERSHIP : <input type="text" name="ownership" value="{{ds.ownership}}" /></p>
+      <p>DATASET KEYWORDS : <input type="text" name="keywords" value="{{ds.keywords}}" /></p>
+      <p>&Star;DATASET LICENSE : <input type="text" name="license" value="{{ds.license}}" /></p>
+      <p>DATASET API URL : <input type="text" name="providingApiUri" value="{{ds.providingApiUri}}" /></p>
+      <p>DATASET RESTRICTIONS : <input type="text" name="restrictions" value="{{ds.restrictions}}" /></p>
+      <p>DATASET EXTENSION : <input type="text" name="datasetExtension" value="{{ds.datasetExtension}}" /></p>
+      <p>&Star;DATASET ITEMS : <input type="text" name="datasetItems" value="{{ds.datasetItems}}" /></p>
+      <p>&Star;DATASET REGIONS : <input type="text" name="targetRegions" value="{{ds.targetRegions}}" /></p>
+      <p>DATASET IDENTIFIER : <input type="text" name="sourceDatasetIds" value="{{ds.sourceDatasetIds}}" /></p>
+      <p>
+        DATASET 품질 검증 여부 : {% set attr = ds.qualityCheckEnabled %}
+        <select name="qualityCheckEnabled">
+          {% if(attr == "true")%}
+          <option value="true" selected>true</option>
+          <option value="false">false</option>
+          {% else %}
+          <option value="true">true</option>
+          <option value="false" selected>false</option>
+          {% endif %}
+        </select>
+      </p>
+      <p>DATASET IDENTIFIER TYPE : <input type="text" name="dataIdentifierType" value="{{ds.dataIdentifierType}}" /></p>
+      <p>DATASET STORAGE RETENTION(DAYS) :<input type="number" name="storageRetention" value="{{ds.storageRetention}}" /></p>
+      <p>DATASET TOPIC RETENTION(ms) : <input type="number" name="topicRetention" value="{{ds.topicRetention}}" /></p>
+      <p>
+        DATAMODEL NAME :
+        <select name="dataIdName" onchange="showAl()">
+          {% for items in moList %} {% if( items.al_name == ds.dataModelType)%}
+          <option value="{{items.al_id}},{{items.al_name}}" selected>{{items.al_name}}</option>
+          {% else %}
+          <option value="{{items.al_id}},{{items.al_name}}">{{items.al_name}}</option>
+          {% endif %} {% endfor %}
+        </select>
+      </p>
+      <p id="selectedNs">└SELECTED DATAMODEL NAMESPACE : <input type="text" name="dataModelNamespace" value="{{ds.dataModelNamespace}}" readonly /></p>
+      <p id="selectedVer">└SELECTED DATAMODEL VERSION : <input type="text" name="dataModelVersion" value="{{ds.dataModelVersion}}" readonly /></p>
+      <input type="hidden" name="dataModelType" value="{{ds.dataModelType}}" /><input type="hidden" name="al_id" value="{{ds.al_id}}" /><input type="hidden" name="getValue" id="valArr" value="" />
+      <input type="button" value="수정하기" onclick="goSubmit()" />
+      <a href="/ds/list"><input type="button" value="목록보기" /></a>
+    </form>
+  </body>
+</html>

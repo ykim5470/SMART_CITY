@@ -5,16 +5,16 @@ const axios = require("axios");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
 const moment = require("moment");
+const base = require("../base");
 const newAnaly = require("./newAnaly");
 
 //post url
 const dataRequest = {
   insert: async (result) => {
     console.log("========DATASET CREATE REQUEST==========");
-    console.log(result);
     await axios({
       method: "post",
-      url: "http://203.253.128.184:18827/datasets",
+      url: `${base.DATA_MANAGER}/datasets`,
       data: result,
       headers: { "Content-Type": "application/json" },
     });
@@ -23,7 +23,7 @@ const dataRequest = {
     console.log("===========DATASET ID LIST REQUEST=============");
     let idList = [];
     let reValue = "false";
-    await axios.get("http://203.253.128.184:18827/datasets", { headers: { Accept: "application/json" } }).then((result) => {
+    await axios.get(`${base.DATA_MANAGER}/datasets`, { headers: { Accept: "application/json" } }).then((result) => {
       result.data.map((el) => {
         idList.push(el.id);
       });
@@ -38,40 +38,25 @@ const dataRequest = {
   },
   delOne: async (dsId) => {
     console.log("========ONE DATA MODEL DELETE REQUEST==========");
-    await axios.delete(`http://203.253.128.184:18827/datasets/${dsId}`, { headers: { Accept: "application/json" } });
+    await axios.delete(`${base.DATA_MANAGER}/datasets/${dsId}`, { headers: { Accept: "application/json" } });
   },
   delList: async (dsId) => {
     console.log("========DATASET LIST DELETE REQUEST==========");
-    await axios.delete(`http://203.253.128.184:18827/datasets/${dsId}`, { headers: { Accept: "application/json" } });
+    await axios.delete(`${base.DATA_MANAGER}/datasets/${dsId}`, { headers: { Accept: "application/json" } });
   },
-  // edit: async (result) => {
-  //   console.log("===========DATA MODEL EDIT REQUEST=============");
-  //   try {
-  //     const colTemp = JSON.parse(JSON.stringify(result))[0]; // result 담기
-  //     const conList = colTemp.al_context.split(","); //context 배열
-  //     const colList = colTemp.column_tbs;
-  //     let nullTF = "";
-  //     let temp = "";
-  //     let requestCol = [];
-  //     for (var i = 0; i < colList.length; i++) {
-  //       nullTF = colList[i].allowNull == "true" ? false : true;
-  //       temp = { name: colList[i].column_name, isRequired: nullTF, attributeType: colList[i].attributeType, maxLength: colList[i].data_size, valueType: colList[i].data_type };
-  //       requestCol.push(JSON.parse(JSON.stringify(temp)));
-  //     }
-  //     await axios({
-  //       method: "PUT",
-  //       url: `http://203.253.128.184:18827/datamodels/${colTemp.al_ns}/${colTemp.al_name}/${colTemp.al_version}`,
-  //       data: {
-  //         context: conList,
-  //         description: colTemp.al_des,
-  //         attributes: requestCol,
-  //       },
-  //       headers: { "Content-Type": "application/json" },
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // },
+  edit: async (result, dsId) => {
+    console.log("===========DATA MODEL EDIT REQUEST=============");
+    try {
+      await axios({
+        method: "PUT",
+        url: `${base.DATA_MANAGER}/datasets/${dsId}`,
+        data: result,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  },
 };
 
 const output = {
@@ -124,6 +109,28 @@ const output = {
       console.log(err);
     }
   },
+  edit: async (req, res) => {
+    let dsId = req.params.ds_id;
+    try {
+      await dataset
+        .findOne({
+          where: { ds_id: dsId },
+        })
+        .then(async (result) => {
+          const ds = result;
+          await analysis_list
+            .findAll({
+              attributes: ["al_name", "al_id"],
+              where: { al_delYn: "N" },
+            })
+            .then((result) => {
+              res.render("dataset/ds_edit", { ds: ds, moList: result });
+            });
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  },
 };
 const process = {
   insert: async (req, res) => {
@@ -136,33 +143,41 @@ const process = {
       });
       await dataset.create(obj).then(async (result) => {
         await dataset
-          .findOne({ attributes: [["dataset_id", "id"],"name","description","updateInterval","category","providerOrganization","providerSystem","isProcessed","ownership",
-            "keywords","license","providingApiUri","restrictions","datasetExtension","datasetItems","targetRegions","storageRetention","topicRetention","sourceDatasetIds",
-            "qualityCheckEnabled","dataIdentifierType","dataModelType","dataModelNamespace","dataModelVersion"],where: { ds_id: JSON.stringify(result.ds_id) }})
+          .findOne({
+            attributes: { exclude: ["ds_id", "createdAt", "updatedAt", "ds_delYn", "al_id"] },
+            where: { ds_id: JSON.stringify(result.ds_id) },
+          })
           .then((result) => {
-            let newValue = "";
-            let sTemp = "";
-            const inRequest = JSON.parse(JSON.stringify(result));
-            Object.values(inRequest).map((el, index) => {
-              if (el != null) {
-                if (Object.keys(inRequest)[index] == "sourceDatasetIds") {
-                  sTemp = Object.values(inRequest)[index].split(",");
-                  const sArr = JSON.stringify(sTemp);
-                  newValue += `[${JSON.stringify(Object.keys(inRequest)[index])} : ${sArr}]`;
-                } else {
-                  newValue += JSON.stringify(Object.entries(inRequest)[index]).replace(",", ":");
+            const reTemp = [result.dataValues];
+            let inResult = {};
+            reTemp.map((el) => {
+              Object.values(el).filter((item, index) => {
+                if (item != null) {
+                  if (Object.keys(el)[index] == "dataset_id") {
+                    inResult["id"] = item;
+                  } else if (Object.keys(el)[index] == "sourceDatasetIds") {
+                    inResult[Object.keys(el)[index]] = item.split();
+                  } else {
+                    inResult[Object.keys(el)[index]] = item;
+                  }
                 }
-              }
+              });
             });
-            newValue = newValue.split("][").join(",");
-            newValue = newValue.replace("[", "{");
-            newValue = newValue.slice(0, -1) + "}";
-            console.log(newValue);
-            dataRequest.insert(newValue);
+            console.log(inResult)
+            dataRequest.insert(inResult);
             res.redirect("/ds/list");
           });
       });
-    } catch (err) {}
+    } catch (err) {
+      let errCode = JSON.parse(JSON.stringify(err.errors));
+      for (var i = 0; i < errCode.length; i++) {
+        if (errCode[i].type.includes("notNull")) {
+          res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>");
+          break;
+        }
+      }
+      console.log(err)
+    }
   },
   //dataset 소프트 삭제
   dsSofeDel: async (req, res) => {
@@ -172,7 +187,7 @@ const process = {
       await dataset.update({ ds_delYn: "Y", dataset_id: rand + dsId }, { where: { dataset_id: dsId } }).then(async (result) => {
         //데이터 삭제 요청
         dataRequest.delOne(dsId);
-        res.redirect("/ds/list/");
+        res.redirect("/ds/list");
       });
     } catch (err) {
       console.log(err);
@@ -184,14 +199,62 @@ const process = {
     var delListId = req.body.deleteList.split(",");
     const rand = "deleted_" + moment().format("YYMMDDHHmmss") + "_";
     try {
-      for(var i =0; i<delListId.length; i++){
-        await dataset.update({ds_delYn : "Y", dataset_id:rand+delListId[i]},{where:{dataset_id:delListId[i]}});
+      for (var i = 0; i < delListId.length; i++) {
+        await dataset.update({ ds_delYn: "Y", dataset_id: rand + delListId[i] }, { where: { dataset_id: delListId[i] } });
         dataRequest.delList(delListId[i]);
       }
       res.redirect("/ds/list");
     } catch (err) {
       console.log("data list soft delete failed");
       console.log(err);
+    }
+  },
+  edited: async (req, res) => {
+    const body = [req.body];
+    try {
+      let edit = {};
+      body.map((el) => {
+        Object.values(el).filter((item, index) => {
+          item != "" ? item : (item = null);
+          let key = Object.keys(el)[index];
+          edit[key] = item;
+        });
+      });
+      await dataset.update(edit, { where: { ds_id: req.params.ds_id } });
+      await dataset
+        .findOne({
+          attributes: { exclude: ["ds_id", "createdAt", "updatedAt", "ds_delYn", "al_id"] },
+          where: { ds_id: req.params.ds_id },
+        })
+        .then((result) => {
+          const reTemp = [result.dataValues];
+          let edResult = {};
+          let dId = "";
+          reTemp.map((el) => {
+            Object.values(el).filter((item, index) => {
+              if (item != null) {
+                if (Object.keys(el)[index] == "dataset_id") {
+                  dId = item;
+                } else if (Object.keys(el)[index] == "sourceDatasetIds") {
+                  edResult[Object.keys(el)[index]] = item.split();
+                } else {
+                  edResult[Object.keys(el)[index]] = item;
+                }
+              }
+            });
+          });
+          dataRequest.edit(edResult, dId);
+          res.redirect("/ds/view/" + req.params.ds_id);
+        });
+    } catch (err) {
+      let errCode = JSON.parse(JSON.stringify(err.errors));
+      console.log(errCode);
+      for (var i = 0; i < errCode.length; i++) {
+        if (errCode[i].type.includes("notNull")) {
+          res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 수정해주세요'); location.href=history.back();</script>");
+          break;
+        }
+      }
     }
   },
 };

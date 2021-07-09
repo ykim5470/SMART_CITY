@@ -1,5 +1,5 @@
 // 수자원 IP address
-const BASE = 'http://203.253.128.184'
+const BASE = 'http://203.253.128.184:'
 const INGEST_INTERFACE_PORT = '18127'
 const DATA_MANAGER_PORT = '18827'
 const DATA_SERVICE_BROKER_PORT = '18227'
