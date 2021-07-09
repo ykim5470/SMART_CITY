@@ -2,12 +2,14 @@ const { model_list, model_output, model_des, model_input, atch_file_tb, analysis
 const axios = require("axios");
 const analysis = require("./newAnaly.js");
 const moment = require("moment");
-const Path = require("path")
-const fs = require('fs'
-)
+const Path = require("path");
+const fs = require("fs");
+const exec = require("child_process");
 const unzipper = require("unzipper");
 const errorHandling = require("../public/js/helpers/error_handling");
 const { INGEST_INTERFACE, DATA_MANAGER, DATA_SERVICE_BROKER } = require("../base");
+const { readdirSync } = require("fs");
+const { resolve } = require("path");
 
 // Get
 const output = {
@@ -296,17 +298,29 @@ const process = {
 	// 파일 TB Create
 	file_add: async (req, res) => {
 		const { originalname, mimetype, path, filename } = req.file;
-		
-		var uploadedFileDirectory = Path.resolve(__dirname, '../uploads/') //업로드 되는 파일 경로
-		var ExtractedFileDirectory = Path.resolve(__dirname, '../uploads/model/') // 압축 해제시 파일 경로
-		
-		// protocol buffer TF saved 모델을 업로드 했을 경우
+
+		var uploadedFileDirectory = Path.resolve(__dirname, "../uploads/").replace(/\\/g, '/'); //업로드 되는 파일 경로
+		var ExtractedFileDirectory = Path.resolve(__dirname, "../uploads/model/").replace(/\\/g, '/'); // 압축 해제시 파일 경로
+		let extractedmodel = Path.resolve(ExtractedFileDirectory + "/" + originalname.split(".")[0]).replace(/\\/g, '/'); // 압축 해제 서브 폴더 이름
+
+		// protocol buffer TF saved 모델을 업로드 했을 경우 JSON처리
 		if (mimetype == "application/x-zip-compressed") {
-			fs.createReadStream(uploadedFileDirectory + "/" + filename).pipe(unzipper.Extract({ path: ExtractedFileDirectory } )); // unzip 하고 폴더에 저장. 
+			await fs
+				.createReadStream(uploadedFileDirectory + "/" + filename)
+				.pipe(unzipper.Extract({ path: ExtractedFileDirectory }))
+				.on("close", () => {
+					resolve();
+					sub_list = fs.readdirSync(extractedmodel);
+					let input_model_path = Path.resolve(ExtractedFileDirectory, originalname.split(".")[0], sub_list[0]).replace(/\\/g, '/');
+					let output_model_path = Path.resolve(ExtractedFileDirectory, filename).replace(/\\/g, '/');
+					exec.exec(
+						`tensorflowjs_converter --input_format=tf_saved_model --output_format=tfjs_graph_model --signature_name=serving_default --saved_model_tags=serve ${input_model_path} ${output_model_path}`
+					);
+				});
+			return;
 		}
-
-		// tensorflowjs_converter --input_format=tf_saved_model --output_format=tfjs_graph_model --signature_name=serving_default --saved_model_tags=serve ../uploads/model/half_plus_two/00000123 ../uploads/model/convert
-
+		// h5 모델을 업로드 했을 경우 JSON처리 
+		
 
 		await atch_file_tb.create({
 			originalname,
