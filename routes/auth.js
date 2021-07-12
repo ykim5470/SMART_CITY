@@ -121,6 +121,7 @@ const output = {
 						// 등록 된 가공 데이터 셋 이름 GET
 						dataset
 							.findAll({
+								where: {ds_delYn: 'N'},
 								attributes: {
 									exclued: ["updatedAt", "createdAt"],
 									includes: [{ model: analysis_list, required: false, attributes: ["al_name"] }],
@@ -214,7 +215,9 @@ const output = {
 						// 등록 된 가공 데이터 셋 이름 GET
 						dataset
 							.findAll({
+								where: {ds_delYn: "N"},
 								attributes: {
+									
 									exclued: ["updatedAt", "createdAt"],
 									includes: [{ model: analysis_list, required: false, attributes: ["al_name"] }],
 									raw: true,
@@ -261,6 +264,7 @@ const output = {
 		try {
 			await dataset
 				.findAll({
+					where: {ds_delYn: "N"},
 					attributes: {
 						exclude: ["updatedAt", "createdAt"],
 					},

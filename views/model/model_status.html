@@ -1,8 +1,18 @@
-{% extends "index.html" %} {% block content %}
-<div class="container pt-3">
-	<h1>분석 모델 관리 모달</h1>
-	<div>현재 분석 상황: {{current_status}}</div>
-	<form action="/model_manage_board/{{md_id}}?_method=PUT" method="post"><button type="submit" name="new_status" value="stop">중지</button> <button type="submit" name="new_status" value="running">실행</button></form>
-
-	{% endblock %}
-</div>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>모델 등록 관리</title>
+	</head>
+	<body>
+		<div class="container pt-3">
+			<h1>분석 모델 관리 모달</h1>
+			<div>현재 분석 상황: {{current_status}}</div>
+			<form action="/model_manage_board/{{md_id}}?_method=PUT" method="post">
+				<button type="submit" name="new_status" value="stop">중지</button> <button type="submit" name="new_status" value="running">실행</button>
+			</form>
+		</div>
+	</body>
+</html>
