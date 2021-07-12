@@ -298,10 +298,16 @@ const process = {
 	// 파일 TB Create
 	file_add: async (req, res) => {
 		const { originalname, mimetype, path, filename } = req.file;
+		await atch_file_tb.create({
+			originalname,
+			mimetype,
+			path,
+			filename,
+		});
 
-		var uploadedFileDirectory = Path.resolve(__dirname, "../uploads/").replace(/\\/g, '/'); //업로드 되는 파일 경로
-		var ExtractedFileDirectory = Path.resolve(__dirname, "../uploads/model/").replace(/\\/g, '/'); // 압축 해제시 파일 경로
-		let extractedmodel = Path.resolve(ExtractedFileDirectory + "/" + originalname.split(".")[0]).replace(/\\/g, '/'); // 압축 해제 서브 폴더 이름
+		var uploadedFileDirectory = Path.resolve(__dirname, "../uploads/").replace(/\\/g, "/"); //업로드 되는 파일 경로
+		var ExtractedFileDirectory = Path.resolve(__dirname, "../uploads/model/").replace(/\\/g, "/"); // 압축 해제시 파일 경로
+		let extractedmodel = Path.resolve(ExtractedFileDirectory + "/" + originalname.split(".")[0]).replace(/\\/g, "/"); // 압축 해제 서브 폴더 이름
 
 		// protocol buffer TF saved 모델을 업로드 했을 경우 JSON처리
 		if (mimetype == "application/x-zip-compressed") {
@@ -311,23 +317,19 @@ const process = {
 				.on("close", () => {
 					resolve();
 					sub_list = fs.readdirSync(extractedmodel);
-					let input_model_path = Path.resolve(ExtractedFileDirectory, originalname.split(".")[0], sub_list[0]).replace(/\\/g, '/');
-					let output_model_path = Path.resolve(ExtractedFileDirectory, filename).replace(/\\/g, '/');
+					let input_model_path = Path.resolve(ExtractedFileDirectory, originalname.split(".")[0], sub_list[0]).replace(/\\/g, "/");
+					let output_model_path = Path.resolve(ExtractedFileDirectory, filename).replace(/\\/g, "/");
 					exec.exec(
 						`tensorflowjs_converter --input_format=tf_saved_model --output_format=tfjs_graph_model --signature_name=serving_default --saved_model_tags=serve ${input_model_path} ${output_model_path}`
 					);
 				});
 			return;
 		}
-		// h5 모델을 업로드 했을 경우 JSON처리 
-		
-
-		await atch_file_tb.create({
-			originalname,
-			mimetype,
-			path,
-			filename,
-		});
+		// h5 모델을 업로드 했을 경우 JSON처리
+		if (mimetype == "application/octet-stream" && originalname.split(".")[1] == "h5") {
+			return;
+		}
+		return;
 	},
 
 	// 모델 등록 Complete
@@ -354,6 +356,8 @@ const process = {
 				const al_list_value = JSON.parse(al_list_str);
 				return (al_id = al_list_value.al_id);
 			});
+
+			console.log(al_id)
 
 			// 파일 TB file_id GET
 			await atch_file_tb.findAll({ order: [["createdAt", "DESC"]] }).then((res) => {
@@ -405,7 +409,6 @@ const process = {
 						}
 					});
 				});
-
 			return res.redirect("/model_manage_board");
 		} catch (err) {
 			console.log(err);

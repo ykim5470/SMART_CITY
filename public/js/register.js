@@ -1,4 +1,3 @@
-
 // Client socket instance create
 const socket = io();
 
@@ -23,16 +22,17 @@ const model_description = document.querySelector(".md_desc");
 
 const user_input_value = [];
 
-window.addEventListener('load', e => {
-	if (data_select_input.value != '') {
-		socket.emit('데이터 선택', {
-			dataset_info: data_select_input.value
-		})
+window.addEventListener("load", (e) => {
+	if (data_select_input.value != "") {
+		socket.emit("데이터 선택", {
+			dataset_info: data_select_input.value,
+		});
 		socket.emit("분석 모델 선택", {
 			al_name_mo: analysis_select_input.value.split(",")[0],
 			selected_processed_dataset_id: analysis_select_input.value.split(",")[1],
 		});
-	}})
+	}
+});
 // 원천 데이터 선택 값 전송
 data_select_input.addEventListener("change", (e) => {
 	e.preventDefault();
