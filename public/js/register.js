@@ -1,3 +1,4 @@
+
 // Client socket instance create
 const socket = io();
 
@@ -22,13 +23,23 @@ const model_description = document.querySelector(".md_desc");
 
 const user_input_value = [];
 
+window.addEventListener('load', e => {
+	if (data_select_input.value != '') {
+		socket.emit('데이터 선택', {
+			dataset_info: data_select_input.value
+		})
+		socket.emit("분석 모델 선택", {
+			al_name_mo: analysis_select_input.value.split(",")[0],
+			selected_processed_dataset_id: analysis_select_input.value.split(",")[1],
+		});
+	}})
 // 원천 데이터 선택 값 전송
 data_select_input.addEventListener("change", (e) => {
 	e.preventDefault();
 	if (data_select_input.value == undefined) {
 		return;
 	}
-	console.log(data_select_input.value)
+	console.log(data_select_input.value);
 	socket.emit("데이터 선택", {
 		dataset_info: data_select_input.value,
 	});
@@ -41,9 +52,8 @@ analysis_select_input.addEventListener("change", (e) => {
 		return;
 	}
 	socket.emit("분석 모델 선택", {
-		al_name_mo: analysis_select_input.value.split(',')[0],
-		selected_processed_dataset_id : analysis_select_input.value.split(',')[1]
-		
+		al_name_mo: analysis_select_input.value.split(",")[0],
+		selected_processed_dataset_id: analysis_select_input.value.split(",")[1],
 	});
 });
 
@@ -77,7 +87,6 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 					return;
 				}
 			});
-			// console.log(e.target.value);
 			socket.emit("입력 데이터 값", { user_input_value: user_input_value });
 		});
 	});
