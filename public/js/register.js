@@ -19,6 +19,7 @@ const input_params_insert = document.querySelector(".input_params_insert");
 const output_params_insert = document.querySelector(".output_params_insert");
 const register_complete = document.querySelector("#submitBtn");
 const model_description = document.querySelector(".md_desc");
+const sub_data_insert = document.querySelector(".sub_data_insert");
 
 const user_input_value = [];
 
@@ -39,7 +40,6 @@ data_select_input.addEventListener("change", (e) => {
 	if (data_select_input.value == undefined) {
 		return;
 	}
-	console.log(data_select_input.value);
 	socket.emit("데이터 선택", {
 		dataset_info: data_select_input.value,
 	});
@@ -90,6 +90,22 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 			socket.emit("입력 데이터 값", { user_input_value: user_input_value });
 		});
 	});
+});
+
+// sub_data GET & add to page
+socket.on("데이터 선택 완료 및 개별 센서 데이터 calling", (data) => {
+	const sub_data = data;
+	const sub_box = sub_data.map((items, index) => {
+		return `
+		<tr>
+			<td>
+				<input type='checkbox' name='sub_data_select' value=${items.id}/>
+			</td>
+			<td>${items.name.value}</td>
+		<tr>
+		`;
+	});
+	sub_data_insert.innerHTML = sub_box.join("");
 });
 
 // output params GET & add to page

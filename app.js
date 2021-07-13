@@ -7,7 +7,8 @@ const nunjucks = require("nunjucks");
 const methodOverride = require("method-override");
 const socket = require("socket.io");
 const axios = require("axios");
-const { analysis_list, column_tb } = require("./models");
+const { analysis_list, column_tb, model_list, model_input } = require("./models");
+const { my_scheduleJob } = require("./public/js/helpers/api_scheduler");
 
 //routers
 const index_router = require("./routes/index");
@@ -54,11 +55,74 @@ let al_name_mo_obj = {};
 io.on("connection", function (socket) {
 	console.log("Made socket connection");
 
+	socket.on("원천 데이터 GET Status", (data) => {
+		console.log("--------------------------------------------------");
+		console.log(data);
+		const { status, md_id } = data;
+		model_list.findOne({ where: { md_id: md_id }, attributes: ["al_time", "sub_data"], include: [{ model: model_input, required: false }], raw: true }).then((res) => {
+			const model_manage_str = JSON.stringify(res);
+			const model_manage_value = JSON.parse(model_manage_str);
+			console.log(model_manage_value);
+			const { al_time, sub_data } = model_manage_value;
+
+			// API request Scheduler callback function
+			const sub_data_get = async () => {
+				var sub_data_list = JSON.parse(sub_data);
+				if (typeof sub_data_list == "string") {
+					axios
+						.get(
+							`http://203.253.128.184:18227/temporal/entities/${sub_data_list.slice(
+								0,
+								-1
+							)}?timerel=between&time=2021-06-01T00:00:00+09:00&endtime=2021-06-24T22:00:00+09:00&limit=48&lastN=48&timeproperty=modifiedAt`,
+							{ headers: { Accept: "application/json" } }
+						)
+						.then((result) => console.log("a"));
+				} else {
+					sub_data_list.filter((el, index) => {
+						axios
+							.get(
+								`http://203.253.128.184:18227/temporal/entities/${el.slice(
+									0,
+									-1
+								)}?timerel=between&time=2021-06-01T00:00:00+09:00&endtime=2021-06-24T22:00:00+09:00&limit=48&lastN=48&timeproperty=modifiedAt`,
+								{ headers: { Accept: "application/json" } }
+							)
+							.then((result) => console.log("b"));
+					});
+				}
+			};
+
+			// scheduler modules
+			var is_running = status == "running" ? true : false;
+			console.log(is_running);
+
+			my_scheduleJob("job1", "Etc/UTC", `*/${al_time} * * * * *`, sub_data_get, is_running);
+			return;
+		});
+	});
+
 	// 데이터 셋 선택
 	socket.on("데이터 선택", (data) => {
 		const { dataset_info } = data;
 
 		data_selection_obj = { ...data };
+		// 선택 된 데이터 개별 센서 데이터 API calling;
+		const sub_data_get = async () => {
+			const sub_data_queries = dataset_info.split(",");
+			const sub_data_attr = ["id", "type", "name", "version"];
+			const attr_obj = Object.fromEntries(sub_data_attr.map((key, index) => [key, sub_data_queries[index]]));
+			const sub_data = await axios
+				.get(`http://203.253.128.184:18227/entities?Type=${attr_obj.name}.${attr_obj.type}:${attr_obj.version}&datasetId=${attr_obj.id}`, { headers: { Accept: "application/json" } })
+				.then((res) => {
+					return res.data;
+				});
+			return sub_data;
+		};
+		sub_data_get().then((res) => {
+			console.log(res);
+			socket.emit("데이터 선택 완료 및 개별 센서 데이터 calling", res);
+		});
 
 		// 선택 된 데이터 API calling; attributes GET
 		const attr_get = async () => {

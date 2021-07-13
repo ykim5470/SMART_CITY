@@ -11,8 +11,11 @@
 			<h1>분석 모델 관리 모달</h1>
 			<div>현재 분석 상황: {{current_status}}</div>
 			<form action="/model_manage_board/{{md_id}}?_method=PUT" method="post">
-				<button type="submit" name="new_status" value="stop">중지</button> <button type="submit" name="new_status" value="running">실행</button>
+				<input class='status_md_id' value ='{{md_id}}'hidden/>
+				<button class="status_btn" type="submit" name="new_status" value="stop">중지</button> <button type="submit" class="status_btn" name="new_status" value="running">실행</button>
 			</form>
 		</div>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="/js/status.js"></script>
 	</body>
 </html>

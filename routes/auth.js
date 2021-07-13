@@ -11,6 +11,10 @@ const { INGEST_INTERFACE, DATA_MANAGER, DATA_SERVICE_BROKER } = require("../base
 const { readdirSync } = require("fs");
 const { resolve } = require("path");
 
+
+
+
+
 // Get
 const output = {
 	// 모델 관리 보드
@@ -121,7 +125,7 @@ const output = {
 						// 등록 된 가공 데이터 셋 이름 GET
 						dataset
 							.findAll({
-								where: {ds_delYn: 'N'},
+								where: { ds_delYn: "N" },
 								attributes: {
 									exclued: ["updatedAt", "createdAt"],
 									includes: [{ model: analysis_list, required: false, attributes: ["al_name"] }],
@@ -215,9 +219,8 @@ const output = {
 						// 등록 된 가공 데이터 셋 이름 GET
 						dataset
 							.findAll({
-								where: {ds_delYn: "N"},
+								where: { ds_delYn: "N" },
 								attributes: {
-									
 									exclued: ["updatedAt", "createdAt"],
 									includes: [{ model: analysis_list, required: false, attributes: ["al_name"] }],
 									raw: true,
@@ -264,7 +267,7 @@ const output = {
 		try {
 			await dataset
 				.findAll({
-					where: {ds_delYn: "N"},
+					where: { ds_delYn: "N" },
 					attributes: {
 						exclude: ["updatedAt", "createdAt"],
 					},
@@ -302,6 +305,7 @@ const process = {
 	// 파일 TB Create
 	file_add: async (req, res) => {
 		const { originalname, mimetype, path, filename } = req.file;
+		console.log(req.file);
 		await atch_file_tb.create({
 			originalname,
 			mimetype,
@@ -331,6 +335,7 @@ const process = {
 		}
 		// h5 모델을 업로드 했을 경우 JSON처리
 		if (mimetype == "application/octet-stream" && originalname.split(".")[1] == "h5") {
+			exec.exec(`tensorflowjs_converter --input_format=keras ${uploadedFileDirectory}/${filename} ${ExtractedFileDirectory}/${filename}`);
 			return;
 		}
 		return;
@@ -338,7 +343,7 @@ const process = {
 
 	// 모델 등록 Complete
 	register_complete: async (req, res) => {
-		const { al_name_mo, al_time, dataset_id, model_desc, ip_attr_name, user_input_param, ip_attr_value_type } = req.body;
+		const { al_name_mo, al_time, dataset_id, model_desc, ip_attr_name, user_input_param, ip_attr_value_type, sub_data_select } = req.body;
 		// Error handling from server
 		try {
 			errorHandling.al_time_handling(al_time); // 3600
@@ -361,7 +366,7 @@ const process = {
 				return (al_id = al_list_value.al_id);
 			});
 
-			console.log(al_id)
+			console.log(al_id);
 
 			// 파일 TB file_id GET
 			await atch_file_tb.findAll({ order: [["createdAt", "DESC"]] }).then((res) => {
@@ -379,7 +384,8 @@ const process = {
 					al_name_mo: al_name_mo.split(",")[0],
 					data_model_name: dataset_id,
 					al_id: al_id,
-					dataset_id: al_name_mo.split(",")[1], // dataset_id will be applied later
+					dataset_id: al_name_mo.split(",")[1],
+					sub_data: sub_data_select,
 				})
 				.then(() => {
 					// 생성된 모델 리스트 TB의 md_id GET

@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: true,
 			},
 			al_name_mo: { type: DataTypes.STRING, defaultValue: "no Model selected", allowNull: true },
-			run_status: { type: DataTypes.ENUM("running", "stop"), defaultValue: "running", allowNull: true },
+			run_status: { type: DataTypes.ENUM("running", "stop"), defaultValue: "stop", allowNull: true },
 			file_id: {
 				type: DataTypes.INTEGER,
 				foreignKey: true,
@@ -47,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: true,
 				type: DataTypes.STRING,
 			},
+			sub_data: {
+				allowNull: false,
+				type: DataTypes.JSON
+			}
 		},
 
 		{

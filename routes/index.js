@@ -23,6 +23,7 @@ router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage
 router.get("/model_manage_board/:md_id", auth.output.manage_status);
 router.get("/model_register_board", auth.output.model_register_board);
 router.get('/model_registered_show/:md_id', auth.output.registered_show);
+
 //Dataset
 router.get("/ds/insert", ds.output.insert);
 router.get("/ds/getNsVer/:id",ds.output.getNsVer);
