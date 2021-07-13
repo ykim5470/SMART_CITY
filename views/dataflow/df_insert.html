@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DATAFLOW 등록</title>
+  </head>
+  <script>
+  
+  </script>
+  <body>
+    <h1>DATAFLOW 등록</h1>
+    <form action="/df/inserted" method="POST" name="register" id="reFrm">
+      <p>&Star;표시 항목은 필수 입니다</p>
+      {% if analy | length %}
+      <p>
+        DATASET_ID SELECT :
+        <select name="dataIdName" onchange="showAl()">
+          {% for items in analy %}
+          <option value="{{items.al_id}},{{items.al_name}}">{{items.al_name}}</option>
+          {% endfor %}
+        </select>
+      </p>
+      <p id="selectedNs"></p>
+      <p id="selectedVer"></p>
+      <input type="hidden" name="dataModelType" value="" /><input type="hidden" name="al_id" value="" /><input type="hidden" name="getValue" id="valArr" value="" />
+      <input type="button" value="등록하기" onclick="goSubmit()" />
+      {% else %}
+      <p>참조할 데이터 모델이 없습니다. 모델을 등록한 후 다시 진행해주세요</p>
+      {% endif %}
+      <p>&Star;DATASET NAME : <input type="text" name="name" placeholder="NAME을 입력하세요." /></p>
+
+      <p>DATASET DESCRIPTION : <input type="text" name="description" placeholder="설명을 입력하세요" /></p>
+
+      <p>&Star;DATASET INTERVAL : <input type="text" name="updateInterval" placeholder="갱신주기를 입력하세요" /></p>
+
+      <p>&Star;DATASET CATEGORY : <input type="text" name="category" placeholder="분류체계(코드)를 입력하세요" /></p>
+
+      <p>&Star;DATASET PROVIDER ORGANIZATION : <input type="text" name="providerOrganization" placeholder="제공기관을 입력하세요" /></p>
+
+      <p>&Star;DATASET PROVIDER SYSTEM : <input type="text" name="providerSystem" placeholder="제공시스템을 입력하세요" /></p>
+
+      <p>DATASET IDENTIFIER TYPE : <input type="text" name="dataIdentifierType" placeholder="데이터 식별자 타입(코드)를 입력하세요" /></p>
+
+      <p>DATASET STORAGE RETENTION(DAYS) : <input type="number" name="storageRetention" placeholder="데이터 저장 유효기간를 입력하세요" /></p>
+
+      <p>DATASET TOPIC RETENTION(ms) : <input type="number" name="topicRetention" placeholder="토픽 저장 유효기간을 입력하세요" /></p>
+      {% if analy | length %}
+      <p>
+        DATAMODEL NAME SELECT :
+        <select name="dataIdName" onchange="showAl()">
+          {% for items in analy %}
+          <option value="{{items.al_id}},{{items.al_name}}">{{items.al_name}}</option>
+          {% endfor %}
+        </select>
+      </p>
+      <p id="selectedNs"></p>
+      <p id="selectedVer"></p>
+      <input type="hidden" name="dataModelType" value="" /><input type="hidden" name="al_id" value="" /><input type="hidden" name="getValue" id="valArr" value="" />
+      <input type="button" value="등록하기" onclick="goSubmit()" />
+      {% else %}
+      <p>참조할 데이터 모델이 없습니다. 모델을 등록한 후 다시 진행해주세요</p>
+      {% endif %}
+      <a href="/ds/list"><input type="button" value="목록보기" /></a>
+    </form>
+  </body>
+  <script>
+    window.onload = showAl();
+  </script>
+</html>

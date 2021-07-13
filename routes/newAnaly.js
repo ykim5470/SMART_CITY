@@ -250,7 +250,7 @@ const process = {
               allowNull: body.allowNull[i],
               attributeType: body.attribute[i],
             });
-            temp = { name: body.colName[i], isRequired: nullTF, attributeType: body.attribute[i], maxLength: body.dataSize[i], valueType: body.colType[i] };
+            temp = { name: body.colName[i], isRequired: nullTF, attributeType: body.attribute[i], maxLength: size[i], valueType: body.colType[i] };
             column.push(JSON.parse(JSON.stringify(temp)));
           }
           //데이터 생성요청

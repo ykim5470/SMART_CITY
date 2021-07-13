@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-	class dataFlow extends Model {
+	class dataflow extends Model {
 		/**
 		 * Helper method for defining associations.
 		 * This method is not a part of Sequelize lifecycle.
@@ -12,19 +12,20 @@ module.exports = (sequelize, DataTypes) => {
 			this.belongsTo(models.dataset, { foreignKey: { name: "dataset_id", allowNull: false }, onDelete: "CASCADE" });
 		}
 	}
-	dataFlow.init(
+	dataflow.init(
 		{
-			dataFlow_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true, allowNull:false },
+			df_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true, allowNull:false },
 			dataset_id: { allowNull: false, foreignKey: true, type: DataTypes.STRING },
-			target_type: { allowNull: false, type: DataTypes.STRING },
-			big_data_storage: { allowNull: false, type: DataTypes.STRING },
+			description : { type: DataTypes.STRING },
+			historyStoreType: { allowNull: false, type: DataTypes.STRING },
 			enabled: { allowNull: false, type: DataTypes.ENUM('true', 'false') },
-			history_store_type: { allowNull: false, type: DataTypes.STRING },
+			types: { allowNull: false, type: DataTypes.STRING },
+			bigDataStorageTypes: { type: DataTypes.STRING }
 		},
 		{
 			sequelize,
-			modelName: "dataFlow",
+			modelName: "dataflow",
 		}
 	);
-	return dataFlow;
+	return dataflow;
 };

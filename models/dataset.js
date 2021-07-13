@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.model_list, { foreignKey: 'dataset_id' }),
-      this.hasMany(models.dataFlow, {foreignKey: 'dataset_id'})
+      this.hasMany(models.dataflow, {foreignKey: 'dataset_id'})
       this.belongsTo(models.analysis_list, 
         {
           foreignKey: { name: 'al_id', allowNull: false },

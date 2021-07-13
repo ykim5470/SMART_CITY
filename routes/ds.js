@@ -1,5 +1,5 @@
 const express = require("express");
-const { analysis_list, column_tb, dataset } = require("../models");
+const { analysis_list, dataset } = require("../models");
 const router = express.Router();
 const axios = require("axios");
 const sequelize = require("sequelize");
@@ -163,20 +163,26 @@ const process = {
                 }
               });
             });
-            console.log(inResult)
+            console.log(inResult);
             dataRequest.insert(inResult);
             res.redirect("/ds/list");
           });
       });
     } catch (err) {
-      let errCode = JSON.parse(JSON.stringify(err.errors));
-      for (var i = 0; i < errCode.length; i++) {
-        if (errCode[i].type.includes("notNull")) {
-          res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>");
-          break;
+      if (err.errors.length > 1) {
+        errCode = JSON.parse(JSON.stringify(err.errors));
+        for (var i = 0; i < errCode.length; i++) {
+          if (errCode[i].type.includes("notNull")) {
+            res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>");
+            break;
+          }
+        }
+      } else {
+        errCode = JSON.stringify(err)
+        if (errCode.includes("cannot be null")) {
+          res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 수정해주세요'); location.href=history.back();</script>");
         }
       }
-      console.log(err)
     }
   },
   //dataset 소프트 삭제
@@ -220,6 +226,9 @@ const process = {
           edit[key] = item;
         });
       });
+      if(edit.isProcessed==null){
+        edit.isProcessed = "가공데이터"
+      }
       await dataset.update(edit, { where: { ds_id: req.params.ds_id } });
       await dataset
         .findOne({
@@ -247,12 +256,18 @@ const process = {
           res.redirect("/ds/view/" + req.params.ds_id);
         });
     } catch (err) {
-      let errCode = JSON.parse(JSON.stringify(err.errors));
-      console.log(errCode);
-      for (var i = 0; i < errCode.length; i++) {
-        if (errCode[i].type.includes("notNull")) {
+      if (err.errors.length > 1) {
+        errCode = JSON.parse(JSON.stringify(err.errors));
+        for (var i = 0; i < errCode.length; i++) {
+          if (errCode[i].type.includes("notNull")) {
+            res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>");
+            break;
+          }
+        }
+      } else {
+        errCode = JSON.stringify(err)
+        if (errCode.includes("cannot be null")) {
           res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 수정해주세요'); location.href=history.back();</script>");
-          break;
         }
       }
     }

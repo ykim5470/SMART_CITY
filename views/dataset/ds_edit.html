@@ -16,10 +16,11 @@
         .then((data) => {
           var ns = document.getElementById("selectedNs");
           var ver = document.getElementById("selectedVer");
-          ns.innerHTML = `└SELECTED DATAMODEL NAMESPACE : <input type="text" name="dataModelNamespace" value="${data.al_ns}" disabled />`;
-          ver.innerHTML = `└SELECTED DATAMODEL VERSION : <input type="text" name="dataModelVersion" value="${data.al_version}" disabled/>`;
+          ns.innerHTML = `└SELECTED DATAMODEL NAMESPACE : <input type="text" name="dataModelNamespace" value="${data.al_ns}" readonly />`;
+          ver.innerHTML = `└SELECTED DATAMODEL VERSION : <input type="text" name="dataModelVersion" value="${data.al_version}" readonly/>`;
         });
       document.getElementsByName("al_id")[0].value = idVer[0];
+      document.getElementsByName("dataModelType")[0].value = idVer[1];
     }
     function goSubmit() {
       document.getElementsByName("dataIdName")[0].disabled = true;
@@ -73,7 +74,7 @@
       </p>
       <p id="selectedNs">└SELECTED DATAMODEL NAMESPACE : <input type="text" name="dataModelNamespace" value="{{ds.dataModelNamespace}}" readonly /></p>
       <p id="selectedVer">└SELECTED DATAMODEL VERSION : <input type="text" name="dataModelVersion" value="{{ds.dataModelVersion}}" readonly /></p>
-      <input type="hidden" name="dataModelType" value="{{ds.dataModelType}}" /><input type="hidden" name="al_id" value="{{ds.al_id}}" /><input type="hidden" name="getValue" id="valArr" value="" />
+      <input type="hidden" name="dataModelType" value="{{ds.dataModelType}}" /><input type="hidden" name="al_id" value="{{ds.al_id}}" />
       <input type="button" value="수정하기" onclick="goSubmit()" />
       <a href="/ds/list"><input type="button" value="목록보기" /></a>
     </form>
