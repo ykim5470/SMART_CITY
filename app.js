@@ -66,7 +66,7 @@ io.on("connection", function (socket) {
 			const { al_time, sub_data } = model_manage_value;
 
 			// API request Scheduler callback function
-			const sub_data_get = async () => {
+			const raw_data_sub_get = async () => {
 				var sub_data_list = JSON.parse(sub_data);
 				if (typeof sub_data_list == "string") {
 					axios
@@ -97,7 +97,7 @@ io.on("connection", function (socket) {
 			var is_running = status == "running" ? true : false;
 			console.log(is_running);
 
-			my_scheduleJob("job1", "Etc/UTC", `*/${al_time} * * * * *`, sub_data_get, is_running);
+			my_scheduleJob("job1", "Etc/UTC", `*/${al_time} * * * * *`, raw_data_sub_get, is_running);
 			return;
 		});
 	});
