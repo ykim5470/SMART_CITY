@@ -9,9 +9,11 @@ const socket = require("socket.io");
 const axios = require("axios");
 const { analysis_list, column_tb, model_list, model_input } = require("./models");
 const { my_scheduleJob } = require("./public/js/helpers/api_scheduler");
+const schedule = require("node-schedule");
 
 //routers
 const index_router = require("./routes/index");
+const { scheduleJob } = require("node-schedule");
 
 models.sequelize
 	.sync({ force: false })
@@ -55,17 +57,15 @@ let al_name_mo_obj = {};
 io.on("connection", function (socket) {
 	console.log("Made socket connection");
 
-	socket.on("원천 데이터 GET Status", (data) => {
-		console.log("--------------------------------------------------");
-		console.log(data);
+	// 스케쥴러 조작
+	socket.on("모델 스케쥴러 조작", (data) => {
 		const { status, md_id } = data;
-		model_list.findOne({ where: { md_id: md_id }, attributes: ["al_time", "sub_data"], include: [{ model: model_input, required: false }], raw: true }).then((res) => {
+		model_list.findOne({ where: { md_id: md_id }, attributes: ["al_time", "sub_data", "run_status"], include: [{ model: model_input, required: false }], raw: true }).then((res) => {
 			const model_manage_str = JSON.stringify(res);
 			const model_manage_value = JSON.parse(model_manage_str);
-			console.log(model_manage_value);
-			const { al_time, sub_data } = model_manage_value;
 
-			// API request Scheduler callback function
+			const { al_time, sub_data } = model_manage_value;
+			// API request Scheduler callback function
 			const raw_data_sub_get = async () => {
 				var sub_data_list = JSON.parse(sub_data);
 				if (typeof sub_data_list == "string") {
@@ -92,13 +92,10 @@ io.on("connection", function (socket) {
 					});
 				}
 			};
-
-			// scheduler modules
+			// scheduler modules
 			var is_running = status == "running" ? true : false;
-			console.log(is_running);
-
-			my_scheduleJob("job1", "Etc/UTC", `*/${al_time} * * * * *`, raw_data_sub_get, is_running);
-			return;
+			console.log(model_manage_value["model_inputs.md_id"]);
+			my_scheduleJob(`${model_manage_value["model_inputs.md_id"]}`, "Etc/UTC", '* * * * *', raw_data_sub_get, is_running);
 		});
 	});
 
@@ -120,7 +117,7 @@ io.on("connection", function (socket) {
 			return sub_data;
 		};
 		sub_data_get().then((res) => {
-			console.log(res);
+			// console.log(res);
 			socket.emit("데이터 선택 완료 및 개별 센서 데이터 calling", res);
 		});
 

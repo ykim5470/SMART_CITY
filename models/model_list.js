@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
 	class model_list extends Model {
 		static associate(models) {
 			// define association here
-			this.hasMany(models.model_input, { foreignKey: "ip_id" });
+			this.hasMany(models.model_input, { foreignKey: "md_id" });
 			this.hasMany(models.model_output, { foreignKey: "op_id" });
 			this.hasMany(models.model_des, { foreignKey: "des_id" });
 			this.belongsTo(models.atch_file_tb, {

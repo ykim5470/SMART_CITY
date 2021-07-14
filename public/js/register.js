@@ -130,8 +130,11 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
 
 const register_submit = () => {
 	register_complete.addEventListener("click", async (e) => {
+		
 		// 파일 정보 post
-		return document.querySelector("#register_complete").submit();
+		return await document.querySelector("#register_complete").submit();
+		
+		
 	});
 };
 

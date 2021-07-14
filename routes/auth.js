@@ -110,7 +110,7 @@ const output = {
 				let processed_selected_name;
 
 				// 유저 인풋 값 GET
-				model_input.findAll({ where: { ip_id: md_id }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
+				model_input.findAll({ where: { md_id: md_id }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
 					const model_input_info_str = JSON.stringify(results);
 					const model_input_info_value = JSON.parse(model_input_info_str);
 
@@ -204,7 +204,7 @@ const output = {
 				let processed_selected_name;
 
 				// 유저 인풋 값 GET
-				model_input.findAll({ where: { ip_id: md_id }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
+				model_input.findAll({ where: { md_id : md_id  }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
 					const model_input_info_str = JSON.stringify(results);
 					const model_input_info_value = JSON.parse(model_input_info_str);
 
@@ -415,7 +415,7 @@ const process = {
 							});
 						}
 						for (i in user_obj) {
-							await model_input.create({ ip_id: md_id, ip_param: i, ip_value: user_obj[i][0], ip_type: user_obj[i][1] });
+							await model_input.create({ md_id: md_id, ip_param: i, ip_value: user_obj[i][0], ip_type: user_obj[i][1] });
 						}
 					});
 				});
@@ -486,7 +486,7 @@ const process = {
 			}
 
 			for (i in user_obj) {
-				model_input.update({ ip_id: md_id, ip_param: i, ip_value: user_obj[i][0], ip_type: user_obj[i][1] }, { where: { ip_id: md_id } });
+				model_input.update({ md_id: md_id, ip_param: i, ip_value: user_obj[i][0], ip_type: user_obj[i][1] }, { where: { md_id: md_id } });
 			}
 
 			return res.redirect("/model_manage_board");
