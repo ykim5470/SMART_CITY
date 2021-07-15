@@ -7,65 +7,83 @@
     <title>DATAFLOW 등록</title>
   </head>
   <script>
-  
+    function typeCheck(item){
+      if(!item.checked&&item.value=="dataServiceBroker"){
+        document.getElementById("brokerTypes").style.display='none';
+      }else if(!item.checked&&item.value=="bigDataStorageHandler"){
+        document.getElementById("handlerTypes").style.display='none';
+      }else if(item.checked&&item.value=="dataServiceBroker"){
+        document.getElementById("brokerTypes").style.display='block';
+      }else{
+        document.getElementById("handlerTypes").style.display='block';
+      }
+    }
+    function able(item){
+      var able = document.getElementsByName("enabled")[0];
+      if(!item.checked){
+        able.value = "false"
+      }else{
+        able.value = "true"
+      }
+    }
+    function goSubmit(){
+      var b = document.getElementsByName("types")[0];
+      var h = document.getElementsByName("types")[1];
+      if(!b.checked && !h.checked){
+        window.alert("type중 하나는 반드시 선택해야 합니다.")
+        return "#"
+      }else{
+        document.register.submit();
+      }
+    }
   </script>
   <body>
     <h1>DATAFLOW 등록</h1>
-    <form action="/df/inserted" method="POST" name="register" id="reFrm">
+    <form action="/df/inserted" method="POST" name="register" id="dfFrm">
       <p>&Star;표시 항목은 필수 입니다</p>
-      {% if analy | length %}
+      {% if df | length %}
       <p>
-        DATASET_ID SELECT :
-        <select name="dataIdName" onchange="showAl()">
-          {% for items in analy %}
-          <option value="{{items.al_id}},{{items.al_name}}">{{items.al_name}}</option>
+        &Star;DATASET_ID SELECT :
+        <select name="dataset_id">
+          {% for items in df %}
+          <option value="{{items.dataset_id}}">{{items.dataset_id}}</option>
           {% endfor %}
         </select>
       </p>
-      <p id="selectedNs"></p>
-      <p id="selectedVer"></p>
-      <input type="hidden" name="dataModelType" value="" /><input type="hidden" name="al_id" value="" /><input type="hidden" name="getValue" id="valArr" value="" />
-      <input type="button" value="등록하기" onclick="goSubmit()" />
       {% else %}
-      <p>참조할 데이터 모델이 없습니다. 모델을 등록한 후 다시 진행해주세요</p>
+      <p>참조할 Dataset 이 없습니다. Dataset을 등록한 후 다시 진행해주세요</p>
       {% endif %}
-      <p>&Star;DATASET NAME : <input type="text" name="name" placeholder="NAME을 입력하세요." /></p>
-
-      <p>DATASET DESCRIPTION : <input type="text" name="description" placeholder="설명을 입력하세요" /></p>
-
-      <p>&Star;DATASET INTERVAL : <input type="text" name="updateInterval" placeholder="갱신주기를 입력하세요" /></p>
-
-      <p>&Star;DATASET CATEGORY : <input type="text" name="category" placeholder="분류체계(코드)를 입력하세요" /></p>
-
-      <p>&Star;DATASET PROVIDER ORGANIZATION : <input type="text" name="providerOrganization" placeholder="제공기관을 입력하세요" /></p>
-
-      <p>&Star;DATASET PROVIDER SYSTEM : <input type="text" name="providerSystem" placeholder="제공시스템을 입력하세요" /></p>
-
-      <p>DATASET IDENTIFIER TYPE : <input type="text" name="dataIdentifierType" placeholder="데이터 식별자 타입(코드)를 입력하세요" /></p>
-
-      <p>DATASET STORAGE RETENTION(DAYS) : <input type="number" name="storageRetention" placeholder="데이터 저장 유효기간를 입력하세요" /></p>
-
-      <p>DATASET TOPIC RETENTION(ms) : <input type="number" name="topicRetention" placeholder="토픽 저장 유효기간을 입력하세요" /></p>
-      {% if analy | length %}
+      <p>DESCRIPTION : <input type="text" name="description" placeholder="설명을 입력하세요." /></p>
       <p>
-        DATAMODEL NAME SELECT :
-        <select name="dataIdName" onchange="showAl()">
-          {% for items in analy %}
-          <option value="{{items.al_id}},{{items.al_name}}">{{items.al_name}}</option>
-          {% endfor %}
+        &Star;HISTORY STORE TYPE :
+        <select name="historyStoreType">
+          <option value="all">all</option>
+          <option value="partial">partial</option>
+          <option value="full">full</option>
         </select>
       </p>
-      <p id="selectedNs"></p>
-      <p id="selectedVer"></p>
-      <input type="hidden" name="dataModelType" value="" /><input type="hidden" name="al_id" value="" /><input type="hidden" name="getValue" id="valArr" value="" />
-      <input type="button" value="등록하기" onclick="goSubmit()" />
-      {% else %}
-      <p>참조할 데이터 모델이 없습니다. 모델을 등록한 후 다시 진행해주세요</p>
-      {% endif %}
-      <a href="/ds/list"><input type="button" value="목록보기" /></a>
+      <p>ENABLED : <input type="checkbox" name="enCheck" onclick="able(this)" /></p>
+      <p>&Star; TYPE / DATA SERVICE BROKER : <input type="checkbox" name="types" value="dataServiceBroker" onclick="typeCheck(this)"/></p>
+      <div id="brokerTypes" style="display: none;">
+        <p>
+          └ BIG DATA STORAGE TYPES / rdb : <input type="checkbox" name="brokerStorageTypes" value="rdb"/> / 
+            hbase : <input type="checkbox" name="brokerStorageTypes" value="hbase"/> / 
+            hive : <input type="checkbox" name="brokerStorageTypes" value="hive"/>
+        </p>
+        <!-- <input type="hidden" name="brokerStorageTypes" value=""> -->
+      </div>
+      <p>&Star; TYPE / BIG DATA STORAGE HANDLER : <input type="checkbox" name="types" value="bigDataStorageHandler" onclick="typeCheck(this)"/></p>
+      <div id="handlerTypes" style="display: none;">
+        <p>
+          └ BIG DATA STORAGE TYPES / rdb : <input type="checkbox" name="handlerStorageTypes" value="rdb"/> / 
+            hbase : <input type="checkbox" name="handlerStorageTypes" value="hbase"/> / 
+            hive : <input type="checkbox" name="handlerStorageTypes" value="hive"/>
+        </p>
+        <!-- <input type="hidden" name="handlerStorageTypes" value=""> -->
+      </div>
+      <input type="hidden" name="enabled" value="false">
+      <br />
+      <input type="button" onclick="goSubmit()" value="등록하기"/>
     </form>
   </body>
-  <script>
-    window.onload = showAl();
-  </script>
 </html>

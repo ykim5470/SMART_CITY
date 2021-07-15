@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require("./auth");
 const newAnaly = require("./newAnaly");
 const ds = require("./ds");
+const df = require("./df");
 const uploadFile = require('../public/js/helpers/upload_dir');
 const ui = require('./ui');
 const paginate = require('express-paginate')
@@ -23,7 +24,6 @@ router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage
 router.get("/model_manage_board/:md_id", auth.output.manage_status);
 router.get("/model_register_board", auth.output.model_register_board);
 router.get('/model_registered_show/:md_id', auth.output.registered_show);
-
 //Dataset
 router.get("/ds/insert", ds.output.insert);
 router.get("/ds/getNsVer/:id",ds.output.getNsVer);
@@ -32,6 +32,8 @@ router.get("/ds/list",paginate.middleware(10, 50), ds.output.list);
 router.get("/ds/list/:page",paginate.middleware(10, 50), ds.output.list);
 router.get("/ds/view/:ds_id", ds.output.view);
 router.get("/ds/edit/:ds_id", ds.output.edit);
+//Dataflow
+router.get("/df/insert", df.output.insert);
 
 
 //==============================POST======================================
@@ -47,6 +49,8 @@ router.post('/model/register/edit', uploadFile.single("atch_origin_file_name"), 
 router.post('/model/redirect/edit', auth.process.edit_redirect)
 //Dataset
 router.post("/ds/inserted" , ds.process.insert)
+//Dataset flow
+router.post("/df/inserted", df.process.insert)
 
 
 //===============================PUT======================================

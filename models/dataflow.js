@@ -20,7 +20,9 @@ module.exports = (sequelize, DataTypes) => {
 			historyStoreType: { allowNull: false, type: DataTypes.STRING },
 			enabled: { allowNull: false, type: DataTypes.ENUM('true', 'false') },
 			types: { allowNull: false, type: DataTypes.STRING },
-			bigDataStorageTypes: { type: DataTypes.STRING }
+			brokerStorageTypes: { type: DataTypes.STRING },
+			handlerStorageTypes: { type: DataTypes.STRING },
+			df_delYn : {type:DataTypes.CHAR ,allowNull:false, defaultValue:'N'}
 		},
 		{
 			sequelize,

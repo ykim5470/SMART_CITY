@@ -63,7 +63,6 @@ function removeRow() {
   oTbl.deleteRow(oTbl.clickedRowIndex);
 }
 function attrChange(idx) {
-  var index;
   var elements = document.getElementsByName(idx.name);
   var valueType = document.getElementsByName("colType");
   for (var i = 0; i < elements.length; i++) {

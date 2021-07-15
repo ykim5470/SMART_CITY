@@ -46,6 +46,7 @@ module.exports = {
         allowNull: false,
         defaultValue:'N'
       },
+      ds_setYn:{type:Sequelize.ENUM('Y','N'),defaultValue:'N',allowNull:false},
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

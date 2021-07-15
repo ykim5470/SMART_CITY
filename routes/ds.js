@@ -144,7 +144,7 @@ const process = {
       await dataset.create(obj).then(async (result) => {
         await dataset
           .findOne({
-            attributes: { exclude: ["ds_id", "createdAt", "updatedAt", "ds_delYn", "al_id"] },
+            attributes: { exclude: ["ds_id", "createdAt", "updatedAt", "ds_delYn", "al_id" , "ds_setYn"] },
             where: { ds_id: JSON.stringify(result.ds_id) },
           })
           .then((result) => {
@@ -163,7 +163,6 @@ const process = {
                 }
               });
             });
-            console.log(inResult);
             dataRequest.insert(inResult);
             res.redirect("/ds/list");
           });

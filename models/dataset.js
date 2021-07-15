@@ -52,7 +52,8 @@ module.exports = (sequelize, DataTypes) => {
     dataModelVersion: { type: DataTypes.STRING, allowNull: false},
     storageRetention: { type: DataTypes.STRING},
     topicRetention: { type: DataTypes.STRING},
-    ds_delYn: { type: DataTypes.CHAR, allowNull: false, defaultValue: 'N' }
+    ds_delYn: { type: DataTypes.CHAR, allowNull: false, defaultValue: 'N' },
+    ds_setYn: {type:DataTypes.ENUM('Y','N'), defaultValue:'N', allowNull:false}
   }, {
     sequelize,
     modelName: 'dataset',
