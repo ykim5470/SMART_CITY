@@ -53,6 +53,8 @@ module.exports = {
 				allowNull: false,
 				type: Sequelize.JSON
 			},
+			data_look_up: { allowNull: false, type: Sequelize.JSON },
+			max_data_load: { allowNull: false, type: Sequelize.INTEGER },
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,

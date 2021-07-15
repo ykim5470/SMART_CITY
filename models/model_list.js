@@ -42,6 +42,8 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: true,
 				type: DataTypes.INTEGER,
 			},
+			data_look_up: { allowNull: false, type: DataTypes.JSON },
+			max_data_load: { allowNull: false, type: DataTypes.INTEGER },
 			dataset_id: {
 				allowNull: false,
 				foreignKey: true,
@@ -49,8 +51,8 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			sub_data: {
 				allowNull: false,
-				type: DataTypes.JSON
-			}
+				type: DataTypes.JSON,
+			},
 		},
 
 		{

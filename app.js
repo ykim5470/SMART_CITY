@@ -10,6 +10,7 @@ const axios = require("axios");
 const { analysis_list, column_tb, model_list, model_input } = require("./models");
 const { my_scheduleJob } = require("./public/js/helpers/api_scheduler");
 const schedule = require("node-schedule");
+const moment = require('moment')
 
 //routers
 const index_router = require("./routes/index");
@@ -54,48 +55,85 @@ const io = socket(server, {
 let data_selection_obj = {};
 let al_name_mo_obj = {};
 
+function data_mapped_filling(select_input_count, raw_data, sortable) {
+	const variable = [Object.keys(sortable)[select_input_count]]
+	const variable_with_data = new Array
+	raw_data[variable].map(el => {
+		return variable_with_data.push(el.value)
+	})
+	return variable_with_data
+}
+
+
 io.on("connection", function (socket) {
 	console.log("Made socket connection");
 
 	// 스케쥴러 조작
 	socket.on("모델 스케쥴러 조작", (data) => {
 		const { status, md_id } = data;
-		model_list.findOne({ where: { md_id: md_id }, attributes: ["al_time", "sub_data", "run_status"], include: [{ model: model_input, required: false }], raw: true }).then((res) => {
-			const model_manage_str = JSON.stringify(res);
-			const model_manage_value = JSON.parse(model_manage_str);
+		model_list.findOne({ where: { md_id: md_id }, attributes: ["al_time", "sub_data",'data_look_up','max_data_load'] }).then((res) => {
+			model_input.findAll({ where: { md_id: md_id }, attributes: ["ip_param", "ip_value"] }).then((user_input_res) => {
+				const user_input_str = JSON.stringify(user_input_res)
+				const user_input_value = JSON.parse(user_input_str)
+				
+				const user_input_value_count = user_input_value.length
 
-			const { al_time, sub_data } = model_manage_value;
-			// API request Scheduler callback function
-			const raw_data_sub_get = async () => {
-				var sub_data_list = JSON.parse(sub_data);
-				if (typeof sub_data_list == "string") {
-					axios
-						.get(
-							`http://203.253.128.184:18227/temporal/entities/${sub_data_list.slice(
-								0,
-								-1
-							)}?timerel=between&time=2021-06-01T00:00:00+09:00&endtime=2021-06-24T22:00:00+09:00&limit=48&lastN=48&timeproperty=modifiedAt`,
-							{ headers: { Accept: "application/json" } }
-						)
-						.then((result) => console.log("a"));
-				} else {
-					sub_data_list.filter((el, index) => {
-						axios
+				const model_manage_str = JSON.stringify(res);
+				const model_manage_value = JSON.parse(model_manage_str);
+				console.log(model_manage_value);
+				
+				let date = new Date()
+				let current_date = moment(date).format()
+
+
+
+				const { al_time, sub_data, data_look_up, max_data_load } = model_manage_value;
+				// API request Scheduler callback function
+				const raw_data_sub_get = async () => {
+					var sub_data_list = JSON.parse(sub_data);
+					if (typeof sub_data_list == "string") {
+						await axios
 							.get(
-								`http://203.253.128.184:18227/temporal/entities/${el.slice(
+								`http://203.253.128.184:18227/temporal/entities/${sub_data_list.slice(
 									0,
 									-1
-								)}?timerel=between&time=2021-06-01T00:00:00+09:00&endtime=2021-06-24T22:00:00+09:00&limit=48&lastN=48&timeproperty=modifiedAt`,
+								)}?timerel=between&time=2021-06-01T00:00:00+09:00&endtime=${current_date}&limit=48&lastN=48&timeproperty=modifiedAt`,
 								{ headers: { Accept: "application/json" } }
 							)
-							.then((result) => console.log("b"));
-					});
-				}
-			};
-			// scheduler modules
-			var is_running = status == "running" ? true : false;
-			console.log(model_manage_value["model_inputs.md_id"]);
-			my_scheduleJob(`${model_manage_value["model_inputs.md_id"]}`, "Etc/UTC", '* * * * *', raw_data_sub_get, is_running);
+							.then((result) => {
+								var raw_data_bundle = result.data // 데이터 번들 
+								sortable_input_param = new Array
+								user_input_value.map(el => sortable_input_param[el.ip_param] = Number(el.ip_value)) 
+								var sorted_input_param = Object.fromEntries(Object.entries(sortable_input_param).sort(([, a], [, b]) => a - b))
+								
+								let running_result = new Object
+								for (let j = 0; j < user_input_value_count; j++) {
+									var variable_attr = user_input_value[j].ip_param
+									var variable_attr_data = (data_mapped_filling(j, raw_data_bundle, sorted_input_param))
+									running_result[variable_attr] = variable_attr_data
+								}
+								console.log(running_result)
+							});
+					} else {
+						sub_data_list.filter(async (el, index) => {
+							await axios
+								.get(
+									`http://203.253.128.184:18227/temporal/entities/${el.slice(
+										0,
+										-1
+									)}?timerel=between&time=2021-06-01T00:00:00+09:00&endtime=2021-06-24T22:00:00+09:00&limit=48&lastN=48&timeproperty=modifiedAt`,
+									{ headers: { Accept: "application/json" } }
+								)
+								.then((result) => console.log("b"));
+						});
+					}
+				};
+				// scheduler modules
+				var is_running = status == "running" ? true : false;
+				var cron_expression = `*/${al_time} * * * * *`;
+
+				my_scheduleJob(md_id, "Etc/UTC", cron_expression, raw_data_sub_get, is_running);
+			});
 		});
 	});
 

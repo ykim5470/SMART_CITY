@@ -11,10 +11,6 @@ const { INGEST_INTERFACE, DATA_MANAGER, DATA_SERVICE_BROKER } = require("../base
 const { readdirSync } = require("fs");
 const { resolve } = require("path");
 
-
-
-
-
 // Get
 const output = {
 	// 모델 관리 보드
@@ -204,7 +200,7 @@ const output = {
 				let processed_selected_name;
 
 				// 유저 인풋 값 GET
-				model_input.findAll({ where: { md_id : md_id  }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
+				model_input.findAll({ where: { md_id: md_id }, attirbutes: ["ip_param", "ip_value"] }).then((results) => {
 					const model_input_info_str = JSON.stringify(results);
 					const model_input_info_value = JSON.parse(model_input_info_str);
 
@@ -343,7 +339,22 @@ const process = {
 
 	// 모델 등록 Complete
 	register_complete: async (req, res) => {
-		const { al_name_mo, al_time, dataset_id, model_desc, ip_attr_name, user_input_param, ip_attr_value_type, sub_data_select } = req.body;
+		const {
+			al_name_mo,
+			al_time,
+			dataset_id,
+			model_desc,
+			ip_attr_name,
+			user_input_param,
+			ip_attr_value_type,
+			sub_data_select,
+			data_lookup_date,
+			data_lookup_hour,
+			data_lookup_min,
+			data_lookup_sec,
+			max_data_load,
+		} = req.body;
+		console.log(req.body);
 		// Error handling from server
 		try {
 			errorHandling.al_time_handling(al_time); // 3600
@@ -351,7 +362,9 @@ const process = {
 			errorHandling.input_param_handling(user_input_param); // ['유량','','','','','',''] or ''
 			errorHandling.al_name_mo_handling(al_name_mo); // lewis-dataset111
 			errorHandling.file_upload_handling(req.file); // {file_name: '', mimtype: '', etc}
-
+			errorHandling.data_look_up_handling(data_lookup_date,data_lookup_hour,data_lookup_min,data_lookup_sec)
+			errorHandling.max_data_load_handling(max_data_load) // limit 48
+			let data_look_up = { 'date': data_lookup_date, 'hour': data_lookup_hour, 'min': data_lookup_min,'sec': data_lookup_sec}
 			let al_id;
 			let file_id;
 			let md_id;
@@ -365,8 +378,6 @@ const process = {
 				const al_list_value = JSON.parse(al_list_str);
 				return (al_id = al_list_value.al_id);
 			});
-
-			console.log(al_id);
 
 			// 파일 TB file_id GET
 			await atch_file_tb.findAll({ order: [["createdAt", "DESC"]] }).then((res) => {
@@ -386,6 +397,8 @@ const process = {
 					al_id: al_id,
 					dataset_id: al_name_mo.split(",")[1],
 					sub_data: sub_data_select,
+					data_look_up: data_look_up,
+					max_data_load: max_data_load,
 				})
 				.then(() => {
 					// 생성된 모델 리스트 TB의 md_id GET

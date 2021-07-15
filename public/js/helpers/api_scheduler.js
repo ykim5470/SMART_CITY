@@ -5,20 +5,12 @@ const my_scheduleJob = (id, mxTimezones, cron_expression, function_name, cancel)
 	var options = {
 		tz: mxTimezones,
 	};
+
 	var cron_attr = cron_expression.split(" ");
 	var interval = parser.parseExpression(cron_expression, options);
 	var cronDate = interval.next();
 	var rule = new schedule.RecurrenceRule();
 
-
-	let a = cron_expression.toString()
-	console.log(a.split(' '))
-	console.log('* * * * * *'.split(' '))
-
-	console.log(cron_expression);
-	console.log(cron_expression.split(' '))
-	// console.log(typeof cron_expression);
-	// console.log(cron_attr);
 	for (var i in cron_attr) {
 		var res = "";
 		switch (i) {
@@ -50,20 +42,16 @@ const my_scheduleJob = (id, mxTimezones, cron_expression, function_name, cancel)
 
 	rule.tz = mxTimezones;
 
-	console.log(rule);
-
 	let jobId = String(id);
 	if (cancel) {
 		schedule.scheduleJob(jobId, rule, () => {
 			console.log("스케쥴러 실행");
-			console.log("Scheduler test-------");
+			console.log(jobId+ '실행')
 			function_name();
 		});
 	} else {
 		let jobs = schedule.scheduledJobs;
-		// console.log(jobs)
 		var running_jobs = jobs[jobId];
-		// console.log(running_jobs)
 		if (Object.keys(jobs).length === 0 && jobs.constructor === Object) {
 			console.log("실행중이던 job 존재하지 않음");
 			return;

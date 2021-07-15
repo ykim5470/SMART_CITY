@@ -11,14 +11,25 @@
 		<div>
 			<table>
 				<thead>
-					분석시간
+					모델 시간 세팅
 				</thead>
 				<tbody>
 					<td>
-						초 :
-						<input type="text" id="al_time" name="al_time" placeholder="분석 시간" />
+						요청 시간 :
+						<input type="text" id="al_time" name="al_time" placeholder="요청 시간" />
 					</td>
 				</tbody>
+			</table>
+			<table>
+				데이터 조회 기간
+				<input class='data_lookup' type='number' name='data_lookup_date' placeholder="일"/>
+				<input class='data_lookup' type='number' name='data_lookup_hour' placeholder="시간"/>
+				<input class='data_lookup' type='number' name='data_lookup_min' placeholder="분"/>
+				<input class='data_lookup' type='number' name='data_lookup_sec' placeholder="초"/>
+			</table>
+			<table>
+				데이터 분석에 필요한 데이터 갯수 
+				<input class='max_data_load_limit' type='number' name='max_data_load' placeholder="가져오는 데이터 갯수"/>
 			</table>
 			<table>
 				<thead>
