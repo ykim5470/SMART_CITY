@@ -1,5 +1,6 @@
 const schedule = require("node-schedule");
 const parser = require("cron-parser");
+const moment = require('moment')
 
 const my_scheduleJob = (id, mxTimezones, cron_expression, function_name, cancel) => {
 	var options = {
@@ -74,4 +75,13 @@ function getRuleValue(value, start_value, end_value) {
 	}
 }
 
-module.exports = { my_scheduleJob };
+const start_end_time_generator=(date_look_up, current_time)=> {
+	const { date, hour, min, sec } = date_look_up; // '2' '3' '' ''
+	let res = date != "" ? moment(current_time).subtract(Number(date), "d").format() : current_time;
+	res = hour != "" ? moment(res).subtract(Number(hour), "h").format() : res;
+	res = min != "" ? moment(res).subtract(Number(min), "m").format() : res;
+	res = sec != "" ? moment(res).subtract(Number(sec), "s").format() : res;
+	return res;
+}
+
+module.exports = { my_scheduleJob, start_end_time_generator};

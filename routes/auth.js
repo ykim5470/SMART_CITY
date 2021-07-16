@@ -364,7 +364,7 @@ const process = {
 			errorHandling.file_upload_handling(req.file); // {file_name: '', mimtype: '', etc}
 			errorHandling.data_look_up_handling(data_lookup_date,data_lookup_hour,data_lookup_min,data_lookup_sec)
 			errorHandling.max_data_load_handling(max_data_load) // limit 48
-			let data_look_up = { 'date': data_lookup_date, 'hour': data_lookup_hour, 'min': data_lookup_min,'sec': data_lookup_sec}
+			let date_look_up = { 'date': data_lookup_date, 'hour': data_lookup_hour, 'min': data_lookup_min,'sec': data_lookup_sec}
 			let al_id;
 			let file_id;
 			let md_id;
@@ -397,7 +397,7 @@ const process = {
 					al_id: al_id,
 					dataset_id: al_name_mo.split(",")[1],
 					sub_data: sub_data_select,
-					data_look_up: data_look_up,
+					date_look_up: date_look_up,
 					max_data_load: max_data_load,
 				})
 				.then(() => {

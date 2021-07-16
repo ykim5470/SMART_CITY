@@ -20,6 +20,7 @@ const output_params_insert = document.querySelector(".output_params_insert");
 const register_complete = document.querySelector("#submitBtn");
 const model_description = document.querySelector(".md_desc");
 const sub_data_insert = document.querySelector(".sub_data_insert");
+const sub_data_insert_option = document.querySelector(".sub_data_insert_option");
 
 const user_input_value = [];
 
@@ -99,13 +100,43 @@ socket.on("데이터 선택 완료 및 개별 센서 데이터 calling", (data) 
 		return `
 		<tr>
 			<td>
-				<input type='checkbox' name='sub_data_select' value=${items.id}/>
+				<input type='checkbox' class='sub_data_select' name='sub_data_select' value=${items.id}/>
 			</td>
 			<td>${items.name.value}</td>
 		<tr>
 		`;
 	});
 	sub_data_insert.innerHTML = sub_box.join("");
+	let temp_sub_data_list = new Array();
+	sub_data_insert.addEventListener("click", (e) => {
+		if (temp_sub_data_list.includes(e.target.value)) {
+			temp_sub_data_list = temp_sub_data_list.filter((el) => {
+				return el !== e.target.value;
+			});
+		} else {
+			temp_sub_data_list.push(e.target.value);
+		}
+		let sub_data_list = temp_sub_data_list.filter((item) => {
+			return item !== undefined;
+		});
+		console.log(sub_data_list);
+		if (sub_data_list.length >= 2) {
+			let sub_option_box = sub_data_list.map((el) => {
+				return `
+				<tr>
+					<td>
+						2개 이상
+						${el}
+					</td>
+				</tr>
+				`;
+			});
+			sub_data_insert_option.innerHTML = sub_option_box.join("");
+		} else {
+			let sub_option_box_delete = `<tr></tr>`
+			sub_data_insert_option.innerHTML = sub_option_box_delete
+		}
+	});
 });
 
 // output params GET & add to page
@@ -130,11 +161,8 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
 
 const register_submit = () => {
 	register_complete.addEventListener("click", async (e) => {
-		
 		// 파일 정보 post
 		return await document.querySelector("#register_complete").submit();
-		
-		
 	});
 };
 
