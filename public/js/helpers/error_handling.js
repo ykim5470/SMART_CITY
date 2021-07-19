@@ -23,7 +23,7 @@ const errorHandling = {
 			}
 		} else {
 			ip_param.filter((el) => (!el == "" ? user_input_count++ : user_input_count));
-			if (user_input_count == 0) {
+			if (user_input_count === 0) {
 				throw "맵핑을 위해 최소 한 개의 데이터를 적어주세요";
 			}
 		}
@@ -34,12 +34,12 @@ const errorHandling = {
 		}
 	},
 	file_upload_handling: (file_obj) => {
-		if (file_obj == undefined) {
+		if (file_obj === undefined) {
 			throw "분석을 위한 파일을 업로드 해주세요";
 		}
 	},
 	max_data_load_handling: (max_data_load) => {
-		if (max_data_load == '') {
+		if (max_data_load === '') {
 			throw '데이터 분석에 필요한 최소 데이터 갯수를 지정해 주세요'
 		}
 		if (max_data_load <= 0) {
@@ -50,6 +50,13 @@ const errorHandling = {
 		if (data_lookup_date && data_lookup_hour && data_lookup_min && data_lookup_sec ) {
 			throw '적어도 하나의 데이터 조회 기간 값을 입력해 주세요'
 		}
+	},
+	data_processing_option_handling: (selected_sub_data, data_processing) =>{
+		console.log(selected_sub_data)
+		if(selected_sub_data.length >=2 && data_processing === ''){
+			throw '센서 2개 이상 선택 시, 데이터 전처리 옵션을 필수로 선택해 주세요'
+		}
+
 	}
 };
 

@@ -331,6 +331,7 @@ const process = {
 		}
 		// h5 모델을 업로드 했을 경우 JSON처리
 		if (mimetype == "application/octet-stream" && originalname.split(".")[1] == "h5") {
+			console.log(ExtractedFileDirectory+'/'+filename)
 			exec.exec(`tensorflowjs_converter --input_format=keras ${uploadedFileDirectory}/${filename} ${ExtractedFileDirectory}/${filename}`);
 			return;
 		}
@@ -353,6 +354,7 @@ const process = {
 			data_lookup_min,
 			data_lookup_sec,
 			max_data_load,
+			data_processing
 		} = req.body;
 		console.log(req.body);
 		// Error handling from server
@@ -364,6 +366,7 @@ const process = {
 			errorHandling.file_upload_handling(req.file); // {file_name: '', mimtype: '', etc}
 			errorHandling.data_look_up_handling(data_lookup_date,data_lookup_hour,data_lookup_min,data_lookup_sec)
 			errorHandling.max_data_load_handling(max_data_load) // limit 48
+			errorHandling.data_processing_option_handling(sub_data_select, data_processing)
 			let date_look_up = { 'date': data_lookup_date, 'hour': data_lookup_hour, 'min': data_lookup_min,'sec': data_lookup_sec}
 			let al_id;
 			let file_id;
@@ -399,6 +402,7 @@ const process = {
 					sub_data: sub_data_select,
 					date_look_up: date_look_up,
 					max_data_load: max_data_load,
+					data_processing_option : data_processing
 				})
 				.then(() => {
 					// 생성된 모델 리스트 TB의 md_id GET

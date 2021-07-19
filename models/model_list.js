@@ -53,6 +53,10 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: false,
 				type: DataTypes.JSON,
 			},
+			data_processing_option: {
+				allowNull: true,
+				type: DataTypes.STRING
+			}
 		},
 
 		{
