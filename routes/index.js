@@ -34,7 +34,9 @@ router.get("/ds/view/:ds_id", ds.output.view);
 router.get("/ds/edit/:ds_id", ds.output.edit);
 //Dataflow
 router.get("/df/insert", df.output.insert);
-
+router.get("/df/list",paginate.middleware(10, 50), df.output.list);
+router.get("/df/list/:page",paginate.middleware(10, 50), df.output.list);
+router.get("/df/view/:df_id", df.output.view);
 
 //==============================POST======================================
 //Analysis
@@ -64,6 +66,10 @@ router.put("/model_manage_board/:md_id", auth.process.edit);
 router.put("/ds/softDel/:dataset_id", ds.process.dsSofeDel);
 router.put("/ds/softListDelete", ds.process.softDelList);
 router.put("/ds/edited/:ds_id", ds.process.edited);
+//Dataflow
+router.put("/df/softDel/:df_id", df.process.softDelOne);
+router.put("/df/softDelList", df.process.softDelList);
+
 
 //==============================DELETE======================================
 

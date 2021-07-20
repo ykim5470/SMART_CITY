@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DATAFLOW 등록</title>
+  </head>
+  <body>
+    <h1>DATAFLOW 상세보기</h1>
+    <p>DATASET ID : {{df.dataset_id}}</p>
+    <p>DESCRIPTION : {{df.description}}</p>
+    <p>HISTORY STORE TYPE :{{df.historyStoreType}}</p>
+    <p>ENABLED : {{df.enabled}} </p>
+    {% set arr = df.types.split(",") %} {% for a in arr %}
+    <p> Type : {{a}} / {% if(a=='dataServiceBroker') %} {{df.brokerStorageTypes}} {% else %} {{df.handlerStorageTypes}} {% endif %}</p>
+    {% endfor %}
+    <form action="/df/softDel/{{df.df_id}}?_method=PUT" method="POST">
+      <input type="submit" value="삭제하기" />
+      <a href="/df/list"><input type="button" value="목록보기" /></a>
+    </form>
+  </body>
+</html>

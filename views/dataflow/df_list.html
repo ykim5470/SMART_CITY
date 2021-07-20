@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>dataset 리스트</title>
+		<title>dataflow 리스트</title>
 		<!-- Bootstrap CSS -->
 		<link
 			rel="stylesheet"
@@ -25,47 +25,27 @@
 		}
 	</script>
 	<body>
-		{% if admin %}
 		<div>
 			<table>
 				<tr>
 					<td>선택 &nbsp</td>
-					<td>삭제된 dataset ID &nbsp&nbsp&nbsp&nbsp</td>
-					<td>삭제된 dataset NAME &nbsp&nbsp&nbsp&nbsp</td>
-					<td>등록일</td>
-				</tr>
-				{% for list in dataList %}
-				<tr>
-					<form action="/new/listDelete?_method=DELETE" method="POST" id="delListFrm">
-						<td><input type="checkbox" name="delId" value="{{list.al_id}}" /></td>
-						<td><a href="/analysis/admin/delView/{{list.al_id}}">{{list.al_name}}</a></td>
-						<td><a href="/analysis/admin/delView/{{list.al_id}}">{{list.al_des}}</a></td>
-						<td>{{list.createdAt}}</td>
-						{% endfor %}
-						<input type="hidden" name="deleteList" id="deleteList" value="" />
-						<input type="button" onclick="getDelete();" value="삭제" />
-					</form>
-				</tr>
-			</table>
-		</div>
-		{% else %}
-		<div>
-			<table>
-				<tr>
-					<td>선택 &nbsp</td>
-					<td>dataset ID &nbsp&nbsp&nbsp&nbsp</td>
-					<td>dataset NAME &nbsp&nbsp&nbsp&nbsp</td>
+					<td>dataset/dataflow ID &nbsp&nbsp&nbsp&nbsp</td>
+					<td>사용여부 &nbsp&nbsp&nbsp&nbsp</td>
 					<td>등록일 &nbsp&nbsp&nbsp&nbsp</td>
 					<td>
-						<a href="/ds/insert"><button>dataset 등록하기</button></a>
+						<a href="/df/insert"><button>dataflow 등록하기</button></a>
 					</td>
 				</tr>
 				{% for list in dataList %}
 				<tr>
-					<form action="/ds/softListDelete?_method=PUT" method="POST" id="delListFrm">
-						<td><input type="checkbox" name="delId" value="{{list.dataset_id}}" /></td>
-						<td><a href="/ds/view/{{list.ds_id}}">{{list.dataset_id}}</a></td>
-						<td><a href="/ds/view/{{list.ds_id}}">{{list.name}}</a></td>
+					<form action="/df/softDelList?_method=PUT" method="POST" id="delListFrm">
+						<td><input type="checkbox" name="delId" value="{{list.df_id}}" /></td>
+						<td><a href="/df/view/{{list.df_id}}">{{list.dataset_id}}</a></td>
+						{% if(list.enabled == 'true') %}
+						<td><a href="/df/view/{{list.df_id}}">사용</a></td>
+						{% else %}
+						<td><a href="/df/view/{{list.df_id}}">중지</a></td>
+						{% endif %}
 						<td>{{list.dateFormat(list.createdAt)}}</td>
 						{% endfor %}
 						<input type="hidden" name="deleteList" id="deleteList" value="" />
@@ -74,7 +54,7 @@
 				</tr>
 			</table>
 		</div>
-		{% endif %}
+		<br />
 		<nav aria-label="Page navigation example"> 
 			<ul class="pagination">
 				<li class="page-item">

@@ -65,11 +65,13 @@ const output = {
       res.render("dataset/ds_insert", { analy: result });
     });
   },
+  //dataset insert > 분석테이블 id 선택 시
   getNsVer: async (req, res) => {
     await analysis_list.findOne({ attributes: ["al_ns", "al_version"], where: { al_id: req.params.id } }).then((result) => {
       res.send(result);
     });
   },
+  //dataset id 증복확인 
   dupCheck: async (req, res) => {
     const id = req.params.checkId;
     dataRequest.getIdList(id).then((result) => {

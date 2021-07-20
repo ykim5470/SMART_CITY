@@ -7,32 +7,32 @@
     <title>DATAFLOW 등록</title>
   </head>
   <script>
-    function typeCheck(item){
-      if(!item.checked&&item.value=="dataServiceBroker"){
-        document.getElementById("brokerTypes").style.display='none';
-      }else if(!item.checked&&item.value=="bigDataStorageHandler"){
-        document.getElementById("handlerTypes").style.display='none';
-      }else if(item.checked&&item.value=="dataServiceBroker"){
-        document.getElementById("brokerTypes").style.display='block';
-      }else{
-        document.getElementById("handlerTypes").style.display='block';
+    function typeCheck(item) {
+      if (!item.checked && item.value == "dataServiceBroker") {
+        document.getElementById("brokerTypes").style.display = "none";
+      } else if (!item.checked && item.value == "bigDataStorageHandler") {
+        document.getElementById("handlerTypes").style.display = "none";
+      } else if (item.checked && item.value == "dataServiceBroker") {
+        document.getElementById("brokerTypes").style.display = "block";
+      } else {
+        document.getElementById("handlerTypes").style.display = "block";
       }
     }
-    function able(item){
+    function able(item) {
       var able = document.getElementsByName("enabled")[0];
-      if(!item.checked){
-        able.value = "false"
-      }else{
-        able.value = "true"
+      if (!item.checked) {
+        able.value = "false";
+      } else {
+        able.value = "true";
       }
     }
-    function goSubmit(){
+    function goSubmit() {
       var b = document.getElementsByName("types")[0];
       var h = document.getElementsByName("types")[1];
-      if(!b.checked && !h.checked){
-        window.alert("type중 하나는 반드시 선택해야 합니다.")
-        return "#"
-      }else{
+      if (!b.checked && !h.checked) {
+        window.alert("type중 하나는 반드시 선택해야 합니다.");
+        return "#";
+      } else {
         document.register.submit();
       }
     }
@@ -63,27 +63,38 @@
         </select>
       </p>
       <p>ENABLED : <input type="checkbox" name="enCheck" onclick="able(this)" /></p>
-      <p>&Star; TYPE / DATA SERVICE BROKER : <input type="checkbox" name="types" value="dataServiceBroker" onclick="typeCheck(this)"/></p>
-      <div id="brokerTypes" style="display: none;">
-        <p>
-          └ BIG DATA STORAGE TYPES / rdb : <input type="checkbox" name="brokerStorageTypes" value="rdb"/> / 
-            hbase : <input type="checkbox" name="brokerStorageTypes" value="hbase"/> / 
-            hive : <input type="checkbox" name="brokerStorageTypes" value="hive"/>
-        </p>
+      <p>&Star; TYPE / DATA SERVICE BROKER : <input type="checkbox" name="types" value="dataServiceBroker" onclick="typeCheck(this)" /></p>
+      <div id="brokerTypes" style="display: none">
+        <p>└ BIG DATA STORAGE TYPES / rdb : <input type="checkbox" name="brokerStorageTypes" value="rdb" /> / hbase : <input type="checkbox" name="brokerStorageTypes" value="hbase" /> / hive : <input type="checkbox" name="brokerStorageTypes" value="hive" /></p>
         <!-- <input type="hidden" name="brokerStorageTypes" value=""> -->
       </div>
-      <p>&Star; TYPE / BIG DATA STORAGE HANDLER : <input type="checkbox" name="types" value="bigDataStorageHandler" onclick="typeCheck(this)"/></p>
-      <div id="handlerTypes" style="display: none;">
-        <p>
-          └ BIG DATA STORAGE TYPES / rdb : <input type="checkbox" name="handlerStorageTypes" value="rdb"/> / 
-            hbase : <input type="checkbox" name="handlerStorageTypes" value="hbase"/> / 
-            hive : <input type="checkbox" name="handlerStorageTypes" value="hive"/>
-        </p>
+      <p>&Star; TYPE / BIG DATA STORAGE HANDLER : <input type="checkbox" name="types" value="bigDataStorageHandler" onclick="typeCheck(this)" /></p>
+      <div id="handlerTypes" style="display: none">
+        <p>└ BIG DATA STORAGE TYPES / rdb : <input type="checkbox" name="handlerStorageTypes" value="rdb" /> / hbase : <input type="checkbox" name="handlerStorageTypes" value="hbase" /> / hive : <input type="checkbox" name="handlerStorageTypes" value="hive" /></p>
         <!-- <input type="hidden" name="handlerStorageTypes" value=""> -->
       </div>
-      <input type="hidden" name="enabled" value="false">
+      <input type="hidden" name="enabled" value="false" />
       <br />
-      <input type="button" onclick="goSubmit()" value="등록하기"/>
+      <input type="button" onclick="goSubmit()" value="등록하기" />
     </form>
   </body>
+  <!-- <script>
+  function back(a) {
+      var t = document.getElementsByName("types");
+      console.log(a)
+      for (var i = 0; i < t.length; i++) {
+        // if (!t[i].checked && t[i].value == "dataServiceBroker") {
+        //   document.getElementById("brokerTypes").style.display = "none";
+        // } else if (!t[i].checked && t[i].value == "bigDataStorageHandler") {
+        //   document.getElementById("handlerTypes").style.display = "none";
+        // } else if (t[i].checked && t[i].value == "dataServiceBroker") {
+        //   document.getElementById("brokerTypes").style.display = "block";
+        // } else {
+        //   document.getElementById("handlerTypes").style.display = "block";
+        // }
+        console.log(t[i].checked)
+      }
+    }
+  window.onload = back();
+  </script> -->
 </html>
