@@ -24,7 +24,7 @@ const sub_data_insert_option = document.querySelector(
   ".sub_data_insert_option"
 );
 
-const user_input_value = [];
+const user_input_value = new Array;
 
 window.addEventListener("load", (e) => {
   if (data_select_input.value != "") {
@@ -69,7 +69,8 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
         <tr>
             <td><input name="ip_attr_value_type" value="${items.valueType}" readonly /></td>
             <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" readonly /></td>
-            <td><input class="user_input_param" name="user_input_param"/></td>
+            <td><input type="number" class="user_input_param" name="user_input_param"/></td>
+            <td class></td>
         </tr>
         `;
   });
@@ -81,15 +82,23 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
   const input_arr = Array.from(user_input_param);
   const input_name_arr = Array.from(ip_attr_name);
 
+  
+
+
   input_arr.map((el, index) => {
     el.addEventListener("change", (e) => {
-      let input_mapping = input_name_arr.filter((el, idx) => {
+       input_name_arr.filter((el, idx) => {
         if (idx === index) {
           user_input_value.push({ key: el.value, value: e.target.value });
+          if(e.target.value !== ''){
+            console.log(user_input_param)
+            user_input_param.innerHTML = `<input class='max_data_load_limit' type='number' name='max_data_load' placeholder="가져오는 데이터 갯수"/>`
+          }
         } else {
           return;
         }
       });
+      console.log(user_input_value)
       socket.emit("입력 데이터 값", { user_input_value: user_input_value });
     });
   });
@@ -123,8 +132,6 @@ socket.on("데이터 선택 완료 및 개별 센서 데이터 calling", (data) 
     });
     console.log(sub_data_list);
     if (sub_data_list.length >= 2) {
-      // 맵을 돌리는 것이 아니라, 옵션을 추가해 주는 것. 셀렉트 박스를 만들자.
-
       let sub_option_box = `
 			<td>
 				<label for="data_processing">옵션 선택: </label>

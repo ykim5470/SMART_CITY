@@ -50,6 +50,18 @@ const errorHandling = {
 		if (data_lookup_date && data_lookup_hour && data_lookup_min && data_lookup_sec ) {
 			throw '적어도 하나의 데이터 조회 기간 값을 입력해 주세요'
 		}
+		if(data_lookup_date > 30){
+			throw '최대 데이터 조회 기간 설정은 30일 미만 가능합니다'
+		}
+		if(data_lookup_hour > 23){
+			throw '최대 데이터 조회 시간 설정은 24시간 미만 가능합니다'
+		}
+		if(data_lookup_min > 59){
+			throw '최대 데이터 조회 분 설정은 60분 미만 가능합니다'
+		}
+		if( data_lookup_sec > 59){
+			throw '최대 데이터 조회 초 설정은 60초 미만 가능합니다'
+		}
 	},
 	data_processing_option_handling: (selected_sub_data, data_processing) =>{
 		console.log(selected_sub_data)

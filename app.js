@@ -128,7 +128,7 @@ io.on("connection", function (socket) {
                     `http://203.253.128.184:18227/temporal/entities/${sub_data_list.slice(
                       0,
                       -1
-                    )}?timerel=between&time=${start_time}&endtime=${end_time}&limit=${max_data_load}&lastN=${max_data_load}&timeproperty=modifiedAt`,
+                    )}?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=${max_data_load}&lastN=${max_data_load}&timeproperty=modifiedAt`,
                     { headers: { Accept: "application/json" } }
                   )
                   .then((result) => {
@@ -140,18 +140,16 @@ io.on("connection", function (socket) {
                     // Mapped 데이터
                     var single_processed_data_result = single_processed_data(
                       user_input_value_count,
-                      user_input_value,
                       sorted_input_param_result,
                       raw_data_bundle
                     );
-
-                    console.log(single_processed_data_result);
+                    return single_processed_data_result;
                   });
               } else {
                 // 다중 센서 데이터 선택 시
                 // 다중 센서 데이터 GET
-                 sub_data_list.filter(async (el, index) => {
-                  let multiple_processed_data_result = await axios
+                await sub_data_list.filter(async (el, index) => {
+                  let multiple_processing_data_result = await axios
                     .get(
                       `http://203.253.128.184:18227/temporal/entities/${el.slice(
                         0,
@@ -168,16 +166,21 @@ io.on("connection", function (socket) {
                       // Mapped 데이터
                       var single_processed_data_result = single_processed_data(
                         user_input_value_count,
-                        user_input_value,
                         sorted_input_param_result,
                         raw_data_bundle
                       );
                       return single_processed_data_result;
                     });
-                  return pre_processed_data.push(multiple_processed_data_result);
+                  return pre_processed_data.push(
+                    multiple_processing_data_result
+                  );
                 });
-				console.log(pre_processed_data)
-                // options(data_processing_option, pre_processed_data); // [] , [{},{}] 
+                var multiple_processed_data_result = options(data_processing_option, pre_processed_data); 
+                // console.log(multiple_processed_data_result)
+              
+                pre_processed_data.length = 0
+              
+                // return multiple_processed_data_result
               }
             };
             // scheduler modules
