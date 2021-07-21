@@ -18,6 +18,7 @@ router.get("/new/view/:al_id", newAnaly.output.view);
 router.get("/new/edit/:al_id", newAnaly.output.edit);
 router.get("/new/admin/deleted", newAnaly.output.viewDelList);
 router.get("/new/duplication/check/:checkName", newAnaly.output.dupCheck);
+router.get("/new/editCheck/:id", newAnaly.output.editChk);
 //Model
 router.get('/model_manage_board/edit/:md_id', auth.output.register_edit)
 router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage_board);
@@ -57,7 +58,7 @@ router.post("/df/inserted", df.process.insert)
 
 //===============================PUT======================================
 //Analysis
-router.put("/new/softDel/:al_id", newAnaly.process.tbSofeDel);
+router.put("/new/softDel/:al_id", newAnaly.process.softDelOne);
 router.put("/new/softListDelete", newAnaly.process.softDelList);
 router.put("/new/edited/:al_id", newAnaly.process.edit);
 //Model

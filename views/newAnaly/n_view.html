@@ -6,6 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>분석 테이블 조회</title>
   </head>
+  <script>
+      function editChk(){
+        var id = document.getElementById("id").value
+        fetch(`/new/editCheck/${id}`).then((res)=>res.json())
+        .then((data)=>{
+          if(data.result == "no"){
+            window.alert("현재 테이블을 사용하는 dataset이 존재 하므로 수정이 불가능 합니다");
+          }else{
+            location.href=`/new/edit/${id}`
+          }
+        })
+      }
+  </script>
   <body>
     <h3>분석 테이블</h3>
     <div>
@@ -28,7 +41,8 @@
     </form>
     {% else %}
     <form action="/new/softDel/{{analysis.al_id}}?_method=PUT" method="POST">
-      <a href="/new/edit/{{analysis.al_id}}"><input type="button" value="수정하기" /></a>
+      <input type="button" value="수정하기" onclick="editChk()"/>
+      <input type="hidden" value ="{{analysis.al_id}}" id="id"/>
       <input type="submit" value="삭제하기" />
       <a href="/new/list"><input type="button" value="목록" /></a>
     </form>

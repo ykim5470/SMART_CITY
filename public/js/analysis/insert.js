@@ -1,5 +1,6 @@
 var oTbl;
 var nameCheck = false;
+function editChk(){console.log(`{{analysis.al_id}}`)}
 function dupCheck() {
   var tbName = document.getElementsByName("tableName")[0];
   if (tbName.value == "") {
@@ -9,7 +10,6 @@ function dupCheck() {
     fetch(`/new/duplication/check/${tbName.value}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         if (data == true) {
           window.alert("사용 불가능한 테이블명입니다.");
           tbName.value = "";

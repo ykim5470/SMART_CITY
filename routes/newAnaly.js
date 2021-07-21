@@ -1,5 +1,5 @@
 const express = require("express");
-const { analysis_list, column_tb, dataset } = require("../models");
+const { analysis_list, column_tb, dataset, error_log } = require("../models");
 const router = express.Router();
 const axios = require("axios");
 const sequelize = require("sequelize");
@@ -47,17 +47,13 @@ const dataRequest = {
       headers: { "Content-Type": "application/json" },
     });
   },
-  delOne: async (result) => {
-    console.log("========ONE DATA MODEL DELETE REQUEST==========");
+  delOne: async (name, ns, ver) => {
+    console.log("========DATA MODEL DELETE REQUEST==========");
     try {
-      await axios.delete(`http://203.253.128.184:18827/datamodels/${result.al_ns}/${result.al_name}/${result.al_version}`, { headers: { Accept: "application/json" } });
+      await axios.delete(`http://203.253.128.184:18827/datamodels/${ns}/${name}/${ver}`, { headers: { Accept: "application/json" } });
     } catch (err) {
       return err.response.data;
     }
-  },
-  delList: async (name, ns, version) => {
-    console.log("========DATA MODEL LIST DELETE REQUEST==========");
-    await axios.delete(`http://203.253.128.184:18827/datamodels/${ns}/${name}/${version}`, { headers: { Accept: "application/json" } });
   },
   edit: async (result) => {
     console.log("===========DATA MODEL EDIT REQUEST=============");
@@ -146,7 +142,7 @@ const output = {
       const hasMore = currentPage < pageCount ? `${base}?page=${currentPage + 1}&limit=10` : `${base}?page=${currentPage}&limit=10`;
       const hasprev = currentPage > 1 ? `${base}?page=${currentPage - 1}&limit=10` : `${base}?page=${currentPage}&limit=10`;
       analysis_list.prototype.dateFormat = (date) => moment(date).format("YYYY.MMM.DD - hh:mm A");
-      res.render("newAnaly/n_list", { anaList: results.rows, pages: pageArray, nextUrl: hasMore, prevUrl: hasprev });
+      res.render("newAnaly/n_list", { anaList: results.rows, pages: pageArray, nextUrl: hasMore, prevUrl: hasprev, cnt: itemCount, pg: currentPage });
     });
   },
   viewDelList: function (req, res, next) {
@@ -206,6 +202,17 @@ const output = {
       res.send(result);
     });
   },
+  //수정 전 dataset check
+  editChk : async(req,res)=>{
+    const analyId = req.params.id;
+    await dataset.findAll({attributes:["dataset_id"],where:{al_id:analyId}}).then((result)=>{
+      if(result.length>0){
+        res.send(JSON.parse(`{"result":"no"}`))
+      }else{
+        res.send(JSON.parse(`{"result":"yes"}`))
+      }
+    })
+  },
 };
 
 // post
@@ -227,7 +234,7 @@ const process = {
       for (var i = 0; i < body.colType.length; i++) {
         size.push(null);
         if (body.colName[i] == "") {
-          res.render("newAnaly/n_insert", { blank: "nullPointException" });
+          res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>");
           return;
         }
         if (body.dataSize[i] != "") {
@@ -258,7 +265,7 @@ const process = {
           res.redirect("/new/list");
         });
       } else {
-        res.render("newAnaly/n_insert", { blank: "nullPointException" });
+        res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>");
       }
     } catch (err) {
       console.log("data insert failed");
@@ -266,27 +273,30 @@ const process = {
     }
   },
   //테이블 소프트 삭제
-  tbSofeDel: async (req, res) => {
+  softDelOne: async (req, res) => {
     const analyId = req.params.al_id;
     const rand = "deleted_" + moment().format("YYMMDDHHmmss") + "_";
     const alert = "<script>alert('해당 테이블을 참조하는 DATASET이 존재 합니다. DATASET 삭제 후 다시 시도 하십시오'); location.href=history.back();</script>";
     try {
-      await dataset.findAll({ attributes: ["ds_id"], where: { al_id: analyId ,ds_delYn:'N' } }).then(async (result) => {
-        if (result.length > 0) {
+      //db에 해당 테이블을 참조하는 dataset이 있는지 확인
+      const dbchk = await dataset.findAll({ attributes: ["ds_id"], where: { al_id: analyId, ds_delYn: "N" } });
+      if (dbchk >= 1) {
+        res.send(alert);
+      }
+      await analysis_list.findOne({ where: { al_id: analyId } }).then(async (result) => {
+        const name = result.al_name;
+        const ns = result.al_ns;
+        const ver = result.al_version;
+        //데이터 삭제 요청
+        const delRequest = await dataRequest.delOne(name, ns, ver);
+        if (delRequest != undefined) {
+          let errDetail = delRequest.detail;
+          errDetail = errDetail.substring(0, errDetail.indexOf(". "));
+          await error_log.create({ col_name: "analysis_list", col_id: analyId, operation: "delete", err_code: errDetail });
           res.send(alert);
         } else {
-          await analysis_list.findOne({ where: { al_id: analyId } }).then(async (result) => {
-            const name = result.al_name;
-            //데이터 삭제 요청
-            dataRequest.delOne(result).then(async (result) => {
-              if (result != undefined && result.detail.includes("Using in dataset")) {
-                res.send(alert);
-              } else {
-                await analysis_list.update({ al_name: rand + name, al_delYn: "Y" }, { where: { al_id: analyId } });
-                res.redirect("/new/list/");
-              }
-            });
-          });
+          await analysis_list.update({ al_name: rand + name, al_delYn: "Y" }, { where: { al_id: analyId } });
+          res.redirect("/new/list/");
         }
       });
     } catch (err) {
@@ -299,8 +309,9 @@ const process = {
     var delListId = req.body.deleteList.split(",");
     const rand = "deleted_" + moment().format("YYMMDDHHmmss") + "_";
     const alert = "<script>alert('삭제하시려는 테이블 중 DATASET이 참조하고 있는 테이블이 존재합니다. DATASET 삭제 후 다시 시도 하십시오'); location.href=history.back();</script>";
+    const alert2 = "<script>alert('TABLE 삭제 도중 오류가 발생했습니다. 확인 후 다시시도해주세요'); location.href='/new/list;</script>";
     try {
-      await dataset.findAll({ attributes: ["ds_id"], where: { al_id: { [Op.in]: delListId },ds_delYn:'N' } }).then(async (result) => {
+      await dataset.findAll({ attributes: ["ds_id"], where: { al_id: { [Op.in]: delListId }, ds_delYn: "N" } }).then(async (result) => {
         if (result.length > 0) {
           res.send(alert);
         } else {
@@ -321,18 +332,22 @@ const process = {
                 verList.push(el.al_version);
                 idList.push(el.al_id);
               });
-              dataRequest.checkDsList(nameList).then(async (result) => {
-                if (result == "true") {
-                  res.send(alert);
+              const apiChk = await dataRequest.checkDsList(nameList);
+              if (apiChk == "true") {
+                res.send(alert);
+              }
+              for (var i = 0; i < nameList.length; i++) {
+                const delRequest = await dataRequest.delOne(nameList[i], nsList[i], verList[i]);
+                if (delRequest != undefined) {
+                  let errDetail = delRequest.detail;
+                  errDetail = errDetail.substring(0, errDetail.indexOf(". "));
+                  await error_log.create({ col_name: "analysis_list", col_id: idList[i], operation: "delete", err_code: errDetail });
+                  res.send(alert2);
                 } else {
-                  for (var i = 0; i < nameList.length; i++) {
-                    //데이터 삭제 요청
-                    dataRequest.delList(nameList[i], nsList[i], verList[i]);
-                    await analysis_list.update({ al_name: rand + nameList[i], al_delYn: "Y" }, { where: { al_id: idList[i] } });
-                  }
-                  res.redirect("/new/list");
+                  await analysis_list.update({ al_name: rand + nameList[i], al_delYn: "Y" }, { where: { al_id: idList[i] } });
                 }
-              });
+              }
+              res.redirect("/new/list/");
             });
         }
       });

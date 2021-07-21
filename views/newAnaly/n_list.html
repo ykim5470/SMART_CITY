@@ -52,6 +52,7 @@
 		<div>
 			<table>
 				<tr>
+					<td>No. &nbsp</td>
 					<td>선택 &nbsp</td>
 					<td>테이블 이름 &nbsp&nbsp&nbsp&nbsp</td>
 					<td>테이블 설명 &nbsp&nbsp&nbsp&nbsp</td>
@@ -63,6 +64,7 @@
 				{% for list in anaList %}
 				<tr>
 					<form action="/new/softListDelete?_method=PUT" method="POST" id="delListFrm">
+						<td>{{(cnt-loop.index)-((pg-1)*10)+1}}</td>
 						<td><input type="checkbox" name="delId" value="{{list.al_id}}" /></td>
 						<td><a href="/new/view/{{list.al_id}}">{{list.al_name}}</a></td>
 						<td><a href="/new/view/{{list.al_id}}">{{list.al_des}}</a></td>
