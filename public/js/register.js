@@ -24,7 +24,7 @@ const sub_data_insert_option = document.querySelector(
   ".sub_data_insert_option"
 );
 
-const user_input_value = new Array;
+const user_input_value = new Array();
 
 window.addEventListener("load", (e) => {
   if (data_select_input.value != "") {
@@ -70,7 +70,7 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
             <td><input name="ip_attr_value_type" value="${items.valueType}" readonly /></td>
             <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" readonly /></td>
             <td><input type="number" class="user_input_param" name="user_input_param"/></td>
-            <td class></td>
+            <td id='max_data_load_box${index}'></td>
         </tr>
         `;
   });
@@ -78,28 +78,21 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 
   // 데이터 선택 후 유저 입력 여부 확인 및 테이블 데이터 INSERT
   const user_input_param = document.getElementsByClassName("user_input_param");
-  const ip_attr_name = document.getElementsByClassName("ip_attr_name");
   const input_arr = Array.from(user_input_param);
-  const input_name_arr = Array.from(ip_attr_name);
-
-  
-
 
   input_arr.map((el, index) => {
     el.addEventListener("change", (e) => {
-       input_name_arr.filter((el, idx) => {
-        if (idx === index) {
-          user_input_value.push({ key: el.value, value: e.target.value });
-          if(e.target.value !== ''){
-            console.log(user_input_param)
-            user_input_param.innerHTML = `<input class='max_data_load_limit' type='number' name='max_data_load' placeholder="가져오는 데이터 갯수"/>`
-          }
-        } else {
-          return;
-        }
-      });
-      console.log(user_input_value)
-      socket.emit("입력 데이터 값", { user_input_value: user_input_value });
+      let max_data_load_box = document.querySelector(
+        `#max_data_load_box${index}`
+      );
+      if (e.target.value !== "") {
+        max_data_load_box.innerHTML = `
+        <input name='max_data_load_index' value=${index} hidden/>
+        <input class='max_data_load_limit' type='number' name='max_data_load' placeholder="가져오는 데이터 갯수"/>
+        `;
+      } else {
+        max_data_load_box.innerHTML = "";
+      }
     });
   });
 });

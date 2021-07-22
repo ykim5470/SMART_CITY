@@ -43,7 +43,6 @@ module.exports = (sequelize, DataTypes) => {
 				type: DataTypes.INTEGER,
 			},
 			date_look_up: { allowNull: false, type: DataTypes.JSON },
-			max_data_load: { allowNull: false, type: DataTypes.INTEGER },
 			dataset_id: {
 				allowNull: false,
 				foreignKey: true,

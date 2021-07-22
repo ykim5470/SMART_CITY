@@ -20,8 +20,9 @@ module.exports = (sequelize, DataTypes) => {
 			id: { allowNull: false, autoIncrement: true, type: DataTypes.INTEGER, primaryKey: true },
 			md_id: { type: DataTypes.UUID, foreignKey: true, allowNull: false },
 			ip_param: { type: DataTypes.STRING, allowNull: true },
-			ip_value: { type: DataTypes.INTEGER, allowNull: true },
-			ip_type:{ type: DataTypes.STRING, allowNull: true },
+			ip_value: { type: DataTypes.INTEGER, allowNull: false },
+			ip_type:{ type: DataTypes.STRING, allowNull: false },
+			ip_load: {type: DataTypes.INTEGER, allowNull: false}
 		},
 		{
 			sequelize,

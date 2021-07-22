@@ -104,15 +104,21 @@ const start_end_time_generator = (date_look_up, current_time) => {
 const single_processed_data = (
   user_input_value_count,
   sorted_input_param,
-  raw_data_bundle
+  raw_data_bundle,
+  user_input_value
 ) => {
   const running_result = new Object();
   for (let j = 0; j < user_input_value_count; j++) {
-    var variable_attr = Object.keys(sorted_input_param)[j]
+    var variable_attr = Object.keys(sorted_input_param)[j];
+    var variable_load;
+    user_input_value.map((el, idx) => {
+      if (el.ip_param === variable_attr) return (variable_load = el.ip_load);
+    });
     var variable_attr_data = data_mapped_filling(
       j,
       raw_data_bundle,
-      sorted_input_param
+      sorted_input_param,
+      variable_load
     );
     running_result[variable_attr] = variable_attr_data;
   }
@@ -123,9 +129,9 @@ const single_processed_data = (
 
 // 다중 데이터 센서 선택 시 맵핑 옵션 모듈
 const options = (option_name, pre_processed_data) => {
-	console.log('---------------------------')
-	console.log(pre_processed_data)
-	console.log('---------------------------')
+  console.log("---------------------------");
+  console.log(pre_processed_data);
+  console.log("---------------------------");
   let res = "";
   switch (option_name) {
     case "add":
@@ -145,7 +151,6 @@ const add_processing = (pre_processed_data) => {
     return [];
   } else {
     console.log(pre_processed_data + "빈 값 아님");
-	console.log(pre_processed_data)
     let total_variable = new Object();
     let attr = Object.keys(pre_processed_data[0]);
     let length = pre_processed_data.length;
@@ -177,50 +182,70 @@ const sorted_input_param = (user_input_value) => {
 };
 
 // 인풋 데이터 원천 데이터 맵핑
-const data_mapped_filling = (select_input_count, raw_data, sortable) => {
+const data_mapped_filling = (select_input_count, raw_data, sortable, load) => {
   const variable = Object.keys(sortable)[select_input_count];
   const variable_with_data = new Array();
   const raw_data_attr_list = Object.keys(raw_data);
-  if (raw_data_attr_list.includes(variable)) {
-    raw_data[variable].map((el) => {
-      variable_with_data.push(el.value);
-    });
-  } else {
-    variable_with_data.push(null);
-  }
-  return variable_with_data;
-};
 
-// 최대 갯수에 따른 데이터 전처리 
-const temp_processing = (pre_processed_data) =>{
-  let result = new Array;
-let resultValue = {};
-result.push(resultValue);
-Object.keys(two[0]).filter((item) => {
-  result[0][item] = [0];
-});
-let maxLength = [];
-let numm = 0;
-Object.keys(result[0]).length;
-for (var i = 0; i < Object.keys(result[0]).length; i++) {
-  for (var j = 0; j < Object.keys(result[0]).length; j++) {
-    if (Object.values(two[j])[i].length > numm) {
-      numm = Object.values(two[j])[i].length;
-    }
-  }
-  maxLength.push(numm);
-}
-maxLength;
-for (var i = 0; i < two.length; i++) {
-  for (var j = 0; j < two.length; j++) {
-    if (Object.values(two[i])[j].length < maxLength[j]) {
-      for (var x = 1; x < maxLength[j]; x++) {
-        Object.values(two[i])[j].push(0);
+  if (raw_data_attr_list.includes(variable)) {
+    const raw_len = raw_data[variable].length;
+    console.log(load)
+    // 원천 데이터 셋에 유저가 필요한 갯수의 attr value가 부족할 때
+    if (raw_len < load) {
+      console.log("-------------------------------1");
+      // 부족한 갯수를 채울 평균 값
+      let current_value_sum = 0;
+      raw_data[variable].map((el) => {
+        current_value_sum += el.value;
+      });
+      // 평균 값
+      var average_of_data = current_value_sum / raw_len;
+      // 채워야 하는 갯수
+      var filling_num = load - raw_len;
+      // 평균 값을 더해서 채움
+      raw_data[variable].map((el) => {
+        variable_with_data.push(el.value);
+      });
+      // 선택한 attr value가 string이 아닐 경우 나머지를 평균 값으로 채울 수 있다
+      if (!isNaN(average_of_data)) {
+        for (let k = 0; k < filling_num; k++) {
+          variable_with_data.push(average_of_data);
+        }
+      }
+      // 선택한 attr value가 string일 경우 그 첫 번째 값으로 나머지를 채운다 
+      else {
+        for (let k = 0; k < filling_num; k++) {
+          variable_with_data.push(variable_with_data[0]);
+        }
       }
     }
+    // 원천 데이터 셋에 유저가 필요한 갯수의 attr value가 있다면 진행
+    else if (raw_len === load) {
+      console.log("---------------------------4");
+      raw_data[variable].map((el) => {
+        variable_with_data.push(el.value);
+      });
+    }
+    // 원천 데이터 셋에 유저가 필요한 갯수의 attr value가 넘을 때
+    else if (raw_len > load) {
+      console.log("-----------------------------------3");
+      raw_data[variable].map((el) => {
+        variable_with_data.push(el.value);
+      });
+      variable_with_data.splice(load, raw_len -1); // 50개를 2개 없애서 48개만 가져온다.
+    }
   }
-}
-}
+  // 원천 데이터 셋에 해당 attr자체가 없을 경우
+  else {
+    console.log("---------------------------------2");
+    for (let k = 0; k < load; k++) {
+      variable_with_data.push(0);
+    }
+  }
+
+  console.log(variable_with_data);
+  return variable_with_data;
+};
 
 module.exports = {
   my_scheduleJob,
@@ -228,5 +253,4 @@ module.exports = {
   sorted_input_param,
   single_processed_data,
   options,
-  temp_processing
 };

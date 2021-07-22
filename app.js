@@ -81,7 +81,6 @@ io.on("connection", function (socket) {
           "al_time",
           "sub_data",
           "date_look_up",
-          "max_data_load",
           "data_processing_option",
         ],
       })
@@ -90,7 +89,7 @@ io.on("connection", function (socket) {
         model_input
           .findAll({
             where: { md_id: md_id },
-            attributes: ["ip_param", "ip_value"],
+            attributes: ["ip_param", "ip_value", 'ip_load'],
           })
           .then((user_input_res) => {
             // 선택 모델 정보 & 인풋 정보 JSON
@@ -99,12 +98,16 @@ io.on("connection", function (socket) {
             const user_input_value_count = user_input_value.length;
             const model_manage_str = JSON.stringify(res);
             const model_manage_value = JSON.parse(model_manage_str);
+            console.log(user_input_value) // 
+            const data_load_limit = new Array
+            user_input_value.map(el => data_load_limit.push(el.ip_load))
+            const max_load = Math.max(...data_load_limit)
+
 
             const {
               al_time,
               sub_data,
               date_look_up,
-              max_data_load,
               data_processing_option,
             } = model_manage_value;
 
@@ -128,7 +131,7 @@ io.on("connection", function (socket) {
                     `http://203.253.128.184:18227/temporal/entities/${sub_data_list.slice(
                       0,
                       -1
-                    )}?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=${max_data_load}&lastN=${max_data_load}&timeproperty=modifiedAt`,
+                    )}?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=${max_load}&lastN=${max_load}&timeproperty=modifiedAt`,
                     { headers: { Accept: "application/json" } }
                   )
                   .then((result) => {
@@ -141,7 +144,8 @@ io.on("connection", function (socket) {
                     var single_processed_data_result = single_processed_data(
                       user_input_value_count,
                       sorted_input_param_result,
-                      raw_data_bundle
+                      raw_data_bundle,
+                      user_input_value
                     );
                     return single_processed_data_result;
                   });
@@ -154,7 +158,7 @@ io.on("connection", function (socket) {
                       `http://203.253.128.184:18227/temporal/entities/${el.slice(
                         0,
                         -1
-                      )}?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=${max_data_load}&lastN=${max_data_load}&timeproperty=modifiedAt`,
+                      )}?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=${max_load}&lastN=${max_load}&timeproperty=modifiedAt`,
                       { headers: { Accept: "application/json" } }
                     )
                     .then((result) => {
@@ -167,7 +171,8 @@ io.on("connection", function (socket) {
                       var single_processed_data_result = single_processed_data(
                         user_input_value_count,
                         sorted_input_param_result,
-                        raw_data_bundle
+                        raw_data_bundle,
+                        user_input_value
                       );
                       return single_processed_data_result;
                     });
@@ -175,7 +180,10 @@ io.on("connection", function (socket) {
                     multiple_processing_data_result
                   );
                 });
-                var multiple_processed_data_result = options(data_processing_option, pre_processed_data); 
+                // console.log(pre_processed_data)
+
+
+                // var multiple_processed_data_result = options(data_processing_option, pre_processed_data); 
                 // console.log(multiple_processed_data_result)
               
                 pre_processed_data.length = 0
