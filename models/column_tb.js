@@ -22,18 +22,18 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: true,
         type: DataTypes.INTEGER
       },
-      data_type: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      data_size: {
-        type: DataTypes.INTEGER,
-      },
       column_name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      allowNull: {
+      valueType: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      maxLength: {
+        type: DataTypes.INTEGER,
+      },
+      isRequired: {
         type: DataTypes.STRING,
         allowNull: false,
       },

@@ -8,30 +8,35 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      al_name: {
+      type: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      al_ns: {
+      namespace: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      al_version: {
+      version: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      al_context: {
+      name : {
+        type : Sequelize.STRING
+      },
+      context: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      description: {
+        type: Sequelize.TEXT
+      },
+      indexAttributeNames:{
+        type:Sequelize.STRING
       },
       al_delYn: {
         type: Sequelize.CHAR,
         allowNull: false,
         defaultValue:'N'
-      },
-      al_des: {
-        type: Sequelize.TEXT,
-        allowNull: false
       },
       createdAt: {
         allowNull: false,

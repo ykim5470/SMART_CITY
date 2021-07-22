@@ -97,10 +97,10 @@ function goSubmit() {
     }
   }
   var frm = document.register;
-  if (frm.tableName.value == "" || frm.nameSpace.value == "" || frm.description.value == "" || frm.context.value == "") {
-    window.alert("빈칸을 모두 입력해주세요");
-    return "#";
-  } else {
+  // if (frm.tableName.value == "" || frm.nameSpace.value == "" || frm.description.value == "" || frm.context.value == "") {
+  //   window.alert("빈칸을 모두 입력해주세요");
+  //   return "#";
+  // } else {
     frm.version.value = frm.first.value + "." + frm.middle.value + "." + frm.last.value;
     var checkValue = document.getElementsByName("nullCheck");
     var nullValue = document.getElementsByName("allowNull");
@@ -108,7 +108,7 @@ function goSubmit() {
       if (checkValue[i].checked) {
         nullValue[i].value = "true";
       }
-    }
+    // }
     frm.submit();
   }
 }

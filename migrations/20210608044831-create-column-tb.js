@@ -18,18 +18,18 @@ module.exports = {
         },
         type: Sequelize.INTEGER
       },
-      data_type: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      data_size: {
-        type: Sequelize.STRING
-      },
       column_name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      allowNull: {
+      valueType: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      maxLength: {
+        type: Sequelize.STRING
+      },
+      isRequired: {
         type: Sequelize.STRING,
         allowNull: false,
       },

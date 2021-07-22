@@ -22,31 +22,36 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         allowNull: false,
       },
-      al_name: {
+      type: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      al_ns: {
+      namespace: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      al_version: {
+      version: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      al_context: {
+      name: {
+        type: DataTypes.STRING
+      },
+      context: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      description: { 
+        type: DataTypes.TEXT
+      },
+      indexAttributeNames: {
+        type: DataTypes.STRING
       },
       al_delYn: {
         type: DataTypes.CHAR,
         allowNull: false,
         defaultValue: 'N'
-      },
-      al_des: { 
-        type: DataTypes.TEXT, 
-        allowNull: false,
-      },
+      }
     },
     {
       sequelize,

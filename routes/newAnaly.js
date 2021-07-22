@@ -5,6 +5,7 @@ const axios = require("axios");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
 const moment = require("moment");
+const base = require("../base");
 const paging = {
   makeArray: function (base, current, totalPg, path) {
     let start = current % 10 == 0 ? Math.floor((current - 1) / 10) * 10 + 1 : Math.floor(current / 10) * 10 + 1; // 페이징 시작 번호
@@ -35,7 +36,7 @@ const dataRequest = {
     console.log("========DATA MODEL CREATE REQUEST==========");
     await axios({
       method: "post",
-      url: "http://203.253.128.184:18827/datamodels",
+      url: `${base.DATA_MANAGER}/datamodels`,
       data: {
         type: result.al_name,
         namespace: result.al_ns,
@@ -50,7 +51,7 @@ const dataRequest = {
   delOne: async (name, ns, ver) => {
     console.log("========DATA MODEL DELETE REQUEST==========");
     try {
-      await axios.delete(`http://203.253.128.184:18827/datamodels/${ns}/${name}/${ver}`, { headers: { Accept: "application/json" } });
+      await axios.delete(`${base.DATA_MANAGER}/datamodels/${ns}/${name}/${ver}`, { headers: { Accept: "application/json" } });
     } catch (err) {
       return err.response.data;
     }
@@ -71,7 +72,7 @@ const dataRequest = {
       }
       await axios({
         method: "PUT",
-        url: `http://203.253.128.184:18827/datamodels/${colTemp.al_ns}/${colTemp.al_name}/${colTemp.al_version}`,
+        url: `${base.DATA_MANAGER}/datamodels/${colTemp.al_ns}/${colTemp.al_name}/${colTemp.al_version}`,
         data: {
           context: conList,
           description: colTemp.al_des,
@@ -87,7 +88,7 @@ const dataRequest = {
     console.log("===========DATA MODEL LIST REQUEST=============");
     let typeList = [];
     let reValue = "false";
-    await axios.get("http://203.253.128.184:18827/datamodels", { headers: { Accept: "application/json" } }).then((result) => {
+    await axios.get(`${base.DATA_MANAGER}/datamodels`, { headers: { Accept: "application/json" } }).then((result) => {
       result.data.map((el) => {
         typeList.push(el.type);
       });
@@ -104,7 +105,7 @@ const dataRequest = {
     console.log("===========DATASET LIST REQUEST=============");
     var typeList = [];
     var plag = "false";
-    await axios.get("http://203.253.128.184:18827/datasets", { headers: { Accept: "application/json" } }).then((result) => {
+    await axios.get(`${base.DATA_MANAGER}/datamodels`, { headers: { Accept: "application/json" } }).then((result) => {
       result.data.map((el) => {
         typeList.push(el.dataModelType);
       });
@@ -203,15 +204,15 @@ const output = {
     });
   },
   //수정 전 dataset check
-  editChk : async(req,res)=>{
+  editChk: async (req, res) => {
     const analyId = req.params.id;
-    await dataset.findAll({attributes:["dataset_id"],where:{al_id:analyId}}).then((result)=>{
-      if(result.length>0){
-        res.send(JSON.parse(`{"result":"no"}`))
-      }else{
-        res.send(JSON.parse(`{"result":"yes"}`))
+    await dataset.findAll({ attributes: ["dataset_id"], where: { al_id: analyId, ds_delYn: "N" } }).then((result) => {
+      if (result.length > 0) {
+        res.send(JSON.parse(`{"result":"no"}`));
+      } else {
+        res.send(JSON.parse(`{"result":"yes"}`));
       }
-    })
+    });
   },
 };
 
@@ -220,7 +221,7 @@ const process = {
   //데이터 생성
   insert: async (req, res) => {
     const body = req.body;
-    console.log(body);
+    const alert = "<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>";
     let size = [];
     try {
       if (typeof body.colName == "string") {
@@ -233,43 +234,50 @@ const process = {
       //null예외처리
       for (var i = 0; i < body.colType.length; i++) {
         size.push(null);
-        if (body.colName[i] == "") {
-          res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>");
-          return;
-        }
+        // if (body.colName[i] == "") {
+        //   res.send(alert);
+        // }
         if (body.dataSize[i] != "") {
           size[i] = body.dataSize[i];
         }
       }
-      if (body.tableName && body.description && body.version && body.nameSpace && body.context) {
-        await analysis_list.create({ al_name: body.tableName, al_ns: body.nameSpace, al_des: body.description, al_version: body.version, al_context: body.context }).then(async (result) => {
-          let temp = "";
-          let column = [];
-          let nullTF = "";
-          const conList = result.al_context.split(",");
-          for (var i = 0; i < body.colType.length; i++) {
-            nullTF = body.allowNull[i] == "true" ? false : true;
-            await column_tb.create({
-              al_id_col: result.al_id,
-              data_type: body.colType[i],
-              data_size: size[i],
-              column_name: body.colName[i],
-              allowNull: body.allowNull[i],
-              attributeType: body.attribute[i],
-            });
-            temp = { name: body.colName[i], isRequired: nullTF, attributeType: body.attribute[i], maxLength: size[i], valueType: body.colType[i] };
-            column.push(JSON.parse(JSON.stringify(temp)));
-          }
-          //데이터 생성요청
-          dataRequest.insert(result, conList, column);
-          res.redirect("/new/list");
-        });
-      } else {
-        res.send("<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>");
-      }
+      await analysis_list.create({ al_name: body.tableName, al_ns: body.nameSpace, al_des: body.description, al_version: body.version, al_context: body.context }).then(async (result) => {
+        let temp = "";
+        let column = [];
+        let nullTF = "";
+        const conList = result.al_context.split(",");
+        for (var i = 0; i < body.colType.length; i++) {
+          nullTF = body.allowNull[i] == "true" ? false : true;
+          await column_tb.create({
+            al_id_col: result.al_id,
+            data_type: body.colType[i],
+            data_size: size[i],
+            column_name: body.colName[i],
+            allowNull: body.allowNull[i],
+            attributeType: body.attribute[i],
+          });
+          temp = { name: body.colName[i], isRequired: nullTF, attributeType: body.attribute[i], maxLength: size[i], valueType: body.colType[i] };
+          column.push(JSON.parse(JSON.stringify(temp)));
+        }
+        //데이터 생성요청
+        //dataRequest.insert(result, conList, column);
+        res.redirect("/new/list");
+      });
     } catch (err) {
-      console.log("data insert failed");
-      console.log(err);
+      if (err.errors.length > 1) {
+        errCode = JSON.parse(JSON.stringify(err.errors));
+        for (var i = 0; i < errCode.length; i++) {
+          if (errCode[i].type.includes("notNull")) {
+            res.send(alert);
+            break;
+          }
+        }
+      } else {
+        errCode = JSON.stringify(err)
+        if (errCode.includes("cannot be null")) {
+          res.send(alert);
+        }
+      }
     }
   },
   //테이블 소프트 삭제
@@ -277,6 +285,7 @@ const process = {
     const analyId = req.params.al_id;
     const rand = "deleted_" + moment().format("YYMMDDHHmmss") + "_";
     const alert = "<script>alert('해당 테이블을 참조하는 DATASET이 존재 합니다. DATASET 삭제 후 다시 시도 하십시오'); location.href=history.back();</script>";
+    const alert2 = "<script>alert('api삭제를 진행 할 수 없습니다. 확인 후 다시 시도해 주세요'); location.href=history.back();</script>";
     try {
       //db에 해당 테이블을 참조하는 dataset이 있는지 확인
       const dbchk = await dataset.findAll({ attributes: ["ds_id"], where: { al_id: analyId, ds_delYn: "N" } });
@@ -291,9 +300,10 @@ const process = {
         const delRequest = await dataRequest.delOne(name, ns, ver);
         if (delRequest != undefined) {
           let errDetail = delRequest.detail;
-          errDetail = errDetail.substring(0, errDetail.indexOf(". "));
+          errDetail.indexOf(". ")>0? errDetail = errDetail.substring(0, errDetail.indexOf(". ")) : errDetail
+          console.log(errDetail)
           await error_log.create({ col_name: "analysis_list", col_id: analyId, operation: "delete", err_code: errDetail });
-          res.send(alert);
+          res.send(alert2);
         } else {
           await analysis_list.update({ al_name: rand + name, al_delYn: "Y" }, { where: { al_id: analyId } });
           res.redirect("/new/list/");
