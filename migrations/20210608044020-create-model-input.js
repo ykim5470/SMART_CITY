@@ -23,7 +23,7 @@ module.exports = {
 				type: Sequelize.STRING,
 			},
 			ip_load: {
-				type: Sequelize.INTEGEr
+				type: Sequelize.INTEGER
 			},
 			createdAt: {
 				allowNull: false,

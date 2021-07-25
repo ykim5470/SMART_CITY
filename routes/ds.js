@@ -61,7 +61,7 @@ const dataRequest = {
 
 const output = {
   insert: async (req, res) => {
-    await analysis_list.findAll({ attributes: ["al_id", "al_name"], where: { al_delYn: "N" } }).then((result) => {
+    await analysis_list.findAll({ attributes: ["al_id", "type"], where: { al_delYn: "N" } }).then((result) => {
       res.render("dataset/ds_insert", { analy: result });
     });
   },

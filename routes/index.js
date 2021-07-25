@@ -11,14 +11,14 @@ const paginate = require('express-paginate')
 router.get("/",function(req,res){res.render("index")})
 //================================GET==================================
 //Analysis 
-router.get("/new/insert", newAnaly.output.insert);
-router.get("/new/list",paginate.middleware(10, 50), newAnaly.output.list);
-router.get("/new/list/:page",paginate.middleware(10, 50), newAnaly.output.list);
-router.get("/new/view/:al_id", newAnaly.output.view);
-router.get("/new/edit/:al_id", newAnaly.output.edit);
-router.get("/new/admin/deleted", newAnaly.output.viewDelList);
-router.get("/new/duplication/check/:checkName", newAnaly.output.dupCheck);
-router.get("/new/editCheck/:id", newAnaly.output.editChk);
+router.get("/analysis/insert", newAnaly.output.insert);
+router.get("/analysis/list",paginate.middleware(10, 50), newAnaly.output.list);
+router.get("/analysis/list/:page",paginate.middleware(10, 50), newAnaly.output.list);
+router.get("/analysis/view/:al_id", newAnaly.output.view);
+router.get("/analysis/edit/:al_id", newAnaly.output.edit);
+router.get("/analysis/admin/deleted", newAnaly.output.viewDelList);
+router.get("/analysis/duplication/check/:checkType", newAnaly.output.dupCheck);
+router.get("/analysis/editCheck/:id", newAnaly.output.editChk);
 //Model
 router.get('/model_manage_board/edit/:md_id', auth.output.register_edit)
 router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage_board);
@@ -41,7 +41,7 @@ router.get("/df/view/:df_id", df.output.view);
 
 //==============================POST======================================
 //Analysis
-router.post("/new/insert", newAnaly.process.insert);
+router.post("/analysis/insert", newAnaly.process.insert);
 //Model
 router.post("/model_manage_board", auth.process.status_update);
 router.post("/model/register", auth.process.register_init);
@@ -58,9 +58,9 @@ router.post("/df/inserted", df.process.insert)
 
 //===============================PUT======================================
 //Analysis
-router.put("/new/softDel/:al_id", newAnaly.process.softDelOne);
-router.put("/new/softListDelete", newAnaly.process.softDelList);
-router.put("/new/edited/:al_id", newAnaly.process.edit);
+router.put("/analysis/softDel/:al_id", newAnaly.process.softDelOne);
+router.put("/analysis/softListDelete", newAnaly.process.softDelList);
+router.put("/analysis/edited/:al_id", newAnaly.process.edit);
 //Model
 router.put("/model_manage_board/:md_id", auth.process.edit);
 //Dataset

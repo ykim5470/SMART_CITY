@@ -33,6 +33,9 @@ module.exports = (sequelize, DataTypes) => {
       maxLength: {
         type: DataTypes.INTEGER,
       },
+      minLength: {
+        type: DataTypes.INTEGER,
+      },
       isRequired: {
         type: DataTypes.STRING,
         allowNull: false,

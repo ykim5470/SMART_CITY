@@ -29,6 +29,9 @@ module.exports = {
       maxLength: {
         type: Sequelize.STRING
       },
+      minLength: {
+        type: Sequelize.STRING
+      },
       isRequired: {
         type: Sequelize.STRING,
         allowNull: false,
