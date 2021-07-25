@@ -64,7 +64,6 @@ const io = socket(server, {
 // Socket Global Variables
 let data_selection_obj = {};
 let al_name_mo_obj = {};
-const pre_processed_data = new Array();
 
 // Socket Connection
 io.on("connection", function (socket) {
@@ -89,7 +88,7 @@ io.on("connection", function (socket) {
         model_input
           .findAll({
             where: { md_id: md_id },
-            attributes: ["ip_param", "ip_value", 'ip_load'],
+            attributes: ["ip_param", "ip_value", "ip_load"],
           })
           .then((user_input_res) => {
             // 선택 모델 정보 & 인풋 정보 JSON
@@ -98,18 +97,13 @@ io.on("connection", function (socket) {
             const user_input_value_count = user_input_value.length;
             const model_manage_str = JSON.stringify(res);
             const model_manage_value = JSON.parse(model_manage_str);
-            console.log(user_input_value) // 
-            const data_load_limit = new Array
-            user_input_value.map(el => data_load_limit.push(el.ip_load))
-            const max_load = Math.max(...data_load_limit)
+            console.log(user_input_value); //
+            const data_load_limit = new Array();
+            user_input_value.map((el) => data_load_limit.push(el.ip_load));
+            const max_load = Math.max(...data_load_limit);
 
-
-            const {
-              al_time,
-              sub_data,
-              date_look_up,
-              data_processing_option,
-            } = model_manage_value;
+            const { al_time, sub_data, date_look_up, data_processing_option } =
+              model_manage_value;
 
             // 데이터 개별 이력조회 API 쿼리 변수
             let date = new Date();
@@ -147,13 +141,14 @@ io.on("connection", function (socket) {
                       raw_data_bundle,
                       user_input_value
                     );
+                    console.log(single_processed_data_result);
                     return single_processed_data_result;
                   });
               } else {
                 // 다중 센서 데이터 선택 시
-                // 다중 센서 데이터 GET
-                await sub_data_list.filter(async (el, index) => {
-                  let multiple_processing_data_result = await axios
+                // 다중 센서 데이터 GET by Promise
+                let pre_processed_data = sub_data_list.map(async (el, index) => {
+                  let multiple_processing_data = await axios
                     .get(
                       `http://203.253.128.184:18227/temporal/entities/${el.slice(
                         0,
@@ -176,19 +171,13 @@ io.on("connection", function (socket) {
                       );
                       return single_processed_data_result;
                     });
-                  return pre_processed_data.push(
-                    multiple_processing_data_result
-                  );
+                  return multiple_processing_data;
                 });
-                // console.log(pre_processed_data)
 
+                // 다중 센서 데이터 Promise 
+                // pre_processed_data // [ Promise { <pending> }, Promise { <pending> } ]
+                var processed_data = options(data_processing_option, pre_processed_data)
 
-                // var multiple_processed_data_result = options(data_processing_option, pre_processed_data); 
-                // console.log(multiple_processed_data_result)
-              
-                pre_processed_data.length = 0
-              
-                // return multiple_processed_data_result
               }
             };
             // scheduler modules

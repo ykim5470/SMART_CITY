@@ -129,9 +129,6 @@ const single_processed_data = (
 
 // 다중 데이터 센서 선택 시 맵핑 옵션 모듈
 const options = (option_name, pre_processed_data) => {
-  console.log("---------------------------");
-  console.log(pre_processed_data);
-  console.log("---------------------------");
   let res = "";
   switch (option_name) {
     case "add":
@@ -146,22 +143,69 @@ const options = (option_name, pre_processed_data) => {
 
 // 다중 데이터 센서 Add 옵션
 const add_processing = (pre_processed_data) => {
-  if (Object.keys(pre_processed_data).length === 0) {
-    console.log("처음에 이거 실행");
-    return [];
-  } else {
-    console.log(pre_processed_data + "빈 값 아님");
-    let total_variable = new Object();
-    let attr = Object.keys(pre_processed_data[0]);
-    let length = pre_processed_data.length;
-    for (let k = 0; k < length; k++) {
-      var sum = pre_processed_data[k][attr[k]].map((el, idx) => {
-        return el + pre_processed_data[length - 1][attr[k]][idx];
-      });
-      total_variable[attr[k]] = sum;
+  let attr_chunks_array = new Array();
+  let promise_resolver = Promise.all(pre_processed_data).then((values) => {
+    list_add(values);
+  });
+
+  function list_add(list_values) {
+    let attr = Object.keys(list_values[0]);
+    // Extract every values from list_values
+    let extracted_list = new Array();
+    for (let e = 0; e < list_values.length; e++) {
+      for (let m = 0; m < attr.length; m++) {
+        extracted_list.push(list_values[e][attr[m]]);
+      }
     }
-    return total_variable;
+
+    let chunks_line = extracted_list.length / attr.length;
+
+    // 같은 attr끼리 묶기
+    for (let p = 0; p < attr.length; p++) {
+      for (let l = 0; l < chunks_line; l++) {
+        attr_chunks_array.push(extracted_list[p + attr.length * l]);
+      }
+    }
+
+    var chunks = [];
+
+    // 같은 attr을 한 개의 array안에 넣기
+    attr_chunks_array.forEach((item) => {
+      if (!chunks.length || chunks[chunks.length - 1].length == chunks_line)
+        chunks.push([]);
+
+      chunks[chunks.length - 1].push(item);
+    });
+
+    // 합 적용
+    for (let q = 0; q < attr.length; q++) {
+      let add_result = chunks[q].reduce(function (array1, array2) {
+        return array1.map(function (value, index) {
+          return value + array2[index];
+        });
+      });
+      console.log(add_result);
+    }
   }
+  // return add_result
+
+  // if (Object.keys(pre_processed_data).length === 0) {
+  //   console.log("처음에 이거 실행");
+  //   return [];
+  // } else {
+  //   console.log(pre_processed_data + "빈 값 아님");
+  //   let total_variable = new Object();
+  //   let attr = Object.keys(pre_processed_data[0]);
+  //   let length = pre_processed_data.length;
+  //   for (let k = 0; k < length; k++) {
+  //     var sum = pre_processed_data[k][attr[k]].map((el, idx) => {
+  //       return el + pre_processed_data[length - 1][attr[k]][idx];
+  //     });
+  //     total_variable[attr[k]] = sum;
+  //   }
+  //   return total_variable;
+  // }
+  console.log("합");
 };
 
 // 다중 데이터 센서 Average 옵션
@@ -189,10 +233,9 @@ const data_mapped_filling = (select_input_count, raw_data, sortable, load) => {
 
   if (raw_data_attr_list.includes(variable)) {
     const raw_len = raw_data[variable].length;
-    console.log(load)
+    console.log(load);
     // 원천 데이터 셋에 유저가 필요한 갯수의 attr value가 부족할 때
     if (raw_len < load) {
-      console.log("-------------------------------1");
       // 부족한 갯수를 채울 평균 값
       let current_value_sum = 0;
       raw_data[variable].map((el) => {
@@ -212,7 +255,7 @@ const data_mapped_filling = (select_input_count, raw_data, sortable, load) => {
           variable_with_data.push(average_of_data);
         }
       }
-      // 선택한 attr value가 string일 경우 그 첫 번째 값으로 나머지를 채운다 
+      // 선택한 attr value가 string일 경우 그 첫 번째 값으로 나머지를 채운다
       else {
         for (let k = 0; k < filling_num; k++) {
           variable_with_data.push(variable_with_data[0]);
@@ -221,29 +264,26 @@ const data_mapped_filling = (select_input_count, raw_data, sortable, load) => {
     }
     // 원천 데이터 셋에 유저가 필요한 갯수의 attr value가 있다면 진행
     else if (raw_len === load) {
-      console.log("---------------------------4");
       raw_data[variable].map((el) => {
         variable_with_data.push(el.value);
       });
     }
     // 원천 데이터 셋에 유저가 필요한 갯수의 attr value가 넘을 때
     else if (raw_len > load) {
-      console.log("-----------------------------------3");
       raw_data[variable].map((el) => {
         variable_with_data.push(el.value);
       });
-      variable_with_data.splice(load, raw_len -1); // 50개를 2개 없애서 48개만 가져온다.
+      variable_with_data.splice(load, raw_len - 1); // 50개를 2개 없애서 48개만 가져온다.
     }
   }
   // 원천 데이터 셋에 해당 attr자체가 없을 경우
   else {
-    console.log("---------------------------------2");
     for (let k = 0; k < load; k++) {
       variable_with_data.push(0);
     }
   }
 
-  console.log(variable_with_data);
+  // console.log(variable_with_data);
   return variable_with_data;
 };
 
