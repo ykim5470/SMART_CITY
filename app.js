@@ -25,14 +25,14 @@ const moment = require("moment");
 //routers
 const index_router = require("./routes/index");
 
-models.sequelize
-  .sync({ force: false })
-  .then(() => {
-    console.log("DB connected");
-  })
-  .catch((err) => {
-    console.log(`DB connection fail: ${err}`);
-  });
+// models.sequelize
+//   .sync({ force: false })
+//   .then(() => {
+//     console.log("DB connected");
+//   })
+//   .catch((err) => {
+//     console.log(`DB connection fail: ${err}`);
+//   });
 
 dotenv.config();
 const app = express();
