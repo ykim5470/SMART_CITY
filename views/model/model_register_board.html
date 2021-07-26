@@ -75,7 +75,7 @@
 						<select name="al_name_mo" id="al_select">
 							<option value="">-선택-</option>
 							{% for el in processed_dataset %}
-							<option value="{{el['analysis_list.type']}},{{el.dataset_id}}">{{el.name}}</option>
+							<option value="{{el['analysis_list.al_name']}},{{el.dataset_id}}">{{el.name}}</option>
 							{% endfor %}
 						</select>
 					</td>
@@ -112,7 +112,7 @@
 			<button type="button" id="submitBtn">등록 완료</button>
 		</div>
 		<script src="/socket.io/socket.io.js"></script>
-		<script src="/js/model/register.js"></script>
+		<script src="/js/register.js"></script>
 	
 	</form>
 	</body>

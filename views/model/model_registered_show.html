@@ -12,28 +12,14 @@
 			<div>
 				<table>
 					<thead>
-						모델 이름
-					</thead>
-					<tbody>
-						<input type='text' name='md_name' value='{{md_name}}'disabled/>
-					</tbody>
-				</table>
-				<table>
-					<thead>
-						모델 시간 세팅
+						분석시간
 					</thead>
 					<tbody>
 						<td>
-							요청 시간 :
-							<input type="text" id="al_time" name="al_time" placeholder="요청 시간" value='{{al_time}}' disabled/>
+							초 :
+							<input type="text" id="al_time" name="al_time" value="{{al_time}}" disabled />
 						</td>
 					</tbody>
-				</table>
-				<table>
-					데이터 조회 기간
-					{% for item in date_look_up %}
-					<input class='data_lookup' type='number' name='data_lookup_date' placeholder="" value='{{item}}' disabled>
-					{% endfor %}
 				</table>
 				<table>
 					<thead>
@@ -114,10 +100,12 @@
 						<input style="width: 200px; height: 100px" name ='model_desc' value="{{md_desc}}" disabled />
 					</thead>
 				</table>
+				<!-- <button type="button" id="submitBtn">수정 완료</button> -->
+                <!-- <a href="http://localhost:3000/model_manage_board/edit/{{md_id}}">수정</a> -->
                 <button>수정</button>
 			</div>
 			<script src="/socket.io/socket.io.js"></script>
-			<script src="/js/model/register_edit.js"></script>
+			<script src="/js/register_edit.js"></script>
 		</form>
 	</body>
 </html>

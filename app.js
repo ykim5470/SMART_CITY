@@ -62,8 +62,8 @@ const io = socket(server, {
 });
 
 // Socket Global Variables
-let data_selection_obj = new Object();
-let al_name_mo_obj = new Object();
+let data_selection_obj = {};
+let al_name_mo_obj = {};
 
 // Socket Connection
 io.on("connection", function (socket) {
@@ -97,6 +97,7 @@ io.on("connection", function (socket) {
             const user_input_value_count = user_input_value.length;
             const model_manage_str = JSON.stringify(res);
             const model_manage_value = JSON.parse(model_manage_str);
+            console.log(user_input_value); //
             const data_load_limit = new Array();
             user_input_value.map((el) => data_load_limit.push(el.ip_load));
             const max_load = Math.max(...data_load_limit);
@@ -146,46 +147,37 @@ io.on("connection", function (socket) {
               } else {
                 // 다중 센서 데이터 선택 시
                 // 다중 센서 데이터 GET by Promise
-                let pre_processed_data = sub_data_list.map(
-                  async (el, index) => {
-                    let multiple_processing_data = await axios
-                      .get(
-                        `http://203.253.128.184:18227/temporal/entities/${el.slice(
-                          0,
-                          -1
-                        )}?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=${max_load}&lastN=${max_load}&timeproperty=modifiedAt`,
-                        { headers: { Accept: "application/json" } }
-                      )
-                      .then((result) => {
-                        var raw_data_bundle = result.data; // 데이터 번들
-                        // 인풋 attr 순서 재배치 by value
-                        var sorted_input_param_result =
-                          sorted_input_param(user_input_value);
+                let pre_processed_data = sub_data_list.map(async (el, index) => {
+                  let multiple_processing_data = await axios
+                    .get(
+                      `http://203.253.128.184:18227/temporal/entities/${el.slice(
+                        0,
+                        -1
+                      )}?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=${max_load}&lastN=${max_load}&timeproperty=modifiedAt`,
+                      { headers: { Accept: "application/json" } }
+                    )
+                    .then((result) => {
+                      var raw_data_bundle = result.data; // 데이터 번들
+                      // 인풋 attr 순서 재배치 by value
+                      var sorted_input_param_result =
+                        sorted_input_param(user_input_value);
 
-                        // Mapped 데이터
-                        var single_processed_data_result =
-                          single_processed_data(
-                            user_input_value_count,
-                            sorted_input_param_result,
-                            raw_data_bundle,
-                            user_input_value
-                          );
-                        return single_processed_data_result;
-                      });
-                    return multiple_processing_data;
-                  }
-                );
+                      // Mapped 데이터
+                      var single_processed_data_result = single_processed_data(
+                        user_input_value_count,
+                        sorted_input_param_result,
+                        raw_data_bundle,
+                        user_input_value
+                      );
+                      return single_processed_data_result;
+                    });
+                  return multiple_processing_data;
+                });
 
-                // 다중 센서 데이터 Promise
+                // 다중 센서 데이터 Promise 
                 // pre_processed_data // [ Promise { <pending> }, Promise { <pending> } ]
-                var processed_data = options(
-                  data_processing_option,
-                  pre_processed_data
-                );
+                var processed_data = options(data_processing_option, pre_processed_data)
 
-                // 옵션 적용된 다중 센서 데이터 Promise
-                // processed_data
-                // processed_data.then(test => console.log(test))
               }
             };
             // scheduler modules
@@ -258,7 +250,7 @@ io.on("connection", function (socket) {
 
     const analysis_output = async () => {
       const analysis_column = await analysis_list
-        .findOne({ where: { type: al_name_mo } })
+        .findOne({ where: { al_name: al_name_mo } })
         .then((res) => {
           const al_list_str = JSON.stringify(res);
           const al_list_value = JSON.parse(al_list_str);
@@ -278,14 +270,4 @@ io.on("connection", function (socket) {
       socket.emit("분석 모델 선택 완료 및 아웃풋 calling", res);
     });
   });
-
-  // 테스트
-  axios
-    .get(
-      "http://203.253.128.184:18227/temporal/entities/urn:waterdna:WaterPumpStation_100?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=25&lastN=25&timeproperty=modifiedAt",
-      { headers: { Accept: "application/json" } }
-    )
-    .then((result) => {
-      socket.emit("테스트 API", result.data);
-    });
 });

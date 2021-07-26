@@ -60,7 +60,7 @@ const dataRequest = {
     console.log("===========DATA MODEL EDIT REQUEST=============");
     try {
       const colTemp = JSON.parse(JSON.stringify(result))[0]; // result 담기
-      const conList = colTemp.type.split(","); //context 배열
+      const conList = colTemp.al_context.split(","); //context 배열
       const colList = colTemp.column_tbs;
       let nullTF = "";
       let temp = "";
@@ -241,11 +241,11 @@ const process = {
           size[i] = body.dataSize[i];
         }
       }
-      await analysis_list.create({ type: body.tableName, namespace: body.nameSpace, description: body.description, version: body.version, context: body.context }).then(async (result) => {
+      await analysis_list.create({ al_name: body.tableName, al_ns: body.nameSpace, al_des: body.description, al_version: body.version, al_context: body.context }).then(async (result) => {
         let temp = "";
         let column = [];
         let nullTF = "";
-        const conList = result.context.split(",");
+        const conList = result.al_context.split(",");
         for (var i = 0; i < body.colType.length; i++) {
           nullTF = body.allowNull[i] == "true" ? false : true;
           await column_tb.create({
@@ -406,7 +406,7 @@ const process = {
         }
       }
       //분석 테이블 DB 수정
-      await analysis_list.update({ context: body.editContext, description: body.editDes }, { where: { al_id: analyId } });
+      await analysis_list.update({ al_context: body.editContext, al_des: body.editDes }, { where: { al_id: analyId } });
       for (var i = 0; i < body.colName.length; i++) {
         if (body.colId[i]) {
           // colId가 있는경우 => 이미 전에 생성이 되어있는 경우 컬럼 수정

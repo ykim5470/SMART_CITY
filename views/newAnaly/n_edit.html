@@ -12,13 +12,13 @@
       <div>
         <p>
           테이블 이름 : <br />
-          <input type="text" name="editName" value="{{analysis.tpye}}" disabled/><br /><br />
+          <input type="text" name="editName" value="{{analysis.al_name}}" disabled/><br /><br />
           Namespace : <br />
-          <input type="text" name="editNs" value="{{analysis.namespace}}" disabled/><br /><br />
+          <input type="text" name="editNs" value="{{analysis.al_ns}}" disabled/><br /><br />
           테이블 설명 : <br />
-          <input type="text" name="editDes" value="{{analysis.description}}" /><br /><br />
+          <input type="text" name="editDes" value="{{analysis.al_des}}" /><br /><br />
           Context : <br />
-          <input type="text" name="editContext" value="{{analysis.context}}" /><br /><br />
+          <input type="text" name="editContext" value="{{analysis.al_context}}" /><br /><br />
           Version : <br />
           {% set ver = analysis.al_version|replace(".","") %} {% set verBox = [0,1,2,3,4,5,6,7,8,9] %}
           <select name="first" disabled>
