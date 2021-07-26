@@ -6,10 +6,13 @@ const ds = require("./ds");
 const df = require("./df");
 const uploadFile = require('../public/js/helpers/upload_dir');
 const ui = require('./ui');
-const paginate = require('express-paginate')
+const paginate = require('express-paginate');
 
 router.get("/",function(req,res){res.render("index")})
 //================================GET==================================
+// Dashboard
+router.get('/dashboard', auth.output.dashboard)
+
 //Analysis 
 router.get("/analysis/insert", newAnaly.output.insert);
 router.get("/analysis/list",paginate.middleware(10, 50), newAnaly.output.list);

@@ -6,7 +6,6 @@ const {
   atch_file_tb,
   analysis_list,
   dataset,
-  sequelize,
 } = require("../models");
 const axios = require("axios");
 const analysis = require("./newAnaly.js");
@@ -21,11 +20,25 @@ const {
   DATA_MANAGER,
   DATA_SERVICE_BROKER,
 } = require("../base");
-const { readdirSync } = require("fs");
+// const { readdirSync } = require("fs");
 const { resolve } = require("path");
 
 // Get
 const output = {
+  // 대시보드
+  dashboard: async (req, res) => {
+    axios
+      .get(
+        "http://203.253.128.184:18227/temporal/entities/urn:waterdna:WaterPumpStation_100?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=25&lastN=25&timeproperty=modifiedAt",
+        { headers: { Accept: "application/json" } }
+      )
+      .then((result) => {
+        const variable1 = result.data.energyConsumption
+        const variable2 = result.data.IntakeVolume
+        console.log(variable1)
+        res.render("dashboard/dashboard.html");
+      });
+  },
   // 모델 관리 보드
   manage_board: async (req, res) => {
     try {
@@ -137,7 +150,7 @@ const output = {
             required: false,
             attributes: ["originalname"],
           },
-          { model: analysis_list, required: false, attributes: ["al_context"] },
+          { model: analysis_list, required: false, attributes: ["context"] },
         ],
         raw: true,
       })
@@ -181,12 +194,12 @@ const output = {
                 .findAll({
                   where: { ds_delYn: "N" },
                   attributes: {
-                    exclued: ["updatedAt", "createdAt"],
-                    includes: [
+                    exclude: ["updatedAt", "createdAt"],
+                    include: [
                       {
                         model: analysis_list,
                         required: false,
-                        attributes: ["al_name"],
+                        attributes: ["type"],
                       },
                     ],
                     raw: true,
@@ -248,7 +261,7 @@ const output = {
             required: false,
             attributes: ["originalname"],
           },
-          { model: analysis_list, required: false, attributes: ["al_context"] },
+          { model: analysis_list, required: false, attributes: ["context"] },
         ],
         raw: true,
       })
@@ -256,8 +269,17 @@ const output = {
         // 등록 된 모델 정보 변수 설정
         const model_edit_str = JSON.stringify(result);
         const model_edit_value = JSON.parse(model_edit_str)[0];
-        const { al_time, al_name_mo, dataset_id, data_model_name } =
-          model_edit_value;
+        const {
+          md_name,
+          al_time,
+          al_name_mo,
+          dataset_id,
+          data_model_name,
+          date_look_up,
+        } = model_edit_value;
+        console.log(model_edit_value);
+        let date_look_up_prev = Object.values(JSON.parse(date_look_up));
+        let md_name_prev = md_name;
         let al_time_prev = al_time;
         let al_name_mo_prev = al_name_mo;
         let dataset_id_prev = dataset_id;
@@ -287,21 +309,22 @@ const output = {
                   raw_data_model_key_prev = el;
                 }
               });
+
               // 등록 된 가공 데이터 셋 이름 GET
               dataset
                 .findAll({
                   where: { ds_delYn: "N" },
                   attributes: {
-                    exclued: ["updatedAt", "createdAt"],
-                    includes: [
-                      {
-                        model: analysis_list,
-                        required: false,
-                        attributes: ["al_name"],
-                      },
-                    ],
-                    raw: true,
+                    exclude: ["updatedAt", "createdAt"],
                   },
+                  include: [
+                    {
+                      model: analysis_list,
+                      required: false,
+                      attributes: ["name"],
+                    },
+                  ],
+                  raw: true,
                 })
                 .then((result_edit) => {
                   const processed_str_edit = JSON.stringify(result_edit);
@@ -323,7 +346,9 @@ const output = {
 
                   return res.render(`model/model_registered_show`, {
                     md_id: md_id,
+                    md_name: md_name_prev,
                     al_time: al_time_prev,
+                    date_look_up: date_look_up_prev,
                     processed_dataset_edit_removed:
                       processed_dataset_edit_removed,
                     raw_data_model_key_prev: raw_data_model_key_prev,
@@ -350,7 +375,7 @@ const output = {
             exclude: ["updatedAt", "createdAt"],
           },
           include: [
-            { model: analysis_list, required: false, attributes: ["al_name"] },
+            { model: analysis_list, required: false, attributes: ["type"] },
           ],
           raw: true,
         })
@@ -365,7 +390,7 @@ const output = {
             }
           });
           processed_dataset.map((el) => {
-            newValue.push({ al_name: el["analysis_list.al_name"] });
+            newValue.push({ al_name: el["analysis_list.type"] });
           });
           const raw_dataset_name = output.raw_dataset_select();
           raw_dataset_name.then((result) => {
@@ -389,7 +414,6 @@ const process = {
   // 파일 TB Create
   file_add: async (req, res) => {
     const { originalname, mimetype, path, filename } = req.file;
-    console.log(req.file);
     await atch_file_tb.create({
       originalname,
       mimetype,
@@ -466,7 +490,6 @@ const process = {
       max_data_load_index,
       data_processing,
     } = req.body;
-    console.log(req.body);
     // Error handling from server
     try {
       errorHandling.al_time_handling(al_time); // 3600
@@ -500,7 +523,7 @@ const process = {
       await process.file_add(req, res);
       // 분석 모델 TB al_id GET
       await analysis_list
-        .findOne({ where: { al_name: al_name_mo.split(",")[0] } })
+        .findOne({ where: { type: al_name_mo.split(",")[0] } })
         .then((res) => {
           const al_list_str = JSON.stringify(res);
           const al_list_value = JSON.parse(al_list_str);
@@ -556,7 +579,7 @@ const process = {
                 max_data_load_index.map((user_index, idx) => {
                   data_load_obj[user_index] = max_data_load[idx];
                 });
-              } else if (typeof max_data_load_index == 'string') {
+              } else if (typeof max_data_load_index == "string") {
                 data_load_obj[max_data_load_index] = max_data_load;
               }
 
@@ -615,8 +638,6 @@ const process = {
       user_input_param,
       ip_attr_value_type,
     } = req.body;
-    console.log("-------------------1");
-    console.log(req.body.al_name_mo);
     try {
       // Error handling from server
       errorHandling.al_time_handling(al_time); // 3600
@@ -643,7 +664,7 @@ const process = {
 
       // 분석 모델 TB al_id GET
       await analysis_list
-        .findOne({ where: { al_name: al_name_mo.split(",")[0] } })
+        .findOne({ where: { type: al_name_mo.split(",")[0] } })
         .then((res) => {
           const al_list_str = JSON.stringify(res);
           const al_list_value = JSON.parse(al_list_str);
