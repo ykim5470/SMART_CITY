@@ -6,6 +6,8 @@ const {
   atch_file_tb,
   analysis_list,
   dataset,
+  chart_list,
+  chart_entities
 } = require("../models");
 const axios = require("axios");
 const analysis = require("./newAnaly.js");
@@ -20,25 +22,52 @@ const {
   DATA_MANAGER,
   DATA_SERVICE_BROKER,
 } = require("../base");
-// const { readdirSync } = require("fs");
 const { resolve } = require("path");
 
 // Get
 const output = {
-  // 대시보드
+  // 대시보드 페이지 Rendering
   dashboard: async (req, res) => {
-    axios
-      .get(
-        "http://203.253.128.184:18227/temporal/entities/urn:waterdna:WaterPumpStation_100?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=25&lastN=25&timeproperty=modifiedAt",
-        { headers: { Accept: "application/json" } }
-      )
-      .then((result) => {
-        const variable1 = result.data.energyConsumption
-        const variable2 = result.data.IntakeVolume
-        console.log(variable1)
-        res.render("dashboard/dashboard.html");
-      });
+    res.render(`dashboard/dashboard`);
   },
+
+  // 대시보드 가공 데이터 셋 GET
+  processed_data_load: async (req,res) => {
+    try{
+    const dataset = await axios.get("http://203.253.128.184:18827/datasets", {
+      headers: { Accept: "application/json" },
+    });
+    const dataset_dict = [];
+    dataset.data.filter((el) => {
+      if (el.isProcessed !== "원천데이터") {
+        return dataset_dict.push({
+          key: el.name,
+          value: {
+            id: el.id,
+            dataModelType: el.dataModelType,
+            dataModelNamespace: el.dataModelNamespace,
+            dataModelVersion: el.dataModelVersion,
+          },
+        });
+      }
+    });
+    return res.send({ data: dataset_dict });
+  }
+    catch (err) {
+        return res.send(err);
+      }
+  },
+
+  // 대시보드 원천 데이터 셋 GET
+  raw_data_load: async( req, res) => {
+    try {
+      const raw_dataset = await output.raw_dataset_select();
+      return res.send({ data: raw_dataset });
+    } catch (err) {
+      console.log(err)
+    }
+  },
+
   // 모델 관리 보드
   manage_board: async (req, res) => {
     try {
@@ -410,7 +439,19 @@ const output = {
 };
 
 // Post
+
 const process = {
+  test: (req,res)=>{
+    console.log('aaaa')
+    let a = res.json()
+    console.log(a)
+  },
+  // 대시보드 차트 등록 Completea
+  chart_register_complete: async(req,res)=>{
+    console.log('차트 등록 완료')
+  },
+
+
   // 파일 TB Create
   file_add: async (req, res) => {
     const { originalname, mimetype, path, filename } = req.file;

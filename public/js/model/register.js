@@ -3,7 +3,7 @@ const socket = io();
 
 /* 
     DOM
-    - 분석 시간 input
+  - 분석 시간 input
 	- 데이터 선택 input
 	- 분석 모델 선택 input
 	- 인풋 파라미터 유저 input

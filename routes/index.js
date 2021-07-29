@@ -12,6 +12,9 @@ router.get("/",function(req,res){res.render("index")})
 //================================GET==================================
 // Dashboard
 router.get('/dashboard', auth.output.dashboard)
+router.get('/dashboard/processed_data_load', auth.output.processed_data_load)
+router.get('/dashboard/raw_data_load', auth.output.raw_data_load)
+
 
 //Analysis 
 router.get("/analysis/insert", newAnaly.output.insert);
@@ -43,6 +46,8 @@ router.get("/df/list/:page",paginate.middleware(10, 50), df.output.list);
 router.get("/df/view/:df_id", df.output.view);
 
 //==============================POST======================================
+//Dashboard
+router.post('/dashboard/test', auth.process.test)
 //Analysis
 router.post("/analysis/insert", newAnaly.process.insert);
 //Model
