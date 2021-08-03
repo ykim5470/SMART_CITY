@@ -1,9 +1,6 @@
 const axios = require("axios");
 const moment = require("moment");
-const {
-    model_list,
-    model_input,
-  } = require("../../../models");
+const { model_list, model_input, atch_file_tb } = require("../../../models");
 const {
   my_scheduleJob,
   start_end_time_generator,
@@ -11,7 +8,10 @@ const {
   sorted_input_param,
   single_processed_data,
 } = require("../helpers/api_scheduler");
-
+const fs = require("fs");
+const Path = require("path");
+const tf = require('@tensorflow/tfjs')
+// require('@tensorflow/tfjs-node');
 
 const model_scheduler = (socket) => {
   socket.on("모델 스케쥴러 조작", (data) => {
@@ -25,6 +25,8 @@ const model_scheduler = (socket) => {
           "sub_data",
           "date_look_up",
           "data_processing_option",
+          "file_id",
+          "analysis_file_format",
         ],
       })
       .then((res) => {
@@ -45,8 +47,14 @@ const model_scheduler = (socket) => {
             user_input_value.map((el) => data_load_limit.push(el.ip_load));
             const max_load = Math.max(...data_load_limit);
 
-            const { al_time, sub_data, date_look_up, data_processing_option } =
-              model_manage_value;
+            const {
+              al_time,
+              sub_data,
+              date_look_up,
+              data_processing_option,
+              file_id,
+              analysis_file_format,
+            } = model_manage_value;
 
             // 데이터 개별 이력조회 API 쿼리 변수
             let date = new Date();
@@ -84,7 +92,50 @@ const model_scheduler = (socket) => {
                       raw_data_bundle,
                       user_input_value
                     );
-                    console.log(single_processed_data_result);
+                    // 변환된 데이터 분석 파일 GET 및 변환 zip파일 Search
+                    atch_file_tb
+                      .findAll({
+                        where: { file_id: file_id },
+                        attributes: ["filename"],
+                      })
+                      .then((file_meta_data) => {
+                        const file_meta_data_str =
+                          JSON.stringify(file_meta_data);
+                        const file_meta_data_value =
+                          JSON.parse(file_meta_data_str);
+                        const { filename } = file_meta_data_value[0];
+
+                        var target_dir = Path.resolve(
+                          __dirname,
+                          "../../../uploads/model/"
+                        ).replace(/\\/g, "/");
+
+                        try {
+                          // 변환된 파일이 존재한다면 데이터 값 loading실행
+                          console.log(
+                            `${target_dir}/${filename}/model.json`
+                          );
+                          if (
+                            fs.existsSync(
+                              `${target_dir}/${filename}`
+                          )) {
+                            console.log(analysis_file_format);
+                            console.log('실행되는감????')
+                            // const model = tf.loadLayersModel(`http://localhost:4000/${target_dir}/${filename}/model.json`)
+                            const model = tf.loadLayersModel(`http://localhost:4000/uploads/model/1627976490278.h5/model.json`)
+                            
+                            .then(models =>{
+                              console.log(models)
+                            })
+                          } else {
+                            throw "존재하지 않는 변환 파일입니다";
+                          }
+                        } catch (err) {
+                          console.log(err);
+                        }
+                      });
+
+                    // console.log(single_processed_data_result)
                     return single_processed_data_result;
                   });
               } else {

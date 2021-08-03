@@ -26,6 +26,16 @@ const { resolve } = require("path");
 
 // Get
 const output = {
+  
+  testtest: async( req, res) => {
+    console.log(req)
+    try {
+      res.send(`dashboard/test`);
+    } catch (err) {
+      console.log(err)
+    }
+  },
+
   // 대시보드 페이지 Rendering
   dashboard: async (req, res) => {
     res.render(`dashboard/dashboard`);
@@ -502,6 +512,7 @@ const process = {
       mimetype == "application/octet-stream" &&
       originalname.split(".")[1] == "h5"
     ) {
+      console.log('h5 변환 실행')
       console.log(ExtractedFileDirectory + "/" + filename);
       exec.exec(
         `tensorflowjs_converter --input_format=keras ${uploadedFileDirectory}/${filename} ${ExtractedFileDirectory}/${filename}`
@@ -530,6 +541,9 @@ const process = {
       max_data_load,
       max_data_load_index,
       data_processing,
+      analysis_file_format,
+      tf_shape,
+      tf_shape_index,
     } = req.body;
     // Error handling from server
     try {
@@ -549,6 +563,7 @@ const process = {
         sub_data_select,
         data_processing
       );
+      errorHandling.tf_shape_handling(max_data_load, tf_shape)
       let date_look_up = {
         date: data_lookup_date,
         hour: data_lookup_hour,
@@ -593,6 +608,7 @@ const process = {
           sub_data: sub_data_select,
           date_look_up: date_look_up,
           data_processing_option: data_processing,
+          analysis_file_format: analysis_file_format
         })
         .then(() => {
           // 생성된 모델 리스트 TB의 md_id GET
@@ -623,6 +639,18 @@ const process = {
               } else if (typeof max_data_load_index == "string") {
                 data_load_obj[max_data_load_index] = max_data_load;
               }
+              // 인풋 파람 필요 텐서 타입 정의
+              let tf_shape_obj = new Object();
+              if(
+                Array.isArray(tf_shape_index) &&
+                Array.isArray(tf_shape)
+              ){
+                tf_shape_index.map((user_index, idx)=>{
+                  tf_shape_obj[user_index] = tf_shape[idx]
+                })
+              }else if(typeof tf_shape_index == 'string'){
+                tf_shape_obj[tf_shape_index] = tf_shape
+              }
 
               // 인풋 파람 TB 생성
               if (typeof user_input_param === "string") {
@@ -643,6 +671,7 @@ const process = {
                       el,
                       ip_attr_value_type[index],
                       data_load_obj[index],
+                      tf_shape_obj[index]
                     ];
                   }
                 });
@@ -654,6 +683,7 @@ const process = {
                   ip_value: user_obj[i][0],
                   ip_type: user_obj[i][1],
                   ip_load: user_obj[i][2],
+                  ip_param_type: user_obj[i][3],
                 });
               }
             });

@@ -14,6 +14,7 @@ router.get("/",function(req,res){res.render("index")})
 router.get('/dashboard', auth.output.dashboard)
 router.get('/dashboard/processed_data_load', auth.output.processed_data_load)
 router.get('/dashboard/raw_data_load', auth.output.raw_data_load)
+router.get('/dashboard/test', auth.output.testtest)
 
 
 //Analysis 

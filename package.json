@@ -19,6 +19,7 @@
 	},
 	"homepage": "https://github.com/jbookes/2021_SmartWater#readme",
 	"dependencies": {
+		"@tensorflow/tfjs": "^3.8.0",
 		"axios": "^0.21.1",
 		"chart.js": "^3.5.0",
 		"child_process": "^1.0.2",

@@ -1,4 +1,3 @@
-
 const errorHandling = {
   al_time_handling: (al_time) => {
     if (al_time === "") {
@@ -47,13 +46,14 @@ const errorHandling = {
     if (max_data_load === "") {
       throw "데이터 분석에 필요한 최소 데이터 갯수를 지정해 주세요";
     }
-    // 1개만 입력 
-    if (Array.isArray(max_data_load)){
+    // 1개만 입력
+    if (Array.isArray(max_data_load)) {
       max_data_load.map((el) => {
-      if (el <= 0) {
-        throw "데이터 분석에 필요한 데이터 갯수는 1 이상의 숫자여야 합니다";
-      }
-    })}
+        if (el <= 0) {
+          throw "데이터 분석에 필요한 데이터 갯수는 1 이상의 숫자여야 합니다";
+        }
+      });
+    }
   },
   data_look_up_handling: (
     data_lookup_date,
@@ -88,6 +88,27 @@ const errorHandling = {
     }
     if (selected_sub_data.length >= 2 && data_processing === "") {
       throw "센서 2개 이상 선택 시, 데이터 전처리 옵션을 필수로 선택해 주세요";
+    }
+  },
+  tf_shape_handling: (max_data_load, tf_shape) => {
+    if (typeof max_data_load == "string") {
+      // tf_shape의 형태가 매치되는 데이터 사이즈 변형 가능한지 확인
+      let tf_shape_arr = JSON.parse(tf_shape);
+      if (Number(max_data_load) !== tf_shape_arr.reduce((a, b) => a * b, 1)) {
+        throw `가져올 데이터 갯수와 텐서 모양이 일치해야 합니다. 데이터 사이즈${Number(
+          max_data_load
+        )}, 변환할 텐서 모양 ${tf_shape_arr}`;
+      }
+    } else {
+      max_data_load.map((el, idx) => {
+        if (
+          Number(el) !== JSON.parse(tf_shape[idx]).reduce((a, b) => a * b, 1)
+        ) {
+          throw `가져올 데이터 갯수와 텐서 모양이 일치해야 합니다. 데이터 사이즈${Number(
+            Number(el)
+          )}, 변환할 텐서 모양 ${JSON.parse(tf_shape[idx])}`;
+        }
+      });
     }
   },
 };

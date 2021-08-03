@@ -71,6 +71,7 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
             <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" readonly /></td>
             <td><input type="number" class="user_input_param" name="user_input_param"/></td>
             <td id='max_data_load_box${index}'></td>
+            <td id='param_tf_shape${index}'></td>
         </tr>
         `;
   });
@@ -85,13 +86,20 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
       let max_data_load_box = document.querySelector(
         `#max_data_load_box${index}`
       );
+      let param_tf_shape_box = document.querySelector(
+        `#param_tf_shape${index}`
+      );
       if (e.target.value !== "") {
         max_data_load_box.innerHTML = `
         <input name='max_data_load_index' value=${index} hidden/>
-        <input class='max_data_load_limit' type='number' name='max_data_load' placeholder="가져오는 데이터 갯수"/>
+        <input class='max_data_load_limit' type='number' name='max_data_load' placeholder="i.e. 5 10 48 etc"/>
         `;
+        param_tf_shape_box.innerHTML = `
+        <input name='tf_shape_index' value=${index} hidden/>
+        <input name='tf_shape' class='tf_shape' placeholder='i.e. [40] [[1,2,3],[4,5,6]]'/>`;
       } else {
         max_data_load_box.innerHTML = "";
+        param_tf_shape_box.innerHTML = "";
       }
     });
   });

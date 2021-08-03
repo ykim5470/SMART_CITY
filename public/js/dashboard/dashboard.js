@@ -47,6 +47,20 @@ const processed_dataset_load = async () => {
   return processed.data;
 };
 
+let connection
+
+async function connect() {
+  connection = await raw_dataset_load()
+if (connection) {
+  return connection;
+} else {
+  return null;
+}
+}
+console.log(connect())
+
+
+
 // Render dataset select box
 const dataset_select = (selected_dataset_type) => {
   try {
