@@ -36,7 +36,7 @@
 				</tr>
 				{% for list in anaList %}
 				<tr>
-					<form action="/new/listDelete?_method=DELETE" method="POST" id="delListFrm">
+					<form action="/analysis/listDelete?_method=DELETE" method="POST" id="delListFrm">
 						<td><input type="checkbox" name="delId" value="{{list.al_id}}" /></td>
 						<td><a href="/analysis/admin/delView/{{list.al_id}}">{{list.al_name}}</a></td>
 						<td><a href="/analysis/admin/delView/{{list.al_id}}">{{list.al_des}}</a></td>
@@ -54,20 +54,22 @@
 				<tr>
 					<td>No. &nbsp</td>
 					<td>선택 &nbsp</td>
-					<td>테이블 이름 &nbsp&nbsp&nbsp&nbsp</td>
-					<td>테이블 설명 &nbsp&nbsp&nbsp&nbsp</td>
+					<td>TABLE TYPE &nbsp&nbsp&nbsp&nbsp</td>
+					<td>TABLE NAMESPACE &nbsp&nbsp&nbsp&nbsp</td>
+					<td>TABLE VERSION &nbsp&nbsp&nbsp&nbsp</td>
 					<td>등록일</td>
 					<td>
-						<a href="/new/insert"><button>분석테이블 등록하기</button></a>
+						<a href="/analysis/insert"><button>분석테이블 등록하기</button></a>
 					</td>
 				</tr>
 				{% for list in anaList %}
 				<tr>
-					<form action="/new/softListDelete?_method=PUT" method="POST" id="delListFrm">
+					<form action="/analysis/softListDelete?_method=PUT" method="POST" id="delListFrm">
 						<td>{{(cnt-loop.index)-((pg-1)*10)+1}}</td>
 						<td><input type="checkbox" name="delId" value="{{list.al_id}}" /></td>
-						<td><a href="/new/view/{{list.al_id}}">{{list.al_name}}</a></td>
-						<td><a href="/new/view/{{list.al_id}}">{{list.al_des}}</a></td>
+						<td><a href="/analysis/view/{{list.al_id}}">{{list.type}}</a></td>
+						<td><a href="/analysis/view/{{list.al_id}}">{{list.namespace}}</a></td>
+						<td><a href="/analysis/view/{{list.al_id}}">{{list.version}}</a></td>
 						<td>{{list.dateFormat(list.createdAt)}}</td>
 						{% endfor %}
 						<input type="hidden" name="deleteList" id="deleteList" value="" />

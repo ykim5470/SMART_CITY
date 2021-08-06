@@ -7,26 +7,59 @@
     <title>분석테이블 등록</title>
   </head>
   <script src="/js/analysis/insert.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script>
+		function insTb() {
+			var clone = $("#addTable").clone();
+      clone.find("input").val("");
+      $("#addChild").append(clone);
+      // var childArrayNum = Number($("#addChild")[0].childElementCount)-1;
+      // $($("#addChild")[0].children[childArrayNum]).attr('name',childArrayNum);
+      // console.log($($("#addChild")[0].children[childArrayNum]))
+      // console.log(childArrayNum)
+		}
+    function insObj() {
+			// var clone = $("#addObject").clone();
+      // clone.find("input").val("");
+      // $("#obTbl").append(clone);
+      document.getElementById("addTable").innerHTML += document.getElementById("addObject").innerHTML
+      console.log(document.getElementById("addObject").innerHTML)
+		}
+	</script>
   <body>
     <h1>분석테이블 등록</h1>
-    <form action="/new/insert" method="POST" name="register">
+    <form action="/analysis/insert" method="POST" name="register">
+      <p>&Star;표시 항목은 필수 입력 항목 입니다</p>
       <table>
         <tr>
-          <td><input type="text" name="al_name" placeholder="테이블이름을 입력하세요." /></td>
-          <td><input type="button" onclick="dupCheck()" name="dupBtn" value="중복확인" /></td>
+          <td>&Star;TYPE : <input type="text" name="type" placeholder="Table Type" /></td>
         </tr>
         <tr>
-          <td><input type="text" name="al_ns" placeholder="nameSpace를 입력하세요." /></td>
+          <td>&Star;NAMESPACE : <input type="text" name="namespace" placeholder="nameSpace" /></td>
         </tr>
         <tr>
-          <td><input type="text" name="description" placeholder="테이블 설명을 입력하세요." /></td>
+          <td>NAME : <input type="text" name="name" placeholder="Table Name" /></td>
         </tr>
         <tr>
-          <td><input type="text" name="context" placeholder="context를 입력하세요" /></td>
+          <!-- <td>
+            &Star;CONTEXT : <input type="text" name="plusCon" placeholder="context" /> <input type="button" value="추가" onclick="pushCon()" />
+            <input type="hidden" name="context" value=""/>
+            <div id="conList"></div>
+          </td> -->
+          <tr>
+          <td>&Star;CONTEXT : <input type="text" name="context" placeholder="context" /></td>
+        </tr>
+        </tr>
+        <tr>
+          <td>DESCRIPTION : <input type="text" name="description" placeholder="Table description" /></td>
+        </tr>
+        <tr>
+          <td>ATTRIBUTE ID : <input type="text" name="indexAttributeNames" placeholder="AttributeId list(복합id는 , 로 구분)" /></td>
         </tr>
         <tr>
           <td>
-            <p>버전선택</p>
+            <br />
+            <span>&Star;VERSION : </span>
             {% set verBox = [0,1,2,3,4,5,6,7,8,9] %}
             <select name="first">
               {% for items in verBox %}
@@ -49,55 +82,73 @@
           </td>
         </tr>
       </table>
-      <h4>분석테이블 컬럼 등록</h4>
-      <table>
-        <tr>
-          <td>
-            <input name="addButton" type="button" style="cursor: hand" onClick="insRow()" value="추가" />
-            필요한 만큼 추가버튼을 클릭하세요.
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <table id="addTable">
-              <tr>
-                <th>Attribute Type</th>
-                <th>Data Type</th>
-                <th>Data Size</th>
-                <th>Column Name</th>
-                <th>Null 허용여부</th>
-              </tr>
-              <tr>
-                <td>
-                  <select name="attribute" onchange="attrChange(this)">
-                    <option value="Property">Property</option>
-                    <option value="GeoProperty">GeoProperty</option>
-                    <option value="Relationship">Relationship</option>
-                  </select>
-                </td>
-                <td>
-                  <select name="colType" style="width: 140px">
-                    <option value="String">STRING</option>
-                    <option value="Integer">INTEGER</option>
-                    <option value="Double">DOUBLE</option>
-                    <option value="Object">OBJECT</option>
-                    <option value="Date">DATE</option>
-                    <option value="ArrayString">ARRAY STRING</option>
-                    <option value="ArrayInteger">ARRAY INTEGER</option>
-                    <option value="ArrayDouble">ARRAY DOUBLE</option>
-                    <option value="ArrayObject">ARRAY OBJECT</option>
-                  </select>
-                </td>
-                <td><input type="text" name="dataSize" placeholder="데이터 사이즈를 입력해주세요" /></td>
-                <td><input type="text" name="colName" placeholder=" 컬럼이름을 입력하세요." /></td>
-                <td><input type="checkbox" name="nullCheck" /><input type="hidden" name="allowNull" value="false" /></td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
+      <br>
+      <h4>데이터 모델 속성 상세 <input id="addButton" type="button" style="cursor: hand" onClick="insTb()" value="추가" /></h4>
+      <div id="addChild">
+        <table id="addTable" cellspacing="0">
+          <tr align="center">
+            <td>&Star; 속성 아이디</td>
+            <td><input type="text" name="column_name" placeholder=" 컬럼이름을 입력하세요." /></td>
+            <td>속성 유형</td>
+            <td>
+              <select name="attributeType" onchange="attrChange(this)">
+                <option value="Property">Property</option>
+                <option value="GeoProperty">GeoProperty</option>
+                <option value="Relationship">Relationship</option>
+              </select>
+            </td>
+            <td>속성 값</td>
+            <td>
+              <select name="valueType" style="width: 140px" onchange="showEnum(this.value)">
+                <option value="String">STRING</option>
+                <option value="Integer">INTEGER</option>
+                <option value="Double">DOUBLE</option>
+                <option value="Object">OBJECT</option>
+                <option value="Date">DATE</option>
+                <option value="ArrayString">ARRAY STRING</option>
+                <option value="ArrayInteger">ARRAY INTEGER</option>
+                <option value="ArrayDouble">ARRAY DOUBLE</option>
+                <option value="ArrayObject">ARRAY OBJECT</option>
+              </select>
+            </td>
+          </tr>
+          <tr align="center">
+            <td>Min Length</td>
+            <td><input type="text" name="minLength" placeholder="데이터 최저 크기를 입력해주세요" /></td>
+            <td>Max Length</td>
+            <td><input type="text" name="maxLength" placeholder="데이터 최대 크기를 입력해주세요" /></td>
+            <td>Null 허용여부 <input type="checkbox" name="nullCheck" /></td>
+            <td>ObservedAt보유여부 <input type="checkbox" name="observedChk" /></td>
+            <td><input type="button" style="cursor: hand" onClick="insObj()" value="Object Members 추가" /></td>
+          </tr>
+          <table id="addObject" style="display: none;">
+            <tr>
+              <td>&Star; Object Name </td>
+              <td><input type="text" name="ob_name"/></td>
+              <td>값 유형</td>
+              <td>
+                <select name="objType" style="width: 140px" onchange="showEnum(this.value)">
+                  <option value="String">STRING</option>
+                  <option value="Integer">INTEGER</option>
+                  <option value="Double">DOUBLE</option>
+                  <option value="Object">OBJECT</option>
+                  <option value="Date">DATE</option>
+                  <option value="ArrayString">ARRAY STRING</option>
+                  <option value="ArrayInteger">ARRAY INTEGER</option>
+                  <option value="ArrayDouble">ARRAY DOUBLE</option>
+                  <option value="ArrayObject">ARRAY OBJECT</option>
+                </select>
+              </td>
+              <td>vlaueEnum</td>
+              <td><input type="text" name="ob_name"/></td>
+            </tr>
+          </table>
+          <input type="hidden" name="isRequired" value="true" />
+          <input type="hidden" name="hasObservedAt" value="false" />
+        </table>
+      </div>
       <br /><input type="button" value="등록하기" onclick="goSubmit()" />
-      <a href="/new/list"><input type="button" value="목록보기" /></a>
+      <a href="/analysis/list"><input type="button" value="목록보기" /></a>
     </form>
   </body>
 </html>

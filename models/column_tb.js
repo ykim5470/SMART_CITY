@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: true,
         type: DataTypes.INTEGER
       },
-      column_name: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -43,6 +43,12 @@ module.exports = (sequelize, DataTypes) => {
       attributeType: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      hasObservedAt: {
+        type: DataTypes.STRING,
+      },
+      valueEnum: {
+        type: DataTypes.STRING,
       },
     },
     {
