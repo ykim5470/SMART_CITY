@@ -69,7 +69,7 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
         <tr>
             <td><input name="ip_attr_value_type" value="${items.valueType}" readonly /></td>
             <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" readonly /></td>
-            <td><input type="number" class="user_input_param" name="user_input_param"/></td>
+            <td><input type="text" class="user_input_param" name="user_input_param"/></td>
             <td id='max_data_load_box${index}'></td>
             <td id='param_tf_shape${index}'></td>
         </tr>

@@ -28,7 +28,7 @@ const { resolve } = require("path");
 const output = {
   
   testtest: async( req, res) => {
-    console.log(req)
+    // console.log(req)
     try {
       res.send(`dashboard/test`);
     } catch (err) {
@@ -448,13 +448,14 @@ const output = {
   },
 };
 
-// Post
 
+// Post
 const process = {
   test: (req,res)=>{
     console.log('aaaa')
-    let a = res.json()
-    console.log(a)
+    let a = req
+    // a.then(result => console.log(result))
+    console.log(a.body.data)
   },
   // 대시보드 차트 등록 Completea
   chart_register_complete: async(req,res)=>{
@@ -563,7 +564,7 @@ const process = {
         sub_data_select,
         data_processing
       );
-      errorHandling.tf_shape_handling(max_data_load, tf_shape)
+      errorHandling.tf_shape_handling(max_data_load, tf_shape, analysis_file_format)
       let date_look_up = {
         date: data_lookup_date,
         hour: data_lookup_hour,

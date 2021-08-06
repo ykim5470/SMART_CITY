@@ -8,10 +8,9 @@ const {
   sorted_input_param,
   single_processed_data,
 } = require("../helpers/api_scheduler");
+const tensor_shape_convert = require('../helpers/tensor_shape_convert')
 const fs = require("fs");
 const Path = require("path");
-const tf = require('@tensorflow/tfjs')
-// require('@tensorflow/tfjs-node');
 
 const model_scheduler = (socket) => {
   socket.on("모델 스케쥴러 조작", (data) => {
@@ -34,7 +33,7 @@ const model_scheduler = (socket) => {
         model_input
           .findAll({
             where: { md_id: md_id },
-            attributes: ["ip_param", "ip_value", "ip_load"],
+            attributes: ["ip_param", "ip_value", "ip_load",'ip_param_type'],
           })
           .then((user_input_res) => {
             // 선택 모델 정보 & 인풋 정보 JSON
@@ -55,6 +54,7 @@ const model_scheduler = (socket) => {
               file_id,
               analysis_file_format,
             } = model_manage_value;
+
 
             // 데이터 개별 이력조회 API 쿼리 변수
             let date = new Date();
@@ -121,12 +121,9 @@ const model_scheduler = (socket) => {
                           )) {
                             console.log(analysis_file_format);
                             console.log('실행되는감????')
-                            // const model = tf.loadLayersModel(`http://localhost:4000/${target_dir}/${filename}/model.json`)
-                            const model = tf.loadLayersModel(`http://localhost:4000/uploads/model/1627976490278.h5/model.json`)
-                            
-                            .then(models =>{
-                              console.log(models)
-                            })
+                            let url = `http://localhost:4000/uploads/model/${filename}/model.json`
+                            tensor_shape_convert(analysis_file_format, single_processed_data_result, user_input_value, url)
+                        
                           } else {
                             throw "존재하지 않는 변환 파일입니다";
                           }
@@ -135,7 +132,7 @@ const model_scheduler = (socket) => {
                         }
                       });
 
-                    // console.log(single_processed_data_result)
+                    console.log(single_processed_data_result)
                     return single_processed_data_result;
                   });
               } else {

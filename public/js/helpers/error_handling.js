@@ -90,25 +90,27 @@ const errorHandling = {
       throw "센서 2개 이상 선택 시, 데이터 전처리 옵션을 필수로 선택해 주세요";
     }
   },
-  tf_shape_handling: (max_data_load, tf_shape) => {
-    if (typeof max_data_load == "string") {
-      // tf_shape의 형태가 매치되는 데이터 사이즈 변형 가능한지 확인
-      let tf_shape_arr = JSON.parse(tf_shape);
-      if (Number(max_data_load) !== tf_shape_arr.reduce((a, b) => a * b, 1)) {
-        throw `가져올 데이터 갯수와 텐서 모양이 일치해야 합니다. 데이터 사이즈${Number(
-          max_data_load
-        )}, 변환할 텐서 모양 ${tf_shape_arr}`;
-      }
-    } else {
-      max_data_load.map((el, idx) => {
-        if (
-          Number(el) !== JSON.parse(tf_shape[idx]).reduce((a, b) => a * b, 1)
-        ) {
+  tf_shape_handling: (max_data_load, tf_shape, analysis_file_format) => {
+    if (analysis_file_format !== "loadGraphModel") {
+      if (typeof max_data_load == "string") {
+        // tf_shape의 형태가 매치되는 데이터 사이즈 변형 가능한지 확인
+        let tf_shape_arr = JSON.parse(tf_shape);
+        if (Number(max_data_load) !== tf_shape_arr.reduce((a, b) => a * b, 1)) {
           throw `가져올 데이터 갯수와 텐서 모양이 일치해야 합니다. 데이터 사이즈${Number(
-            Number(el)
-          )}, 변환할 텐서 모양 ${JSON.parse(tf_shape[idx])}`;
+            max_data_load
+          )}, 변환할 텐서 모양 ${tf_shape_arr}`;
         }
-      });
+      } else {
+        max_data_load.map((el, idx) => {
+          if (
+            Number(el) !== JSON.parse(tf_shape[idx]).reduce((a, b) => a * b, 1)
+          ) {
+            throw `가져올 데이터 갯수와 텐서 모양이 일치해야 합니다. 데이터 사이즈${Number(
+              Number(el)
+            )}, 변환할 텐서 모양 ${JSON.parse(tf_shape[idx])}`;
+          }
+        });
+      }
     }
   },
 };
