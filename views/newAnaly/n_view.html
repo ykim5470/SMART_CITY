@@ -23,15 +23,17 @@
     <h3>분석 테이블</h3>
     <div>
       <p>
-        테이블 이름 : <br />
+        TABLE TYPE : <br />
         {{analysis.type}} <br /><br />
-        Name Space : <br />
+        TABLE NAMESPACE : <br />
         {{analysis.namespace}} <br /><br />
-        테이블 내용 : <br />
-        {{analysis.description}} <br /><br />
-        Version : {{version}} <br />
-        context : <br />
-        {{analysis.context}}
+        TABLE CONTEXT : <br />
+        {{analysis.context}} <br /><br />
+        TABLE VERSION : <br />
+        {{analysis.version}} <br /><br />
+        TABLE NAME : {{analysis.name}} <br />
+        TABLE DESCRIPTION : {{analysis.description}} <br />
+        TABLE INDEX ATTRIBUTE NAMES : {{analysis.indexAttributeNames}} <br />
       </p>
     </div>
     {% if admin %}
@@ -40,32 +42,38 @@
       <a href="/analysis/admin/deleted"><input type="button" value="목록" /></a>
     </form>
     {% else %}
-    <form action="/new/softDel/{{analysis.al_id}}?_method=PUT" method="POST">
+    <form action="/analysis/softDel/{{analysis.al_id}}?_method=PUT" method="POST">
       <input type="button" value="수정하기" onclick="editChk()"/>
       <input type="hidden" value ="{{analysis.al_id}}" id="id"/>
       <input type="submit" value="삭제하기" />
-      <a href="/new/list"><input type="button" value="목록" /></a>
+      <a href="/analysis/list"><input type="button" value="목록" /></a>
     </form>
     {% endif %}
     {% if column|length %}
     <h4>예측데이터 컬럼 리스트</h4>
     <table>
       <tr>
-        <th align="left">Attribute 타입&nbsp&nbsp&nbsp&nbsp</th>
-        <th align="left">데이터타입&nbsp&nbsp&nbsp&nbsp</th>
-        <th align="left">데이터크기&nbsp&nbsp&nbsp&nbsp</th>
-        <th align="left">컬럼명&nbsp&nbsp&nbsp&nbsp&nbsp</th>
+        <th align="left">Attribute Type&nbsp&nbsp&nbsp&nbsp</th>
+        <th align="left">Value Type&nbsp&nbsp&nbsp&nbsp</th>
+        <th align="left">Min Length&nbsp&nbsp&nbsp&nbsp</th>
+        <th align="left">Max Length&nbsp&nbsp&nbsp&nbsp</th>
+        <th align="left">Name&nbsp&nbsp&nbsp&nbsp&nbsp</th>
       </tr>
       {% for colList in column %}
       <tr>
         <td>{{ colList.attributeType }}</td>
-        <td>{{ colList.data_type }}</td>
-        {% if colList.data_size %}
-        <td>{{ colList.data_size }}</td>
+        <td>{{ colList.valueType }}</td>
+        {% if colList.minLength %}
+        <td>{{ colList.minLength }}</td>
         {% else %}
         <td>(null)</td>
         {% endif %}
-        <td>{{ colList.column_name }}</td>
+        {% if colList.maxLength %}
+        <td>{{ colList.maxLength }}</td>
+        {% else %}
+        <td>(null)</td>
+        {% endif %}
+        <td>{{ colList.name }}</td>
       </tr>
       {% endfor %}
     </table>

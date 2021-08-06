@@ -1,114 +1,117 @@
-var oTbl;
-var nameCheck = false;
-function editChk(){console.log(`{{analysis.al_id}}`)}
+var typeCheck = false;
+var cnt = 1;
+function editChk() {
+  console.log(`{{analysis.al_id}}`);
+}
+function pushCon(){
+  var inputData = document.getElementsByName("plusCon")[0];
+  var context = document.getElementsByName("context")[0]
+  if(inputData.value==""){
+    window.alert("context를 입력해주세요");
+    return "#";
+  }
+  var show = document.getElementById("conList")
+  var temp = document.createElement("p")
+  temp.setAttribute("id","conLi"+cnt)
+  temp.innerHTML = `<span id="con${cnt}">${inputData.value}</span> <input type="button" value="삭제" onclick="conDel(${cnt})"/>`
+  show.appendChild(temp);
+  cnt++;
+  if(context.value!=""){
+    context.value += `,${inputData.value}`
+  }else{
+    context.value += inputData.value
+  }
+  inputData.value = "";
+}
+function conDel(id){
+  console.log(document.getElementById(`con${id}`).innerHTML)
+}
 function dupCheck() {
-  var tbName = document.getElementsByName("tableName")[0];
-  if (tbName.value == "") {
-    window.alert("테이블명을 입력해주세요");
+  var type = document.getElementsByName("type")[0];
+  if (type.value == "") {
+    window.alert("테이블 타입을 입력해주세요");
     return "#";
   } else {
-    fetch(`/new/duplication/check/${tbName.value}`)
+    fetch(`/analysis/duplication/check/${type.value}`)
       .then((res) => res.json())
       .then((data) => {
         if (data == true) {
-          window.alert("사용 불가능한 테이블명입니다.");
-          tbName.value = "";
-          tbName.focus();
+          window.alert("사용 불가능한 테이블 타입입니다.");
+          type.value = "";
+          type.focus();
         } else {
-          window.alert("사용 가능한 테이블명입니다.");
-          nameCheck = true;
-          tbName.readOnly = true;
-          tbName.style.backgroundColor = "#E5E5E5";
-          tbName.style.color = "#A5A5A5";
-          tbName.style.borderColor = "#E5E5E5";
+          window.alert("사용 가능한 테이블 타입입니다.");
+          typeCheck = true;
+          type.readOnly = true;
+          type.style.backgroundColor = "#E5E5E5";
+          type.style.color = "#A5A5A5";
+          type.style.borderColor = "#E5E5E5";
           document.getElementsByName("dupBtn")[0].disabled = true;
         }
       });
   }
 }
 //Row 추가
-function insRow() {
-  oTbl = document.getElementById("addTable");
-  var oRow = oTbl.insertRow();
-  oRow.onmouseover = function () {
-    oTbl.clickedRowIndex = this.rowIndex;
-  }; //clickedRowIndex - 클릭한 Row의 위치를 확인;
-  var cell1 = oRow.insertCell();
-  var cell2 = oRow.insertCell();
-  var cell3 = oRow.insertCell();
-  var cell4 = oRow.insertCell();
-  var cell5 = oRow.insertCell();
-  //삽입될 Form Tag
-  var frmTag1 =
-    "<select name='attribute' onchange='attrChange(this)'><option value='Property'>Property</option><option value='GeoProperty'>GeoProperty</option>" +
-    "<option value='Relationship'>Relationship</option></select>";
-  var frmTag2 =
-    "<select name='colType' style='width:140px;'><option value='String'>STRING</option><option value='Integer'>INTEGER</option>" +
-    "<option value='Double'>DOUBLE</option> <option value='Object'>OBJECT</option>" +
-    "<option value='Date'>DATE</option><option value='ArrayString'>ARRAY STRING</option>" +
-    "<option value='ArrayInteger'>ARRAY INTEGER</option> <option value='ArrayDouble'>ARRAY DOUBLE</option>" +
-    "<option value='ArrayObject'>ARRAY OBJECT</option></select>";
-  var frmTag3 = "<input type='text' name='dataSize' placeholder='데이터 사이즈를 입력해주세요' />";
-  var frmTag4 = "<input type='text' name='colName' placeholder=' 컬럼이름을 입력하세요.' />";
-  var frmTag5 = "<input type='checkbox' name='nullCheck' /><input type='hidden' name='allowNull' value='false'/>";
-  frmTag5 += "&nbsp&nbsp<input type=button value='삭제' onClick='removeRow()' style='cursor:hand'>";
-  cell1.innerHTML = frmTag1;
-  cell2.innerHTML = frmTag2;
-  cell3.innerHTML = frmTag3;
-  cell4.innerHTML = frmTag4;
-  cell5.innerHTML = frmTag5;
-}
-//Row 삭제
-function removeRow() {
-  oTbl.deleteRow(oTbl.clickedRowIndex);
-}
+
 function attrChange(idx) {
   var elements = document.getElementsByName(idx.name);
-  var valueType = document.getElementsByName("colType");
+  var valueType = document.getElementsByName("valueType");
+  console.log(idx.parentElement)
+  var v = document.getElementsByName("vEnum");
   for (var i = 0; i < elements.length; i++) {
     if (elements[i] == idx) {
       if (elements[i].value == "GeoProperty") {
         valueType[i].innerHTML = " <option value='GeoJson'>GeoJson</option>";
+        v[0].style.display="none"
+        v[1].style.display="none"
       } else if (elements[i].value == "Relationship") {
         valueType[i].innerHTML = " <option value='String'>STRING</option>";
+        v[0].style.display="block"
+        v[1].style.display="block"
       } else {
-        valueType[i].innerHTML =
-          "<option value='String'>STRING</option><option value='Integer'>INTEGER</option>" +
-          "<option value='Double'>DOUBLE</option> <option value='Object'>OBJECT</option>" +
-          "<option value='Date'>DATE</option><option value='ArrayString'>ARRAY STRING</option>" +
-          "<option value='ArrayInteger'>ARRAY INTEGER</option> <option value='ArrayDouble'>ARRAY DOUBLE</option>" +
-          "<option value='ArrayObject'>ARRAY OBJECT</option> ";
+        valueType[i].innerHTML = "<option value='String'>STRING</option><option value='Integer'>INTEGER</option>" + "<option value='Double'>DOUBLE</option> <option value='Object'>OBJECT</option>" + "<option value='Date'>DATE</option><option value='ArrayString'>ARRAY STRING</option>" + "<option value='ArrayInteger'>ARRAY INTEGER</option> <option value='ArrayDouble'>ARRAY DOUBLE</option>" + "<option value='ArrayObject'>ARRAY OBJECT</option> ";
+        v[0].style.display="block"
+        v[1].style.display="block"
       }
       break;
     }
   }
 }
 function goSubmit() {
-  if (nameCheck == false) {
-    window.alert("테이블명 중복 체크를 진행해주세요");
-    return "#";
-  }
-  var columnName = document.getElementsByName("colName");
-  for (var i = 0; i < columnName.length; i++) {
-    if (columnName[i].value == "") {
-      window.alert("빈칸을 모두 입력해주세요");
-      columnName[i].focus();
-      return "#";
+  // if (typeCheck == false) {
+  //   window.alert("테이블 타입 중복 체크를 진행해주세요");
+  //   return "#";
+  // }
+  var frm = document.register;
+  frm.version.value = frm.first.value + "." + frm.middle.value + "." + frm.last.value;
+  frm.first.disabled = true;
+  frm.middle.disabled = true;
+  frm.last.disabled = true;
+  var checkValue = document.getElementsByName("nullCheck");
+  var requierd = document.getElementsByName("isRequired");
+  for (var i = 0; i < checkValue.length; i++) {
+    if (checkValue[i].checked) {
+      requierd[i].value = "false";
     }
   }
-  var frm = document.register;
-  // if (frm.tableName.value == "" || frm.nameSpace.value == "" || frm.description.value == "" || frm.context.value == "") {
-  //   window.alert("빈칸을 모두 입력해주세요");
-  //   return "#";
-  // } else {
-    frm.version.value = frm.first.value + "." + frm.middle.value + "." + frm.last.value;
-    var checkValue = document.getElementsByName("nullCheck");
-    var nullValue = document.getElementsByName("allowNull");
-    for (var i = 0; i < checkValue.length; i++) {
-      if (checkValue[i].checked) {
-        nullValue[i].value = "true";
-      }
-    // }
-    frm.submit();
+  var obChk = document.getElementsByName("observedChk");
+  var has = document.getElementsByName("hasObservedAt");
+  for (var i = 0; i < checkValue.length; i++) {
+    if (obChk[i].checked) {
+      has[i].value = "true";
+    }
   }
+  // var columnName = document.getElementsByName("column_name");
+  // if(document.getElementsByName("namespace")[0].value==""||document.getElementsByName("context")[0].value==""){
+  //   window.alert("별표 표시된 항목은 필수 입력사항입니다. 입력 후 진행해주세요");
+  //   return "#";
+  // }
+  // for (var i = 0; i < columnName.length; i++) {
+  //   if (columnName[i].value == "") {
+  //     window.alert("column name을 입력해주세요");
+  //     columnName[i].focus();
+  //     return "#";
+  //   }
+  // }
+  frm.submit();
 }

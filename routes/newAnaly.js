@@ -6,6 +6,7 @@ const sequelize = require("sequelize");
 const Op = sequelize.Op;
 const moment = require("moment");
 const base = require("../base");
+const { text } = require("express");
 const paging = {
   makeArray: function (base, current, totalPg, path) {
     let start = current % 10 == 0 ? Math.floor((current - 1) / 10) * 10 + 1 : Math.floor(current / 10) * 10 + 1; // 페이징 시작 번호
@@ -32,21 +33,18 @@ const paging = {
 
 //post url
 const dataRequest = {
-  insert: async (result, conList, column) => {
+  insert: async (result) => {
     console.log("========DATA MODEL CREATE REQUEST==========");
-    await axios({
-      method: "post",
-      url: `${base.DATA_MANAGER}/datamodels`,
-      data: {
-        type: result.al_name,
-        namespace: result.al_ns,
-        version: result.al_version,
-        context: conList,
-        description: result.al_des,
-        attributes: column,
-      },
-      headers: { "Content-Type": "application/json" },
-    });
+    try {
+      await axios({
+        method: "post",
+        url: `${base.DATA_MANAGER}/datamodels`,
+        data: result,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (err) {
+      return err.response.data;
+    }
   },
   delOne: async (name, ns, ver) => {
     console.log("========DATA MODEL DELETE REQUEST==========");
@@ -60,7 +58,7 @@ const dataRequest = {
     console.log("===========DATA MODEL EDIT REQUEST=============");
     try {
       const colTemp = JSON.parse(JSON.stringify(result))[0]; // result 담기
-      const conList = colTemp.type.split(","); //context 배열
+      const conList = colTemp.al_context.split(","); //context 배열
       const colList = colTemp.column_tbs;
       let nullTF = "";
       let temp = "";
@@ -84,7 +82,7 @@ const dataRequest = {
       console.log(err);
     }
   },
-  getTypeList: async (name) => {
+  getTypeList: async (type) => {
     console.log("===========DATA MODEL LIST REQUEST=============");
     let typeList = [];
     let reValue = "false";
@@ -93,7 +91,7 @@ const dataRequest = {
         typeList.push(el.type);
       });
       for (var i = 0; i < typeList.length; i++) {
-        if (typeList[i] === name) {
+        if (typeList[i] === type) {
           reValue = "true";
           return reValue;
         }
@@ -198,8 +196,8 @@ const output = {
     }
   },
   dupCheck: async (req, res) => {
-    const tbName = req.params.checkName;
-    dataRequest.getTypeList(tbName).then((result) => {
+    const type = req.params.checkType;
+    dataRequest.getTypeList(type).then((result) => {
       res.send(result);
     });
   },
@@ -222,61 +220,72 @@ const process = {
   insert: async (req, res) => {
     const body = req.body;
     const alert = "<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>";
-    let size = [];
+    const alert2 = "<script>alert('DATA 생성 중 오류발생으로 생성이 완료 되지 않았습니다. 확인 후 다시 시도해주세요'); location.href=history.back();</script>";
+    const col_name = ["attributeType", "valueType", "minLength", "maxLength", "column_name", "isRequired"];
+    const rand = "deleted_" + moment().format("YYMMDDHHmmss") + "_";
+    var table = {};
+    var column = {};
+    const t = await analysis_list.sequelize.transaction();
     try {
-      if (typeof body.colName == "string") {
-        body.colName = body.colName.split();
-        body.colType = body.colType.split();
-        body.dataSize = body.dataSize.split();
-        body.allowNull = body.allowNull.split();
-        body.attribute = body.attribute.split();
-      }
-      //null예외처리
-      for (var i = 0; i < body.colType.length; i++) {
-        size.push(null);
-        // if (body.colName[i] == "") {
-        //   res.send(alert);
-        // }
-        if (body.dataSize[i] != "") {
-          size[i] = body.dataSize[i];
-        }
-      }
-      await analysis_list.create({ type: body.tableName, namespace: body.nameSpace, description: body.description, version: body.version, context: body.context }).then(async (result) => {
-        let temp = "";
-        let column = [];
-        let nullTF = "";
-        const conList = result.context.split(",");
-        for (var i = 0; i < body.colType.length; i++) {
-          nullTF = body.allowNull[i] == "true" ? false : true;
-          await column_tb.create({
-            al_id_col: result.al_id,
-            data_type: body.colType[i],
-            data_size: size[i],
-            column_name: body.colName[i],
-            allowNull: body.allowNull[i],
-            attributeType: body.attribute[i],
-          });
-          temp = { name: body.colName[i], isRequired: nullTF, attributeType: body.attribute[i], maxLength: size[i], valueType: body.colType[i] };
-          column.push(JSON.parse(JSON.stringify(temp)));
-        }
-        //데이터 생성요청
-        //dataRequest.insert(result, conList, column);
-        res.redirect("/new/list");
-      });
-    } catch (err) {
-      if (err.errors.length > 1) {
-        errCode = JSON.parse(JSON.stringify(err.errors));
-        for (var i = 0; i < errCode.length; i++) {
-          if (errCode[i].type.includes("notNull")) {
-            res.send(alert);
-            break;
+      for (var i = 0; i < Object.keys(body).length; i++) {
+        if (col_name.includes(Object.keys(body)[i])) {
+          //column_tb 속성일 경우
+          let key = Object.entries(body)[i];
+          if (typeof key[1] == "string") {
+            key[1] != "" ? key[1] : (key[1] = null);
+            column[key[0]] = [key[1]];
+          } else {
+            for (var j = 0; j < key[1].length; j++) {
+              key[1][j] != "" ? key[1][j] : (key[1][j] = null);
+            }
+            column[key[0]] = key[1];
+          }
+        } else {
+          //table 속성
+          let key = Object.entries(body)[i];
+          if (key[1] != "") {
+            table[key[0]] = key[1];
           }
         }
-      } else {
-        errCode = JSON.stringify(err)
-        if (errCode.includes("cannot be null")) {
-          res.send(alert);
+      }
+      let attrList = [];
+      let tempCol = {};
+      //const analy = await analysis_list.create(table, { transaction: t }); //table 등록
+      var colKey = Object.keys(column);
+      for (var i = 0; i < column.attributeType.length; i++) {
+        tempCol = {};
+        for (var j = 0; j < colKey.length; j++) {
+          colKey[j] == "column_name" ? (colKey[j] = "name") : colKey[j];
+          tempCol[colKey[j]] = Object.values(column)[j][i];
+          //tempCol.al_id_col = analy.al_id;
         }
+        //await column_tb.create(tempCol, { transaction: t });
+        attrList.push(tempCol);
+      }
+      t.commit();
+      attrList.map((el) => {
+        for (var i in el) {
+          if (el[i] === null) {
+            delete el[i];
+          }
+        }
+      });
+      table.context = table.context.split();
+      table.indexAttributeNames == undefined ? "" : (table.indexAttributeNames = table.indexAttributeNames.split());
+      table.attributes = attrList;
+      const creRequest = await dataRequest.insert(table);
+      if (creRequest != undefined) {
+        await error_log.create({ col_name: "analysis_list", col_id: analy.al_id, operation: "create", err_code: creRequest.detail });
+        await analysis_list.update({ type: (rand + analy.type) , al_delYn: "Y" }, { where: { al_id: analy.al_id } });
+        res.send(alert2);
+      } else {
+        res.redirect("/analysis/list/");
+      }
+    } catch (err) {
+      console.log(err);
+      t.rollback();
+      if (err.errors[0].message.includes("cannot be null")) {
+        res.send(alert);
       }
     }
   },
@@ -300,13 +309,13 @@ const process = {
         const delRequest = await dataRequest.delOne(name, ns, ver);
         if (delRequest != undefined) {
           let errDetail = delRequest.detail;
-          errDetail.indexOf(". ")>0? errDetail = errDetail.substring(0, errDetail.indexOf(". ")) : errDetail
-          console.log(errDetail)
+          errDetail.indexOf(". ") > 0 ? (errDetail = errDetail.substring(0, errDetail.indexOf(". "))) : errDetail;
+          console.log(errDetail);
           await error_log.create({ col_name: "analysis_list", col_id: analyId, operation: "delete", err_code: errDetail });
           res.send(alert2);
         } else {
           await analysis_list.update({ al_name: rand + name, al_delYn: "Y" }, { where: { al_id: analyId } });
-          res.redirect("/new/list/");
+          res.redirect("/analysis/list/");
         }
       });
     } catch (err) {
@@ -319,7 +328,7 @@ const process = {
     var delListId = req.body.deleteList.split(",");
     const rand = "deleted_" + moment().format("YYMMDDHHmmss") + "_";
     const alert = "<script>alert('삭제하시려는 테이블 중 DATASET이 참조하고 있는 테이블이 존재합니다. DATASET 삭제 후 다시 시도 하십시오'); location.href=history.back();</script>";
-    const alert2 = "<script>alert('TABLE 삭제 도중 오류가 발생했습니다. 확인 후 다시시도해주세요'); location.href='/new/list;</script>";
+    const alert2 = "<script>alert('TABLE 삭제 도중 오류가 발생했습니다. 확인 후 다시시도해주세요'); location.href='/analysis/list;</script>";
     try {
       await dataset.findAll({ attributes: ["ds_id"], where: { al_id: { [Op.in]: delListId }, ds_delYn: "N" } }).then(async (result) => {
         if (result.length > 0) {
@@ -357,7 +366,7 @@ const process = {
                   await analysis_list.update({ al_name: rand + nameList[i], al_delYn: "Y" }, { where: { al_id: idList[i] } });
                 }
               }
-              res.redirect("/new/list/");
+              res.redirect("/analysis/list/");
             });
         }
       });
@@ -406,7 +415,7 @@ const process = {
         }
       }
       //분석 테이블 DB 수정
-      await analysis_list.update({ context: body.editContext, description: body.editDes }, { where: { al_id: analyId } });
+      await analysis_list.update({ al_context: body.editContext, al_des: body.editDes }, { where: { al_id: analyId } });
       for (var i = 0; i < body.colName.length; i++) {
         if (body.colId[i]) {
           // colId가 있는경우 => 이미 전에 생성이 되어있는 경우 컬럼 수정
@@ -446,7 +455,7 @@ const process = {
         .then((result) => {
           dataRequest.edit(result);
         });
-      res.redirect("/new/view/" + analyId);
+      res.redirect("/analysis/view/" + analyId);
     } catch (err) {
       console.log("Data update failed");
       console.log(err);

@@ -1,22 +1,22 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('column_tbs', {
-      col_id:{
+    await queryInterface.createTable('object_members', {
+      obj_id: {
         allowNull: false,
-        primaryKey: true,
         autoIncrement: true,
+        primaryKey: true,
         type: Sequelize.INTEGER
       },
-      al_id_col: {
+      col_id_obj: {
         allowNull: false,
         foreignKey: true,
         onDelete:'CASCADE',
         references:{
-          model: 'analysis_lists',
-          key : 'al_id'
+          model: 'column_tb',
+          key : 'col_id'
         },
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       name: {
         type: Sequelize.STRING,
@@ -26,25 +26,8 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      maxLength: {
-        type: Sequelize.STRING
-      },
-      minLength: {
-        type: Sequelize.STRING
-      },
-      isRequired: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      attributeType: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      hasObservedAt: {
-        type: Sequelize.STRING,
-      },
       valueEnum: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -57,6 +40,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('column_tbs');
+    await queryInterface.dropTable('object_members');
   }
 };
