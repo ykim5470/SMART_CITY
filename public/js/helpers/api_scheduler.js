@@ -119,7 +119,8 @@ const single_processed_data = (
       sorted_input_param,
       variable_load
     );
-    running_result[variable_attr] = variable_attr_data;
+    var variable_attr_ip_value = Object.values(sorted_input_param)[j]
+    running_result[variable_attr_ip_value] = variable_attr_data;
   }
   return running_result;
 };
@@ -230,15 +231,19 @@ const list_add = (list_values) => {
 
 // 유저 인풋 attr & value sorting
 const sorted_input_param = (user_input_value) => {
-  sortable_input_param = new Array();
-  user_input_value.map(
-    (el) => (sortable_input_param[el.ip_param] = Number(el.ip_value))
-  );
-  var sorted_input_param = Object.fromEntries(
-    Object.entries(sortable_input_param).sort(([, a], [, b]) => a - b)
-  );
+  // sortable_input_param = new Array();
+  // user_input_value.map(
+  //   (el) => (sortable_input_param[el.ip_param] = Number(el.ip_value))
+  // );
+  // var sorted_input_param = Object.fromEntries(
+  //   Object.entries(sortable_input_param).sort(([, a], [, b]) => a - b)
+  // );
+  var sorted_input_param = new Object
+  user_input_value.map(el => sorted_input_param[el.ip_param] = el.ip_value)
+
   return sorted_input_param;
 };
+
 
 // 인풋 데이터 원천 데이터 맵핑
 const data_mapped_filling = (select_input_count, raw_data, sortable, load) => {
@@ -295,6 +300,7 @@ const data_mapped_filling = (select_input_count, raw_data, sortable, load) => {
       variable_with_data.push(0);
     }
   }
+  console.log(variable_with_data)
   return variable_with_data;
 };
 

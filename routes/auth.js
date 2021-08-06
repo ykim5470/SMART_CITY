@@ -457,7 +457,7 @@ const process = {
     // a.then(result => console.log(result))
     console.log(a.body.data)
   },
-  // 대시보드 차트 등록 Completea
+  // 대시보드 차트 등록 Complete
   chart_register_complete: async(req,res)=>{
     console.log('차트 등록 완료')
   },

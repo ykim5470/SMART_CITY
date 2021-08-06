@@ -14,7 +14,7 @@ const analysis_select = require('./public/js/event_handlers/analysis_select')
 const index_router = require("./routes/index");
 
 // models.sequelize
-//   .sync({ force: false })
+//   .sync({ force: false})
 //   .then(() => {
 //     console.log("DB connected");
 //   })

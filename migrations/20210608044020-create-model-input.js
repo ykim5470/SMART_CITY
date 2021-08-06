@@ -22,7 +22,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       ip_value: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       ip_type: {
         type: Sequelize.STRING,
