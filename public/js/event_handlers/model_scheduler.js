@@ -1,6 +1,11 @@
 const axios = require("axios");
 const moment = require("moment");
-const { model_list, model_input, atch_file_tb } = require("../../../models");
+const {
+  model_list,
+  model_input,
+  atch_file_tb,
+  model_output,
+} = require("../../../models");
 const {
   my_scheduleJob,
   start_end_time_generator,
@@ -8,7 +13,8 @@ const {
   sorted_input_param,
   single_processed_data,
 } = require("../helpers/api_scheduler");
-const tensor_shape_convert = require('../helpers/tensor_shape_convert')
+const  data_upsert_serving = require('../helpers/data_serving')
+const tensor_shape_convert = require("../helpers/tensor_shape_convert");
 const fs = require("fs");
 const Path = require("path");
 
@@ -33,7 +39,7 @@ const model_scheduler = (socket) => {
         model_input
           .findAll({
             where: { md_id: md_id },
-            attributes: ["ip_param", "ip_value", "ip_load",'ip_param_type'],
+            attributes: ["ip_param", "ip_value", "ip_load", "ip_param_type", "ip_order"],
           })
           .then((user_input_res) => {
             // 선택 모델 정보 & 인풋 정보 JSON
@@ -54,7 +60,6 @@ const model_scheduler = (socket) => {
               file_id,
               analysis_file_format,
             } = model_manage_value;
-
 
             // 데이터 개별 이력조회 API 쿼리 변수
             let date = new Date();
@@ -84,9 +89,7 @@ const model_scheduler = (socket) => {
                     // 인풋 attr 순서 재배치 by value
                     var sorted_input_param_result =
                       sorted_input_param(user_input_value);
-                    
 
-                    
                     // Mapped 데이터
                     var single_processed_data_result = single_processed_data(
                       user_input_value_count,
@@ -95,46 +98,56 @@ const model_scheduler = (socket) => {
                       user_input_value
                     );
                     // 변환된 데이터 분석 파일 GET 및 변환 zip파일 Search
-                    // atch_file_tb
-                    //   .findAll({
-                    //     where: { file_id: file_id },
-                    //     attributes: ["filename"],
-                    //   })
-                    //   .then((file_meta_data) => {
-                    //     const file_meta_data_str =
-                    //       JSON.stringify(file_meta_data);
-                    //     const file_meta_data_value =
-                    //       JSON.parse(file_meta_data_str);
-                    //     const { filename } = file_meta_data_value[0];
+                    atch_file_tb
+                      .findAll({
+                        where: { file_id: file_id },
+                        attributes: ["filename"],
+                      })
+                      .then((file_meta_data) => {
+                        const file_meta_data_str =
+                          JSON.stringify(file_meta_data);
+                        const file_meta_data_value =
+                          JSON.parse(file_meta_data_str);
+                        const { filename } = file_meta_data_value[0];
 
-                    //     var target_dir = Path.resolve(
-                    //       __dirname,
-                    //       "../../../uploads/model/"
-                    //     ).replace(/\\/g, "/");
+                        var target_dir = Path.resolve(
+                          __dirname,
+                          "../../../uploads/model/"
+                        ).replace(/\\/g, "/");
 
-                    //     try {
-                    //       // 변환된 파일이 존재한다면 데이터 값 loading실행
-                    //       console.log(
-                    //         `${target_dir}/${filename}/model.json`
-                    //       );
-                    //       if (
-                    //         fs.existsSync(
-                    //           `${target_dir}/${filename}`
-                    //       )) {
-                    //         console.log(analysis_file_format);
-                    //         console.log('실행되는감????')
-                    //         let url = `http://localhost:4000/uploads/model/${filename}/model.json`
-                    //         tensor_shape_convert(analysis_file_format, single_processed_data_result, user_input_value, url)
-                        
-                    //       } else {
-                    //         throw "존재하지 않는 변환 파일입니다";
-                    //       }
-                    //     } catch (err) {
-                    //       console.log(err);
-                    //     }
-                    //   });
+                        try {
+                          // 변환된 파일이 존재한다면 데이터 값 loading실행
+                          console.log(`${target_dir}/${filename}/model.json`);
+                          if (fs.existsSync(`${target_dir}/${filename}`)) {
+                            model_output
+                              .findAll({
+                                where: { op_id: md_id },
+                                attributes: ["op_col_id", "op_value", "op_date_look_up"],
+                              })
+                              .then(async(op_data) => {
+                                const op_data_str = JSON.stringify(op_data);
+                                const op_data_value = JSON.parse(op_data_str);
 
-                    console.log(single_processed_data_result)
+                                console.log("실행되는감????");
+                                let url = `http://localhost:4000/uploads/model/${filename}/model.json`;
+                                let predicted_output = await tensor_shape_convert(
+                                  analysis_file_format,
+                                  op_data_value,
+                                  user_input_value,
+                                  single_processed_data_result,
+                                  url
+                                );
+
+                                data_upsert_serving(predicted_output, md_id)
+                              });
+                          } else {
+                            throw "존재하지 않는 변환 파일입니다";
+                          }
+                        } catch (err) {
+                          console.log(err);
+                        }
+                      });
+
                     return single_processed_data_result;
                   });
               } else {

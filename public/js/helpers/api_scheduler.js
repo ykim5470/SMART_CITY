@@ -223,7 +223,6 @@ const list_add = (list_values) => {
       return pre_array[0].split(' ')
     }
     });
-    console.log(add_result)
     add_processed[attr[q]] = add_result;
   }
   return add_processed;
@@ -231,13 +230,6 @@ const list_add = (list_values) => {
 
 // 유저 인풋 attr & value sorting
 const sorted_input_param = (user_input_value) => {
-  // sortable_input_param = new Array();
-  // user_input_value.map(
-  //   (el) => (sortable_input_param[el.ip_param] = Number(el.ip_value))
-  // );
-  // var sorted_input_param = Object.fromEntries(
-  //   Object.entries(sortable_input_param).sort(([, a], [, b]) => a - b)
-  // );
   var sorted_input_param = new Object
   user_input_value.map(el => sorted_input_param[el.ip_param] = el.ip_value)
 
@@ -300,7 +292,6 @@ const data_mapped_filling = (select_input_count, raw_data, sortable, load) => {
       variable_with_data.push(0);
     }
   }
-  console.log(variable_with_data)
   return variable_with_data;
 };
 

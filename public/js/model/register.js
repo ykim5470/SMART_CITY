@@ -17,6 +17,7 @@ const analysis_select_input = document.querySelector("#al_select");
 const file_select_input = document.querySelector("#file_select");
 const input_params_insert = document.querySelector(".input_params_insert");
 const output_params_insert = document.querySelector(".output_params_insert");
+const output_look_up_insert = document.querySelector(".output_look_up_insert");
 const register_complete = document.querySelector("#submitBtn");
 const model_description = document.querySelector(".md_desc");
 const sub_data_insert = document.querySelector(".sub_data_insert");
@@ -69,6 +70,7 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
         <tr>
             <td><input name="ip_attr_value_type" value="${items.valueType}" readonly /></td>
             <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" readonly /></td>
+            <td><input type="number" name="user_input_order"/></td> 
             <td><input type="text" class="user_input_param" name="user_input_param"/></td>
             <td id='max_data_load_box${index}'></td>
             <td id='param_tf_shape${index}'></td>
@@ -159,17 +161,43 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
   const output_box = model_column.map((items) => {
     return `
         <tr>
+        <td><input type="hidden" name="op_col_id" value="${items.col_id}" /></td>
         <td><input name="op_attr_value_type" value="${items.attributeType}" readonly /></td>
         <td><input name="op_attr_name" value="${items.column_name}" readonly /></td>
-        <td><input name="user_output_param" placeholder="TF로 자동 채워질 예정"" /></td>
+        <td><input name="user_output_param" /></td>
         </tr>
         `;
   });
-  output_params_insert.innerHTML = output_box.join("");
 
-  const user_output_param =
-    document.getElementsByClassName("user_output_param");
-  // 해당 output_value를 어떻게 할 것인가?
+  const output_look_up_data = `<table>
+  데이터 조회 기간
+  <input
+    class="op_data_lookup"
+    type="number"
+    name="op_data_lookup_date"
+    placeholder="일"
+  />
+  <input
+    class="op_data_lookup"
+    type="number"
+    name="op_data_lookup_hour"
+    placeholder="시간"
+  />
+  <input
+    class="op_data_lookup"
+    type="number"
+    name="op_data_lookup_min"
+    placeholder="분"
+  />
+  <input
+    class="op_data_lookup"
+    type="number"
+    name="op_data_lookup_sec"
+    placeholder="초"
+  />
+</table>`;
+  output_params_insert.innerHTML = output_box.join("");
+  output_look_up_insert.innerHTML = output_look_up_data;
 });
 
 const register_submit = () => {

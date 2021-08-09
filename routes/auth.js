@@ -532,6 +532,7 @@ const process = {
       dataset_id,
       model_desc,
       ip_attr_name,
+      user_input_order,
       user_input_param,
       ip_attr_value_type,
       sub_data_select,
@@ -539,13 +540,20 @@ const process = {
       data_lookup_hour,
       data_lookup_min,
       data_lookup_sec,
+      op_data_lookup_date,
+      op_data_lookup_hour,
+      op_data_lookup_min,
+      op_data_lookup_sec,
       max_data_load,
       max_data_load_index,
       data_processing,
       analysis_file_format,
       tf_shape,
       tf_shape_index,
+      op_col_id,
+      user_output_param
     } = req.body;
+    console.log(req.body)
     // Error handling from server
     try {
       errorHandling.al_time_handling(al_time); // 3600
@@ -559,6 +567,12 @@ const process = {
         data_lookup_min,
         data_lookup_sec
       );
+      errorHandling.data_look_up_handling(
+        op_data_lookup_date,
+        op_data_lookup_hour,
+        op_data_lookup_min,
+        op_data_lookup_sec
+      )
       errorHandling.max_data_load_handling(max_data_load); // limit 48, 5, 2
       errorHandling.data_processing_option_handling(
         sub_data_select,
@@ -667,12 +681,13 @@ const process = {
                 });
               } else {
                 user_input_param.filter((el, index) => {
-                  if (el != "") {
+                  if (el !== "") {
                     user_obj[ip_attr_name[index]] = [
                       el,
                       ip_attr_value_type[index],
                       data_load_obj[index],
-                      tf_shape_obj[index]
+                      tf_shape_obj[index],
+                      user_input_order[index]
                     ];
                   }
                 });
@@ -685,7 +700,29 @@ const process = {
                   ip_type: user_obj[i][1],
                   ip_load: user_obj[i][2],
                   ip_param_type: user_obj[i][3],
+                  ip_order: user_obj[i][4]
                 });
+              }
+
+              // 아웃풋 파람 생성
+              let op_user_obj = new Object
+              if(typeof user_output_param !== 'string'){
+              user_output_param.filter((el,idx)=>{
+                if(el !== ''){
+                  op_user_obj[op_col_id[idx]] = el
+                }
+              })}else{
+                op_user_obj[op_col_id] = user_output_param
+              }
+              // 아웃풋 TB Create
+              let op_date_look_up = {
+                date: op_data_lookup_date,
+                hour: op_data_lookup_hour,
+                min: op_data_lookup_min,
+                sec: op_data_lookup_sec,
+              };
+              for(j in op_user_obj){
+              model_output.create({op_id: md_id, op_col_id: j, op_value: op_user_obj[j], op_date_look_up: op_date_look_up})
               }
             });
         });

@@ -21,6 +21,7 @@ module.exports = {
       ip_param: {
         type: Sequelize.STRING,
       },
+      ip_order: { type: Sequelize.INTEGER },
       ip_value: {
         type: Sequelize.STRING,
       },
