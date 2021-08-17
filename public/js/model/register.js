@@ -163,7 +163,7 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
         <tr>
         <td><input type="hidden" name="op_col_id" value="${items.col_id}" /></td>
         <td><input name="op_attr_value_type" value="${items.attributeType}" readonly /></td>
-        <td><input name="op_attr_name" value="${items.column_name}" readonly /></td>
+        <td><input name="op_attr_name" value="${items.name}" readonly /></td>
         <td><input name="user_output_param" /></td>
         </tr>
         `;

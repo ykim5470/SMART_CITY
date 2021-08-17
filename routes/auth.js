@@ -6,11 +6,9 @@ const {
   atch_file_tb,
   analysis_list,
   dataset,
-  chart_list,
-  chart_entities
 } = require("../models");
 const axios = require("axios");
-const analysis = require("./newAnaly.js");
+const paging = require("../public/js/helpers/pagination");
 const moment = require("moment");
 const Path = require("path");
 const fs = require("fs");
@@ -38,6 +36,7 @@ const output = {
 
   // 대시보드 페이지 Rendering
   dashboard: async (req, res) => {
+    // console.log(req)
     res.render(`dashboard/dashboard`);
   },
 
@@ -99,7 +98,7 @@ const output = {
           const itemCount = result.count; //총 게시글 갯수
           const pageCount = Math.ceil(itemCount / req.query.limit); //페이지 갯수
           const base = "model_manage_board"; // base url
-          const pageArray = analysis.paging.makeArray(
+          const pageArray = paging.makeArray(
             base,
             currentPage,
             pageCount,
@@ -130,7 +129,8 @@ const output = {
   },
 
   // 원천 데이터셋 선택
-  raw_dataset_select: async () => {
+  raw_dataset_select: async (req, res) => {
+    try{
     const dataset = await axios.get("http://203.253.128.184:18827/datasets", {
       headers: { Accept: "application/json" },
     });
@@ -149,260 +149,264 @@ const output = {
       }
     });
     return dataset_dict;
-  },
+  }catch(err){
+    return 
+      // err: 'raw data API calling failed'
 
-  // 실측 데이터 API GET; 최종값 조회 or 개별 이력 조회에 따라 API url 변경 예정
-  raw_data_get: async (type, namespace, version, dataset_id) => {
-    await axios
-      .get(
-        `${DATA_SERVICE_BROKER}/entities?Type=${type}.${namespace}:${version}&datasetId=${dataset_id}`,
-        { headers: { Accept: "application/json" } }
-      )
-      .then((rawData) => {});
+
+
+
+  }
   },
 
   // 모델 상태 관리
   manage_status: (req, res) => {
+    try{
     const { status } = req.query;
     const { md_id } = req.params;
     return res.render("model/model_status", {
       current_status: status,
       md_id: md_id,
-    });
-  },
-
-  // 등록 수정
-  register_edit: (req, res) => {
-    // 등록 된 md_id GET
-    const md_id = req.params.md_id;
-    // 등록 된 모델 정보 GET
-    model_list
-      .findAll({
-        attributes: {
-          exclude: ["updatedAt", "createdAt"],
-        },
-        where: { md_id: md_id },
-        include: [
-          { model: model_des, required: false, attributes: ["des_text"] },
-          {
-            model: atch_file_tb,
-            required: false,
-            attributes: ["originalname"],
-          },
-          { model: analysis_list, required: false, attributes: ["context"] },
-        ],
-        raw: true,
+    });}
+    catch(err){
+      return res.status(500).json({
+        err: 'manage board page calling failed'
       })
-      .then((result) => {
-        // 등록 된 모델 정보 변수 설정
-        const model_edit_str = JSON.stringify(result);
-        const model_edit_value = JSON.parse(model_edit_str)[0];
-        const { al_time, al_name_mo, dataset_id, data_model_name } =
-          model_edit_value;
-        let al_time_prev = al_time;
-        let al_name_mo_prev = al_name_mo;
-        let dataset_id_prev = dataset_id;
-        let raw_data_model_name_prev = data_model_name;
-        let md_desc_prev = model_edit_value["model_des.des_text"];
-        let file_name_prev = model_edit_value["atch_file_tb.originalname"];
-        let processed_dataset_edit = new Array();
-        let processed_dataset_edit_removed = new Array();
-        let raw_data_model_key_prev;
-        let processed_selected_name;
-
-        // 유저 인풋 값 GET
-        model_input
-          .findAll({
-            where: { md_id: md_id },
-            attirbutes: ["ip_param", "ip_value"],
-          })
-          .then((results) => {
-            const model_input_info_str = JSON.stringify(results);
-            const model_input_info_value = JSON.parse(model_input_info_str);
-
-            // 등록 된 원천 데이터 셋 이름 GET
-            const raw_dataset_name_edit = output.raw_dataset_select();
-            raw_dataset_name_edit.then((dataset_name_result) => {
-              dataset_name_result.filter((el) => {
-                if (el.value.id === raw_data_model_name_prev.split(",")[0]) {
-                  raw_data_model_key_prev = el;
-                }
-              });
-              // 등록 된 가공 데이터 셋 이름 GET
-              dataset
-                .findAll({
-                  where: { ds_delYn: "N" },
-                  attributes: {
-                    exclude: ["updatedAt", "createdAt"],
-                    include: [
-                      {
-                        model: analysis_list,
-                        required: false,
-                        attributes: ["type"],
-                      },
-                    ],
-                    raw: true,
-                  },
-                })
-                .then((result_edit) => {
-                  const processed_str_edit = JSON.stringify(result_edit);
-                  const processed_value_edit = JSON.parse(processed_str_edit);
-                  processed_value_edit.map((el) => {
-                    if (el.isProcessed != "원천데이터") {
-                      processed_dataset_edit.push(el);
-                    }
-                  });
-
-                  // 가공 데이터 중 선택된 데이터 셋 이름 GET
-                  processed_dataset_edit.filter((el) => {
-                    if (el.dataset_id == dataset_id_prev) {
-                      processed_selected_name = el.name;
-                    } else {
-                      processed_dataset_edit_removed.push(el);
-                    }
-                  });
-
-                  return res.render(`model/model_register_board_edit`, {
-                    md_id: md_id,
-                    al_time: al_time_prev,
-                    processed_dataset_edit_removed:
-                      processed_dataset_edit_removed,
-                    raw_data_model_key_prev: raw_data_model_key_prev,
-                    md_desc: md_desc_prev,
-                    data_model_name: raw_data_model_name_prev,
-                    model_input_info_value: model_input_info_value,
-                    file_name_prev: file_name_prev,
-                    al_name_mo_prev: al_name_mo_prev,
-                    processed_selected_name: processed_selected_name,
-                    dataset_id_prev: dataset_id_prev,
-                  });
-                });
-            });
-          });
-      });
+    }
   },
 
-  // 등록된 모델 보기
-  registered_show: (req, res) => {
-    // 등록 된 md_id GET
-    const md_id = req.params.md_id;
-    // 등록 된 모델 정보 GET
-    model_list
-      .findAll({
-        attributes: {
-          exclude: ["updatedAt", "createdAt"],
-        },
-        where: { md_id: md_id },
-        include: [
-          { model: model_des, required: false, attributes: ["des_text"] },
-          {
-            model: atch_file_tb,
-            required: false,
-            attributes: ["originalname"],
-          },
-          { model: analysis_list, required: false, attributes: ["context"] },
-        ],
-        raw: true,
-      })
-      .then((result) => {
-        // 등록 된 모델 정보 변수 설정
-        const model_edit_str = JSON.stringify(result);
-        const model_edit_value = JSON.parse(model_edit_str)[0];
-        const {
-          md_name,
-          al_time,
-          al_name_mo,
-          dataset_id,
-          data_model_name,
-          date_look_up,
-        } = model_edit_value;
-        console.log(model_edit_value);
-        let date_look_up_prev = Object.values(JSON.parse(date_look_up));
-        let md_name_prev = md_name;
-        let al_time_prev = al_time;
-        let al_name_mo_prev = al_name_mo;
-        let dataset_id_prev = dataset_id;
-        let raw_data_model_name_prev = data_model_name;
-        let md_desc_prev = model_edit_value["model_des.des_text"];
-        let file_name_prev = model_edit_value["atch_file_tb.originalname"];
-        let processed_dataset_edit = new Array();
-        let processed_dataset_edit_removed = new Array();
-        let raw_data_model_key_prev;
-        let processed_selected_name;
+  // // 등록 수정
+  // register_edit: (req, res) => {
+  //   // 등록 된 md_id GET
+  //   const md_id = req.params.md_id;
+  //   // 등록 된 모델 정보 GET
+  //   model_list
+  //     .findAll({
+  //       attributes: {
+  //         exclude: ["updatedAt", "createdAt"],
+  //       },
+  //       where: { md_id: md_id },
+  //       include: [
+  //         { model: model_des, required: false, attributes: ["des_text"] },
+  //         {
+  //           model: atch_file_tb,
+  //           required: false,
+  //           attributes: ["originalname"],
+  //         },
+  //         { model: analysis_list, required: false, attributes: ["context"] },
+  //       ],
+  //       raw: true,
+  //     })
+  //     .then((result) => {
+  //       // 등록 된 모델 정보 변수 설정
+  //       const model_edit_str = JSON.stringify(result);
+  //       const model_edit_value = JSON.parse(model_edit_str)[0];
+  //       const { al_time, al_name_mo, dataset_id, data_model_name } =
+  //         model_edit_value;
+  //       let al_time_prev = al_time;
+  //       let al_name_mo_prev = al_name_mo;
+  //       let dataset_id_prev = dataset_id;
+  //       let raw_data_model_name_prev = data_model_name;
+  //       let md_desc_prev = model_edit_value["model_des.des_text"];
+  //       let file_name_prev = model_edit_value["atch_file_tb.originalname"];
+  //       let processed_dataset_edit = new Array();
+  //       let processed_dataset_edit_removed = new Array();
+  //       let raw_data_model_key_prev;
+  //       let processed_selected_name;
 
-        // 유저 인풋 값 GET
-        model_input
-          .findAll({
-            where: { md_id: md_id },
-            attirbutes: ["ip_param", "ip_value"],
-          })
-          .then((results) => {
-            const model_input_info_str = JSON.stringify(results);
-            const model_input_info_value = JSON.parse(model_input_info_str);
+  //       // 유저 인풋 값 GET
+  //       model_input
+  //         .findAll({
+  //           where: { md_id: md_id },
+  //           attirbutes: ["ip_param", "ip_value"],
+  //         })
+  //         .then((results) => {
+  //           const model_input_info_str = JSON.stringify(results);
+  //           const model_input_info_value = JSON.parse(model_input_info_str);
 
-            // 등록 된 원천 데이터 셋 이름 GET
-            const raw_dataset_name_edit = output.raw_dataset_select();
-            raw_dataset_name_edit.then((dataset_name_result) => {
-              dataset_name_result.filter((el) => {
-                if (el.value.id === raw_data_model_name_prev.split(",")[0]) {
-                  raw_data_model_key_prev = el;
-                }
-              });
+  //           // 등록 된 원천 데이터 셋 이름 GET
+  //           const raw_dataset_name_edit = output.raw_dataset_select();
+  //           raw_dataset_name_edit.then((dataset_name_result) => {
+  //             dataset_name_result.filter((el) => {
+  //               if (el.value.id === raw_data_model_name_prev.split(",")[0]) {
+  //                 raw_data_model_key_prev = el;
+  //               }
+  //             });
+  //             // 등록 된 가공 데이터 셋 이름 GET
+  //             dataset
+  //               .findAll({
+  //                 where: { ds_delYn: "N" },
+  //                 attributes: {
+  //                   exclude: ["updatedAt", "createdAt"],
+  //                   include: [
+  //                     {
+  //                       model: analysis_list,
+  //                       required: false,
+  //                       attributes: ["type"],
+  //                     },
+  //                   ],
+  //                   raw: true,
+  //                 },
+  //               })
+  //               .then((result_edit) => {
+  //                 const processed_str_edit = JSON.stringify(result_edit);
+  //                 const processed_value_edit = JSON.parse(processed_str_edit);
+  //                 processed_value_edit.map((el) => {
+  //                   if (el.isProcessed != "원천데이터") {
+  //                     processed_dataset_edit.push(el);
+  //                   }
+  //                 });
 
-              // 등록 된 가공 데이터 셋 이름 GET
-              dataset
-                .findAll({
-                  where: { ds_delYn: "N" },
-                  attributes: {
-                    exclude: ["updatedAt", "createdAt"],
-                  },
-                  include: [
-                    {
-                      model: analysis_list,
-                      required: false,
-                      attributes: ["name"],
-                    },
-                  ],
-                  raw: true,
-                })
-                .then((result_edit) => {
-                  const processed_str_edit = JSON.stringify(result_edit);
-                  const processed_value_edit = JSON.parse(processed_str_edit);
-                  processed_value_edit.map((el) => {
-                    if (el.isProcessed != "원천데이터") {
-                      processed_dataset_edit.push(el);
-                    }
-                  });
+  //                 // 가공 데이터 중 선택된 데이터 셋 이름 GET
+  //                 processed_dataset_edit.filter((el) => {
+  //                   if (el.dataset_id == dataset_id_prev) {
+  //                     processed_selected_name = el.name;
+  //                   } else {
+  //                     processed_dataset_edit_removed.push(el);
+  //                   }
+  //                 });
 
-                  // 가공 데이터 중 선택된 데이터 셋 이름 GET
-                  processed_dataset_edit.filter((el) => {
-                    if (el.dataset_id == dataset_id_prev) {
-                      processed_selected_name = el.name;
-                    } else {
-                      processed_dataset_edit_removed.push(el);
-                    }
-                  });
+  //                 return res.render(`model/model_register_board_edit`, {
+  //                   md_id: md_id,
+  //                   al_time: al_time_prev,
+  //                   processed_dataset_edit_removed:
+  //                     processed_dataset_edit_removed,
+  //                   raw_data_model_key_prev: raw_data_model_key_prev,
+  //                   md_desc: md_desc_prev,
+  //                   data_model_name: raw_data_model_name_prev,
+  //                   model_input_info_value: model_input_info_value,
+  //                   file_name_prev: file_name_prev,
+  //                   al_name_mo_prev: al_name_mo_prev,
+  //                   processed_selected_name: processed_selected_name,
+  //                   dataset_id_prev: dataset_id_prev,
+  //                 });
+  //               });
+  //           });
+  //         });
+  //     });
+  // },
 
-                  return res.render(`model/model_registered_show`, {
-                    md_id: md_id,
-                    md_name: md_name_prev,
-                    al_time: al_time_prev,
-                    date_look_up: date_look_up_prev,
-                    processed_dataset_edit_removed:
-                      processed_dataset_edit_removed,
-                    raw_data_model_key_prev: raw_data_model_key_prev,
-                    md_desc: md_desc_prev,
-                    data_model_name: raw_data_model_name_prev,
-                    model_input_info_value: model_input_info_value,
-                    file_name_prev: file_name_prev,
-                    al_name_mo_prev: al_name_mo_prev,
-                    processed_selected_name: processed_selected_name,
-                  });
-                });
-            });
-          });
-      });
-  },
+  // // 등록된 모델 보기
+  // registered_show: (req, res) => {
+  //   // 등록 된 md_id GET
+  //   const md_id = req.params.md_id;
+  //   // 등록 된 모델 정보 GET
+  //   model_list
+  //     .findAll({
+  //       attributes: {
+  //         exclude: ["updatedAt", "createdAt"],
+  //       },
+  //       where: { md_id: md_id },
+  //       include: [
+  //         { model: model_des, required: false, attributes: ["des_text"] },
+  //         {
+  //           model: atch_file_tb,
+  //           required: false,
+  //           attributes: ["originalname"],
+  //         },
+  //         { model: analysis_list, required: false, attributes: ["context"] },
+  //       ],
+  //       raw: true,
+  //     })
+  //     .then((result) => {
+  //       // 등록 된 모델 정보 변수 설정
+  //       const model_edit_str = JSON.stringify(result);
+  //       const model_edit_value = JSON.parse(model_edit_str)[0];
+  //       const {
+  //         md_name,
+  //         al_time,
+  //         al_name_mo,
+  //         dataset_id,
+  //         data_model_name,
+  //         date_look_up,
+  //       } = model_edit_value;
+  //       console.log(model_edit_value);
+  //       let date_look_up_prev = Object.values(JSON.parse(date_look_up));
+  //       let md_name_prev = md_name;
+  //       let al_time_prev = al_time;
+  //       let al_name_mo_prev = al_name_mo;
+  //       let dataset_id_prev = dataset_id;
+  //       let raw_data_model_name_prev = data_model_name;
+  //       let md_desc_prev = model_edit_value["model_des.des_text"];
+  //       let file_name_prev = model_edit_value["atch_file_tb.originalname"];
+  //       let processed_dataset_edit = new Array();
+  //       let processed_dataset_edit_removed = new Array();
+  //       let raw_data_model_key_prev;
+  //       let processed_selected_name;
+
+  //       // 유저 인풋 값 GET
+  //       model_input
+  //         .findAll({
+  //           where: { md_id: md_id },
+  //           attirbutes: ["ip_param", "ip_value"],
+  //         })
+  //         .then((results) => {
+  //           const model_input_info_str = JSON.stringify(results);
+  //           const model_input_info_value = JSON.parse(model_input_info_str);
+
+  //           // 등록 된 원천 데이터 셋 이름 GET
+  //           const raw_dataset_name_edit = output.raw_dataset_select();
+  //           raw_dataset_name_edit.then((dataset_name_result) => {
+  //             dataset_name_result.filter((el) => {
+  //               if (el.value.id === raw_data_model_name_prev.split(",")[0]) {
+  //                 raw_data_model_key_prev = el;
+  //               }
+  //             });
+
+  //             // 등록 된 가공 데이터 셋 이름 GET
+  //             dataset
+  //               .findAll({
+  //                 where: { ds_delYn: "N" },
+  //                 attributes: {
+  //                   exclude: ["updatedAt", "createdAt"],
+  //                 },
+  //                 include: [
+  //                   {
+  //                     model: analysis_list,
+  //                     required: false,
+  //                     attributes: ["name"],
+  //                   },
+  //                 ],
+  //                 raw: true,
+  //               })
+  //               .then((result_edit) => {
+  //                 const processed_str_edit = JSON.stringify(result_edit);
+  //                 const processed_value_edit = JSON.parse(processed_str_edit);
+  //                 processed_value_edit.map((el) => {
+  //                   if (el.isProcessed != "원천데이터") {
+  //                     processed_dataset_edit.push(el);
+  //                   }
+  //                 });
+
+  //                 // 가공 데이터 중 선택된 데이터 셋 이름 GET
+  //                 processed_dataset_edit.filter((el) => {
+  //                   if (el.dataset_id == dataset_id_prev) {
+  //                     processed_selected_name = el.name;
+  //                   } else {
+  //                     processed_dataset_edit_removed.push(el);
+  //                   }
+  //                 });
+
+  //                 return res.render(`model/model_registered_show`, {
+  //                   md_id: md_id,
+  //                   md_name: md_name_prev,
+  //                   al_time: al_time_prev,
+  //                   date_look_up: date_look_up_prev,
+  //                   processed_dataset_edit_removed:
+  //                     processed_dataset_edit_removed,
+  //                   raw_data_model_key_prev: raw_data_model_key_prev,
+  //                   md_desc: md_desc_prev,
+  //                   data_model_name: raw_data_model_name_prev,
+  //                   model_input_info_value: model_input_info_value,
+  //                   file_name_prev: file_name_prev,
+  //                   al_name_mo_prev: al_name_mo_prev,
+  //                   processed_selected_name: processed_selected_name,
+  //                 });
+  //               });
+  //           });
+  //         });
+  //     });
+  // },
 
   // 모델 등록 보드
   model_register_board: async (req, res) => {
@@ -433,6 +437,7 @@ const output = {
           });
           const raw_dataset_name = output.raw_dataset_select();
           raw_dataset_name.then((result) => {
+            console.log(result)
             res.render(`model/model_register_board`, {
               processed_dataset: processed_dataset,
               raw_dataset_name: result,
@@ -553,7 +558,7 @@ const process = {
       op_col_id,
       user_output_param
     } = req.body;
-    console.log(req.body)
+    // console.log(req.body)
     // Error handling from server
     try {
       errorHandling.al_time_handling(al_time); // 3600

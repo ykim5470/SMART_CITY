@@ -7,8 +7,11 @@ const nunjucks = require("nunjucks");
 const methodOverride = require("method-override");
 const socket = require("socket.io");
 const model_scheduler = require("./public/js/event_handlers/model_scheduler");
-const dataset_select = require('./public/js/event_handlers/dataset_select')
-const analysis_select = require('./public/js/event_handlers/analysis_select')
+const old_dataset_select = require("./public/js/event_handlers/old_dataset_select");
+const old_analysis_select = require("./public/js/event_handlers/old_analysis_select");
+const dataset_select = require("./public/js/event_handlers/old_dataset_select");
+const analysis_select = require("./public/js/event_handlers/old_analysis_select");
+
 
 //routers
 const index_router = require("./routes/index");
@@ -56,9 +59,15 @@ io.on("connection", (socket) => {
   // 스케쥴러 조작
   model_scheduler(socket);
 
+  // 이전 데이터 셋 선택
+  // old_dataset_select(socket)
+
   // 데이터 셋 선택
-  dataset_select(socket)
+  dataset_select(socket);
+
+  // 이전 선택 된 분석 모델 API calling; attributes GET
+  old_analysis_select(socket)
 
   // 선택 된 분석 모델 API calling; attributes GET
-  analysis_select(socket)
+  // analysis_select(socket);
 });

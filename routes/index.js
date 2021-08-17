@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("./auth");
+const new_auth = require('./new_auth')
 const newAnaly = require("./newAnaly");
 const ds = require("./ds");
 const df = require("./df");
@@ -27,11 +28,17 @@ router.get("/analysis/admin/deleted", newAnaly.output.viewDelList);
 router.get("/analysis/duplication/check/:checkType", newAnaly.output.dupCheck);
 router.get("/analysis/editCheck/:id", newAnaly.output.editChk);
 //Model
-router.get('/model_manage_board/edit/:md_id', auth.output.register_edit)
-router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage_board);
-router.get("/model_manage_board/:md_id", auth.output.manage_status);
-router.get("/model_register_board", auth.output.model_register_board);
-router.get('/model_registered_show/:md_id', auth.output.registered_show);
+// router.get('/model_manage_board/edit/:md_id', auth.output.register_edit)
+// router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage_board);
+// router.get("/model_manage_board/:md_id", auth.output.manage_status);
+// router.get("/model_register_board", auth.output.model_register_board);
+// router.get('/model_registered_show/:md_id', auth.output.registered_show);
+
+router.get('/model_manage_board', paginate.middleware(10, 50), new_auth.output.manage_board)
+router.get("/model_manage_board/:md_id", new_auth.output.manage_status);
+router.get("/model_register_board", new_auth.output.model_register_board);
+
+
 //Dataset
 router.get("/ds/insert", ds.output.insert);
 router.get("/ds/getNsVer/:id",ds.output.getNsVer);
