@@ -1,5 +1,5 @@
 const express = require("express");
-const { analysis_list, column_tb, dataset, error_log } = require("../models");
+const { analysis_list, column_tb, dataset, error_log, object_member } = require("../models");
 const router = express.Router();
 const axios = require("axios");
 const sequelize = require("sequelize");
@@ -7,6 +7,8 @@ const Op = sequelize.Op;
 const moment = require("moment");
 const base = require("../base");
 const { text } = require("express");
+const e = require("express");
+const { col } = require("sequelize");
 const paging = {
   makeArray: function (base, current, totalPg, path) {
     let start = current % 10 == 0 ? Math.floor((current - 1) / 10) * 10 + 1 : Math.floor(current / 10) * 10 + 1; // 페이징 시작 번호
@@ -219,68 +221,56 @@ const process = {
   //데이터 생성
   insert: async (req, res) => {
     const body = req.body;
+    console.log(body)
     const alert = "<script>alert('별표 표시 항목은 필수 입력사항 입니다. 확인 후 다시 등록해주세요'); location.href=history.back();</script>";
     const alert2 = "<script>alert('DATA 생성 중 오류발생으로 생성이 완료 되지 않았습니다. 확인 후 다시 시도해주세요'); location.href=history.back();</script>";
-    const col_name = ["attributeType", "valueType", "minLength", "maxLength", "column_name", "isRequired"];
     const rand = "deleted_" + moment().format("YYMMDDHHmmss") + "_";
-    var table = {};
-    var column = {};
     const t = await analysis_list.sequelize.transaction();
     try {
+      var table = {};
       for (var i = 0; i < Object.keys(body).length; i++) {
-        if (col_name.includes(Object.keys(body)[i])) {
-          //column_tb 속성일 경우
-          let key = Object.entries(body)[i];
-          if (typeof key[1] == "string") {
-            key[1] != "" ? key[1] : (key[1] = null);
-            column[key[0]] = [key[1]];
-          } else {
-            for (var j = 0; j < key[1].length; j++) {
-              key[1][j] != "" ? key[1][j] : (key[1][j] = null);
-            }
-            column[key[0]] = key[1];
-          }
-        } else {
-          //table 속성
-          let key = Object.entries(body)[i];
-          if (key[1] != "") {
-            table[key[0]] = key[1];
-          }
+        let key = Object.entries(body)[i];
+        if (key[1] != "") {
+          table[key[0]] = key[1];
         }
       }
-      let attrList = [];
-      let tempCol = {};
-      //const analy = await analysis_list.create(table, { transaction: t }); //table 등록
-      var colKey = Object.keys(column);
-      for (var i = 0; i < column.attributeType.length; i++) {
-        tempCol = {};
-        for (var j = 0; j < colKey.length; j++) {
-          colKey[j] == "column_name" ? (colKey[j] = "name") : colKey[j];
-          tempCol[colKey[j]] = Object.values(column)[j][i];
-          //tempCol.al_id_col = analy.al_id;
+      const analy = await analysis_list.create(table, { transaction: t }); //table 등록
+      const objCol = ["objName","objType","objEnum"];
+      table.attributes = table.attributes.replace(/},{/gi,"}/{")
+      let attrArr = table.attributes.split("/")
+      let colId = [];
+      for(var i=0; i<attrArr.length; i++){
+        attrArr[i] = JSON.parse(attrArr[i]);
+        let column = {};
+        let obj = {};
+        Object.keys(attrArr[i]).map((el)=>{
+          if(attrArr[i][el]){
+            if(el=="column_name"){
+              column["name"] = attrArr[i][el]
+            }else if(objCol.includes(el)){
+              typeof attrArr[i][el] == "string" ? (attrArr[i][el].split()) : attrArr[i][el]
+              obj[el] = attrArr[i][el]
+            }else{
+              column[el] = attrArr[i][el]
+            }
+          }
+        })
+        column["al_id_col"] = analy.al_id;
+        let attr = await column_tb.create(column,{ transaction: t });
+        console.log(obj)
+        console.log(obj.objName.length)
+        for(var j=0; j<obj.objName.length; j++){
+          obj.objEnum[j]==""? (obj.objEnum[j]=null) : obj.objEnum[j]
+          await object_member.create({
+            col_id_obj:attr.col_id,
+            name:obj.objName[j],
+            valueType:obj.objType[j],
+            valueEnum:obj.objEnum[j]
+          },{transaction:t})
         }
-        //await column_tb.create(tempCol, { transaction: t });
-        attrList.push(tempCol);
       }
       t.commit();
-      attrList.map((el) => {
-        for (var i in el) {
-          if (el[i] === null) {
-            delete el[i];
-          }
-        }
-      });
-      table.context = table.context.split();
-      table.indexAttributeNames == undefined ? "" : (table.indexAttributeNames = table.indexAttributeNames.split());
-      table.attributes = attrList;
-      const creRequest = await dataRequest.insert(table);
-      if (creRequest != undefined) {
-        await error_log.create({ col_name: "analysis_list", col_id: analy.al_id, operation: "create", err_code: creRequest.detail });
-        await analysis_list.update({ type: (rand + analy.type) , al_delYn: "Y" }, { where: { al_id: analy.al_id } });
-        res.send(alert2);
-      } else {
-        res.redirect("/analysis/list/");
-      }
+      res.redirect("/analysis/insert/");
     } catch (err) {
       console.log(err);
       t.rollback();

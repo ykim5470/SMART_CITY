@@ -5,6 +5,7 @@ const new_auth = require('./new_auth')
 const newAnaly = require("./newAnaly");
 const ds = require("./ds");
 const df = require("./df");
+const dash = require("./dash");
 const uploadFile = require('../public/js/helpers/upload_dir');
 const ui = require('./ui');
 const paginate = require('express-paginate');
@@ -12,10 +13,10 @@ const paginate = require('express-paginate');
 router.get("/",function(req,res){res.render("index")})
 //================================GET==================================
 // Dashboard
-router.get('/dashboard', auth.output.dashboard)
-router.get('/dashboard/processed_data_load', auth.output.processed_data_load)
-router.get('/dashboard/raw_data_load', auth.output.raw_data_load)
-router.get('/dashboard/test', auth.output.testtest)
+router.get('/dashboard', dash.output.dashboard)
+router.get('/dashboard/processed_data_load', dash.output.processed_data_load)
+router.get('/dashboard/raw_data_load', dash.output.raw_data_load)
+router.get('/dashboard/test', dash.output.testtest)
 
 
 //Analysis 
@@ -55,7 +56,7 @@ router.get("/df/view/:df_id", df.output.view);
 
 //==============================POST======================================
 //Dashboard
-router.post('/dashboard/test', auth.process.test)
+router.post('/dashboard/test', dash.process.test)
 //Analysis
 router.post("/analysis/insert", newAnaly.process.insert);
 //Model

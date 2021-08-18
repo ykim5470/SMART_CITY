@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>분석테이블 등록</title>
+  </head>
+  <script src="/js/analysis/insert.js"></script>
+  <body>
+    <h1>분석테이블 등록</h1>
+    <form action="/analysis/insert" method="POST" name="register">
+      <p>&Star;표시 항목은 필수 입력 항목 입니다</p>
+      <table>
+        <tr>
+          <td>&Star;TYPE : <input type="text" name="type" placeholder="Table Type" /> <input type="button" onclick="dupCheck()" name="dupBtn" value="중복확인" /></td>
+        </tr>
+        <tr>
+          <td>&Star;NAMESPACE : <input type="text" name="namespace" placeholder="nameSpace" /></td>
+        </tr>
+        <tr>
+          <td>NAME : <input type="text" name="name" placeholder="Table Name" /></td>
+        </tr>
+        <tr>
+          <td>&Star;CONTEXT : <input type="text" name="context" placeholder="context" /></td>
+        </tr>
+        <tr>
+          <td>DESCRIPTION : <input type="text" name="description" placeholder="Table description" /></td>
+        </tr>
+        <tr>
+          <td>ATTRIBUTE ID : <input type="text" name="indexAttributeNames" placeholder="AttributeId list(복합id는 , 로 구분)" /></td>
+        </tr>
+        <tr>
+          <td>
+            <br/>
+            <span>&Star;VERSION : </span>
+            {% set verBox = [0,1,2,3,4,5,6,7,8,9] %}
+            <select name="first">
+              {% for items in verBox %}
+              <option value="{{items}}">{{items}}</option>
+              {% endfor %}
+            </select>
+            <span>.</span>
+            <select name="middle">
+              {% for items in verBox %}
+              <option value="{{items}}">{{items}}</option>
+              {% endfor %}
+            </select>
+            <span>.</span>
+            <select name="last">
+              {% for items in verBox %}
+              <option value="{{items}}">{{items}}</option>
+              {% endfor %}
+            </select>
+            <input type="hidden" name="version" id="version" />
+          </td>
+        </tr>
+      </table>
+      <h4>분석테이블 컬럼 등록</h4>
+      <table>
+        <tr>
+          <td>
+            <input name="addButton" type="button" style="cursor: hand" onClick="insRow()" value="추가" />
+            필요한 만큼 추가버튼을 클릭하세요.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table id="addTable">
+              <tr>
+                <th>Attribute Type</th>
+                <th>Data Type</th>
+                <th>Min Length</th>
+                <th>Max Length</th>
+                <th>&Star; Column Name</th>
+                <th name="vEnum">Value Enum</th>
+                <th>Null 허용여부</th>
+                <th>ObservedAt보유여부</th>
+              </tr>
+              <tr id="tdNum">
+                <td>
+                  <select name="attributeType" onchange="attrChange(this)">
+                    <option value="Property">Property</option>
+                    <option value="GeoProperty">GeoProperty</option>
+                    <option value="Relationship">Relationship</option>
+                  </select>
+                </td>
+                <td>
+                  <select name="valueType" style="width: 140px" onchange="showEnum(this.value)">
+                    <option value="String">STRING</option>
+                    <option value="Integer">INTEGER</option>
+                    <option value="Double">DOUBLE</option>
+                    <option value="Object">OBJECT</option>
+                    <option value="Date">DATE</option>
+                    <option value="ArrayString">ARRAY STRING</option>
+                    <option value="ArrayInteger">ARRAY INTEGER</option>
+                    <option value="ArrayDouble">ARRAY DOUBLE</option>
+                    <option value="ArrayObject">ARRAY OBJECT</option>
+                  </select>
+                </td>
+                <td><input type="text" name="minLength" placeholder="데이터 최저 크기를 입력해주세요" /></td>
+                <td><input type="text" name="maxLength" placeholder="데이터 최대 크기를 입력해주세요" /></td>
+                <td><input type="text" name="column_name" placeholder=" 컬럼이름을 입력하세요." /></td>
+                <td name="vEnum"><input type="text" name="valueEnum" placeholder="예:나쁨,보통,좋음(값은 , 로 구분)"/></td>
+                <td><input type="checkbox" name="nullCheck"/><input type="hidden" name="isRequired" value="true" /></td>
+                <td><input type="checkbox" name="observedChk"/><input type="hidden" name="hasObservedAt" value="false" /></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <br /><input type="button" value="등록하기" onclick="goSubmit()" />
+      <a href="/analysis/list"><input type="button" value="목록보기" /></a>
+    </form>
+  </body>
+</html>
