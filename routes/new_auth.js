@@ -20,8 +20,12 @@ const {
 } = require("../base");
 const { resolve } = require("path");
 
+
 // GET
 const output = {
+  test_test: (req, res) => {
+    res.render("model/test");
+  },
   // 모델 관리 페이지
   manage_board: async (req, res) => {
     try {
@@ -223,8 +227,8 @@ const process = {
     }
   },
 
- // 모델 등록 Complete
- register_complete: async (req, res) => {
+  // 모델 등록 Complete
+  register_complete: async (req, res) => {
     const {
       md_name,
       al_name_mo,
@@ -251,9 +255,9 @@ const process = {
       tf_shape,
       tf_shape_index,
       op_col_id,
-      user_output_param
+      user_output_param,
     } = req.body;
-    console.log(req.body)
+    console.log(req.body);
     // Error handling from server
     try {
       errorHandling.al_time_handling(al_time); // 3600
@@ -272,13 +276,17 @@ const process = {
         op_data_lookup_hour,
         op_data_lookup_min,
         op_data_lookup_sec
-      )
+      );
       errorHandling.max_data_load_handling(max_data_load); // limit 48, 5, 2
       errorHandling.data_processing_option_handling(
         sub_data_select,
         data_processing
       );
-      errorHandling.tf_shape_handling(max_data_load, tf_shape, analysis_file_format)
+      errorHandling.tf_shape_handling(
+        max_data_load,
+        tf_shape,
+        analysis_file_format
+      );
       let date_look_up = {
         date: data_lookup_date,
         hour: data_lookup_hour,
@@ -312,7 +320,7 @@ const process = {
           sub_data: sub_data_select,
           date_look_up: date_look_up,
           data_processing_option: data_processing,
-          analysis_file_format: analysis_file_format
+          analysis_file_format: analysis_file_format,
         })
         .then(() => {
           // 생성된 모델 리스트 TB의 md_id GET
@@ -345,15 +353,12 @@ const process = {
               }
               // 인풋 파람 필요 텐서 타입 정의
               let tf_shape_obj = new Object();
-              if(
-                Array.isArray(tf_shape_index) &&
-                Array.isArray(tf_shape)
-              ){
-                tf_shape_index.map((user_index, idx)=>{
-                  tf_shape_obj[user_index] = tf_shape[idx]
-                })
-              }else if(typeof tf_shape_index == 'string'){
-                tf_shape_obj[tf_shape_index] = tf_shape
+              if (Array.isArray(tf_shape_index) && Array.isArray(tf_shape)) {
+                tf_shape_index.map((user_index, idx) => {
+                  tf_shape_obj[user_index] = tf_shape[idx];
+                });
+              } else if (typeof tf_shape_index == "string") {
+                tf_shape_obj[tf_shape_index] = tf_shape;
               }
 
               // 인풋 파람 TB 생성
@@ -376,7 +381,7 @@ const process = {
                       ip_attr_value_type[index],
                       data_load_obj[index],
                       tf_shape_obj[index],
-                      user_input_order[index]
+                      user_input_order[index],
                     ];
                   }
                 });
@@ -389,19 +394,20 @@ const process = {
                   ip_type: user_obj[i][1],
                   ip_load: user_obj[i][2],
                   ip_param_type: user_obj[i][3],
-                  ip_order: user_obj[i][4]
+                  ip_order: user_obj[i][4],
                 });
               }
 
               // 아웃풋 파람 생성
-              let op_user_obj = new Object
-              if(typeof user_output_param !== 'string'){
-              user_output_param.filter((el,idx)=>{
-                if(el !== ''){
-                  op_user_obj[op_col_id[idx]] = el
-                }
-              })}else{
-                op_user_obj[op_col_id] = user_output_param
+              let op_user_obj = new Object();
+              if (typeof user_output_param !== "string") {
+                user_output_param.filter((el, idx) => {
+                  if (el !== "") {
+                    op_user_obj[op_col_id[idx]] = el;
+                  }
+                });
+              } else {
+                op_user_obj[op_col_id] = user_output_param;
               }
               // 아웃풋 TB Create
               let op_date_look_up = {
@@ -410,8 +416,13 @@ const process = {
                 min: op_data_lookup_min,
                 sec: op_data_lookup_sec,
               };
-              for(j in op_user_obj){
-              model_output.create({op_id: md_id, op_col_id: j, op_value: op_user_obj[j], op_date_look_up: op_date_look_up})
+              for (j in op_user_obj) {
+                model_output.create({
+                  op_id: md_id,
+                  op_col_id: j,
+                  op_value: op_user_obj[j],
+                  op_date_look_up: op_date_look_up,
+                });
               }
             });
         });

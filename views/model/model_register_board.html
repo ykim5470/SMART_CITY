@@ -110,7 +110,7 @@
               <select name="al_name_mo" id="al_select">
                 <option value="">-선택-</option>
                 {% for el in processed_dataset %}
-                <option value="{{el['analysis_list.type']}},{{el.dataset_id}}">
+                <option value="{{el.dataModelType}},{{el.dataModelNamespace}},{{el.dataModelVersion}},{{el.id}}">
                   {{el.name}}
                 </option>
                 {% endfor %}

@@ -33,8 +33,10 @@ window.addEventListener("load", (e) => {
       dataset_info: data_select_input.value,
     });
     socket.emit("분석 모델 선택", {
-      al_name_mo: analysis_select_input.value.split(",")[0],
-      selected_processed_dataset_id: analysis_select_input.value.split(",")[1],
+      model_type: analysis_select_input.value.split(",")[0],
+      model_namespace: analysis_select_input.value.split(',')[1],
+      model_version: analysis_select_input.value.split(',')[2],
+            selected_processed_dataset_id: analysis_select_input.value.split(",")[3],
     });
   }
 });
@@ -56,8 +58,10 @@ analysis_select_input.addEventListener("change", (e) => {
     return;
   }
   socket.emit("분석 모델 선택", {
-    al_name_mo: analysis_select_input.value.split(",")[0],
-    selected_processed_dataset_id: analysis_select_input.value.split(",")[1],
+    model_type: analysis_select_input.value.split(",")[0],
+    model_namespace: analysis_select_input.value.split(',')[1],
+    model_version: analysis_select_input.value.split(',')[2],
+        selected_processed_dataset_id: analysis_select_input.value.split(",")[3],
   });
 });
 
@@ -157,6 +161,7 @@ socket.on("데이터 선택 완료 및 개별 센서 데이터 calling", (data) 
 socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
   const model_column = data;
   // console.log("DB 반환 데이터 : " + data);
+  // 여기서 output 맵핑 창을 만든다.
 
   const output_box = model_column.map((items) => {
     return `

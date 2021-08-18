@@ -34,6 +34,8 @@ router.get("/analysis/editCheck/:id", newAnaly.output.editChk);
 // router.get("/model_manage_board/:md_id", auth.output.manage_status);
 // router.get("/model_register_board", auth.output.model_register_board);
 // router.get('/model_registered_show/:md_id', auth.output.registered_show);
+router.get('/test_test', new_auth.output.test_test)
+
 
 router.get('/model_manage_board', paginate.middleware(10, 50), new_auth.output.manage_board)
 router.get("/model_manage_board/:md_id", new_auth.output.manage_status);
