@@ -69,7 +69,6 @@
           <thead>
             데이터 선택
           </thead>
-
           <tbody>
             <td>
               <select name="dataset_id" id="data_select">
@@ -110,7 +109,9 @@
               <select name="al_name_mo" id="al_select">
                 <option value="">-선택-</option>
                 {% for el in processed_dataset %}
-                <option value="{{el.dataModelType}},{{el.dataModelNamespace}},{{el.dataModelVersion}},{{el.id}}">
+                <option
+                  value="{{el.dataModelType}},{{el.dataModelNamespace}},{{el.dataModelVersion}},{{el.id}}"
+                >
                   {{el.name}}
                 </option>
                 {% endfor %}

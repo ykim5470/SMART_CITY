@@ -11,14 +11,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: { name: "file_id" },
         onDelete: "CASCADE",
       });
-      this.belongsTo(models.analysis_list, {
-        foreignKey: { name: "al_id", allowNull: false },
-        onDelete: "CASCADE",
-      });
-      this.belongsTo(models.dataset, {
-        foreignKey: { name: "dataset_id", allowNull: false },
-        onDelete: "CASCADE",
-      });
+      // this.belongsTo(models.analysis_list, {
+      //   foreignKey: { name: "al_id", allowNull: false },
+      //   onDelete: "CASCADE",
+      // });
+      // this.belongsTo(models.dataset, {
+      //   foreignKey: { name: "dataset_id", allowNull: false },
+      //   onDelete: "CASCADE",
+      // });
     }
   }
   model_list.init(
@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       run_status: {
-        type: DataTypes.ENUM("running", "stop"),
+        type: DataTypes.ENUM("running", "stop", "halt"),
         defaultValue: "stop",
         allowNull: true,
       },
@@ -50,17 +50,17 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: true,
       },
       data_model_name: { type: DataTypes.STRING, allowNull: false },
-      al_id: {
-        allowNull: false,
-        foreignKey: true,
-        type: DataTypes.INTEGER,
-      },
+      // al_id: {
+      //   allowNull: false,
+      //   foreignKey: true,
+      //   type: DataTypes.INTEGER,
+      // },
       date_look_up: { allowNull: false, type: DataTypes.JSON },
-      dataset_id: {
-        allowNull: false,
-        foreignKey: true,
-        type: DataTypes.STRING,
-      },
+      // dataset_id: {
+      //   allowNull: false,
+      //   foreignKey: true,
+      //   type: DataTypes.STRING,
+      // },
       sub_data: {
         allowNull: false,
         type: DataTypes.JSON,

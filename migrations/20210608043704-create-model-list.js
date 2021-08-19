@@ -29,26 +29,26 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       data_model_name: { type: Sequelize.STRING, allowNull: false },
-      al_id: {
-        allowNull: false,
-        foreignKey: true,
-        onDelete: "CASCADE",
-        references: {
-          model: "analysis_lists",
-          key: "al_id",
-        },
-        type: Sequelize.INTEGER,
-      },
-      dataset_id: {
-        allowNull: false,
-        foreignKey: true,
-        onDelete: "CASCADE",
-        references: {
-          model: "dataset",
-          key: "dataset_id",
-        },
-        type: Sequelize.STRING,
-      },
+      // al_id: {
+      //   allowNull: false,
+      //   foreignKey: true,
+      //   onDelete: "CASCADE",
+      //   references: {
+      //     model: "analysis_lists",
+      //     key: "al_id",
+      //   },
+      //   type: Sequelize.INTEGER,
+      // },
+      // dataset_id: {
+      //   allowNull: false,
+      //   foreignKey: true,
+      //   onDelete: "CASCADE",
+      //   references: {
+      //     model: "dataset",
+      //     key: "dataset_id",
+      //   },
+      //   type: Sequelize.STRING,
+      // },
       sub_data: {
         allowNull: false,
         type: Sequelize.JSON,

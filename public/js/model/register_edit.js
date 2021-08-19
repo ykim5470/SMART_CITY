@@ -116,6 +116,9 @@ socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
 	// 해당 output_value를 어떻게 할 것인가?
 });
 
+
+
+
 const register_submit = () => {
 	if (register_edit != null) {
 		register_edit.addEventListener("click", async (e) => {

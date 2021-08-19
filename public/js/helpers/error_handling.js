@@ -62,10 +62,10 @@ const errorHandling = {
     data_lookup_sec
   ) => {
     if (
-      data_lookup_date &&
-      data_lookup_hour &&
-      data_lookup_min &&
-      data_lookup_sec
+      data_lookup_date === "" &&
+      data_lookup_hour === "" &&
+      data_lookup_min === "" &&
+      data_lookup_sec === ""
     ) {
       throw "적어도 하나의 데이터 조회 기간 값을 입력해 주세요";
     }

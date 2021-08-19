@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("./auth");
+// const auth = require("./auth");
 const new_auth = require('./new_auth')
 const newAnaly = require("./newAnaly");
 const ds = require("./ds");
@@ -34,10 +34,10 @@ router.get("/analysis/editCheck/:id", newAnaly.output.editChk);
 // router.get("/model_manage_board/:md_id", auth.output.manage_status);
 // router.get("/model_register_board", auth.output.model_register_board);
 // router.get('/model_registered_show/:md_id', auth.output.registered_show);
+
 router.get('/test_test', new_auth.output.test_test)
-
-
 router.get('/model_manage_board', paginate.middleware(10, 50), new_auth.output.manage_board)
+router.get('/model_registered_show/:md_id', new_auth.output.registered_show);
 router.get("/model_manage_board/:md_id", new_auth.output.manage_status);
 router.get("/model_register_board", new_auth.output.model_register_board);
 
@@ -62,13 +62,21 @@ router.post('/dashboard/test', dash.process.test)
 //Analysis
 router.post("/analysis/insert", newAnaly.process.insert);
 //Model
-router.post("/model_manage_board", auth.process.status_update);
-router.post("/model/register", auth.process.register_init);
-router.post('/model/list/delete', auth.process.delete)
-router.post('/model/file_add',uploadFile.single("atch_origin_file_name"), auth.process.file_add)
-router.post('/model/register/complete', uploadFile.single("atch_origin_file_name"), auth.process.register_complete)
-router.post('/model/register/edit', uploadFile.single("atch_origin_file_name"), auth.process.register_edit)
-router.post('/model/redirect/edit', auth.process.edit_redirect)
+// router.post("/model_manage_board", auth.process.status_update);
+// router.post("/model/register", auth.process.register_init);
+// router.post('/model/list/delete', auth.process.delete)
+// router.post('/model/file_add',uploadFile.single("atch_origin_file_name"), auth.process.file_add)
+// router.post('/model/register/complete', uploadFile.single("atch_origin_file_name"), auth.process.register_complete)
+// router.post('/model/register/edit', uploadFile.single("atch_origin_file_name"), auth.process.register_edit)
+// router.post('/model/redirect/edit', auth.process.edit_redirect)
+
+router.post('/model/file_add',uploadFile.single("atch_origin_file_name"), new_auth.process.file_add)
+router.post('/model/register/complete', uploadFile.single("atch_origin_file_name"), new_auth.process.register_complete)
+router.post('/model/list/delete', new_auth.process.delete)
+router.post("/model/register", new_auth.process.register_init);
+router.post("/model_manage_board", new_auth.process.status_update);
+
+
 //Dataset
 router.post("/ds/inserted" , ds.process.insert)
 //Dataset flow
@@ -81,7 +89,9 @@ router.put("/analysis/softDel/:al_id", newAnaly.process.softDelOne);
 router.put("/analysis/softListDelete", newAnaly.process.softDelList);
 router.put("/analysis/edited/:al_id", newAnaly.process.edit);
 //Model
-router.put("/model_manage_board/:md_id", auth.process.edit);
+// router.put("/model_manage_board/:md_id", auth.process.edit);
+router.put("/model_manage_board/:md_id", new_auth.process.edit);
+
 //Dataset
 router.put("/ds/softDel/:dataset_id", ds.process.dsSofeDel);
 router.put("/ds/softListDelete", ds.process.softDelList);

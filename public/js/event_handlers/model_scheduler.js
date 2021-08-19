@@ -13,13 +13,15 @@ const {
   sorted_input_param,
   single_processed_data,
 } = require("../helpers/api_scheduler");
-const  data_upsert_serving = require('../helpers/data_serving')
+// const  data_upsert_serving = require('../helpers/data_serving')
 const tensor_shape_convert = require("../helpers/tensor_shape_convert");
 const fs = require("fs");
 const Path = require("path");
 
 const model_scheduler = (socket) => {
-  socket.on("모델 스케쥴러 조작", (data) => {
+  socket.on("모델 스케쥴러 조작",(data) => {
+    console.log('삭제 시 요청 받았나?')
+    console.log(data)
     const { status, md_id } = data;
     // 선택 모델 정보 GET
     model_list
@@ -138,7 +140,8 @@ const model_scheduler = (socket) => {
                                   url
                                 );
 
-                                data_upsert_serving(predicted_output, md_id)
+                                  // console.log(predicted_output)
+                                // data_upsert_serving(predicted_output, md_id)
                               });
                           } else {
                             throw "존재하지 않는 변환 파일입니다";
