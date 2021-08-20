@@ -13,7 +13,7 @@ const { resolve } = require("path");
 // Get
 const output = {
   testtest: async (req, res) => {
-    // console.log(req)
+    console.log(req);
     try {
       res.send(`dashboard/test`);
     } catch (err) {
@@ -25,62 +25,62 @@ const output = {
     // console.log(req)
     res.render(`dashboard/dashboard`);
   },
-  // 대시보드 가공 데이터 셋 GET
-  processed_data_load: async (req, res) => {
+  // 대시보드 데이터 셋 GET
+  dataset_load: async (req, res) => {
     try {
+      const selected_value = req.params.data;
       const dataset = await axios.get("http://203.253.128.184:18827/datasets", {
         headers: { Accept: "application/json" },
       });
       const dataset_dict = [];
       dataset.data.filter((el) => {
-        if (el.isProcessed !== "원천데이터") {
-          return dataset_dict.push({
-            key: el.name,
-            value: {
-              id: el.id,
-              dataModelType: el.dataModelType,
-              dataModelNamespace: el.dataModelNamespace,
-              dataModelVersion: el.dataModelVersion,
-            },
-          });
+        if (selected_value == "raw_data") {
+          if (el.isProcessed === "원천데이터") {
+            return dataset_dict.push({
+              key: el.name,
+              value: {
+                id: el.id,
+                dataModelType: el.dataModelType,
+                dataModelNamespace: el.dataModelNamespace,
+                dataModelVersion: el.dataModelVersion,
+              },
+            });
+          }
+        } else {
+          if (el.isProcessed !== "원천데이터") {
+            return dataset_dict.push({
+              key: el.name,
+              value: {
+                id: el.id,
+                dataModelType: el.dataModelType,
+                dataModelNamespace: el.dataModelNamespace,
+                dataModelVersion: el.dataModelVersion,
+              },
+            });
+          }
         }
       });
-      return res.send({ data: dataset_dict });
-    } catch (err) {
-      return res.send(err);
-    }
-  },
-  // 대시보드 원천 데이터 셋 GET
-  raw_data_load: async (req, res) => {
-    try {
-      const raw_dataset = await output.raw_dataset_select();
-      return res.send({ data: raw_dataset });
+      return res.send({ data : dataset_dict });
     } catch (err) {
       console.log(err);
+      return;
+      // err: 'raw data API calling failed'
     }
   },
-  // 원천 데이터셋 선택
-  raw_dataset_select: async (req, res) => {
+  // 대시보드 데이터 GET
+  data_load: async (req, res) => {
     try {
-      const dataset = await axios.get("http://203.253.128.184:18827/datasets", {
+      const defineUri = req.params.data;
+      const dataList = await axios.get(`http://203.253.128.184:18227/entities?${defineUri}`, {
         headers: { Accept: "application/json" },
       });
-      const dataset_dict = [];
-      dataset.data.filter((el) => {
-        if (el.isProcessed === "원천데이터") {
-          return dataset_dict.push({
-            key: el.name,
-            value: {
-              id: el.id,
-              dataModelType: el.dataModelType,
-              dataModelNamespace: el.dataModelNamespace,
-              dataModelVersion: el.dataModelVersion,
-            },
-          });
-        }
+      const data_dict = [];
+      dataList.data.filter((el) => {
+          return data_dict.push(el.name)
       });
-      return dataset_dict;
+      return res.send({ data : data_dict });
     } catch (err) {
+      console.log(err);
       return;
       // err: 'raw data API calling failed'
     }
