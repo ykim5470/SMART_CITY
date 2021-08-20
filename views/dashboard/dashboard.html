@@ -18,37 +18,7 @@
   <div id="main">
     <!-- common area -->
     <div class="common-area">
-        <header class="header">
-            <h1 class="header-logo">
-                <img src="/img/logo.png" alt="스마트 시티 로고" class="logo-img" />
-            </h1>
-            <nav class="gnb">
-                <ul class="gnb-list">
-                    <li class="gnb-item gnb-item-batch is-active">
-                        <a href="dashboard.html" class="gnb-link">
-                            <span class="gnb-link-icon"></span>
-                            <p class="gnb-link-text">대시보드</p>
-                        </a>
-                    </li>
-                    <li class="gnb-item gnb-item-template">
-                        <a href="list.html" class="gnb-link">
-                            <span class="gnb-link-icon"></span>
-                            <p class="gnb-link-text">나의 모델 관리</p>
-                        </a>
-                    </li>
-                    <li class="gnb-item gnb-item-template">
-                        <a href="admin/list.html" class="gnb-link">
-                            <span class="gnb-link-icon"></span>
-                            <p class="gnb-link-text">전체 사용자 모델 관리</p>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-            <button class="gnb-toggle-btn">
-                <span class="toggle-btn-line"></span>
-                <span class="toggle-btn-line"></span>
-            </button>
-        </header>
+      {% include "../common/header.html" %}
         <div class="contents-header clearfix">
             <h2 class="contents-title float-left"><span>스마트시티</span> 데이터 실시간 분석 대시보드</h2>
             <div class="user float-right clearfix">
@@ -58,7 +28,6 @@
         </div>
     </div>
     <!-- //common area -->
-
     <!-- contents-area -->
     <div class="contents">
       <h3 class="hidden">컨텐츠 시작</h3>
