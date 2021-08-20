@@ -1,149 +1,107 @@
-.jsonView{
-    margin-left: 20px;
-    font-family: Consolas, "Lucida Console", Menlo, "dejavu sans mono", monospace;
-    font-size: 16px;
-    line-height: 16px;
-    padding: 2px;
-    cursor: default;
-    color: rgb(66, 66, 66);
-    white-space: nowrap;
-    -webkit-user-select: none;
+/*
+ * JSON Tree Viewer
+ * http://github.com/summerstyle/jsonTreeViewer
+ *
+ * Copyright 2017 Vera Lobacheva (http://iamvera.com)
+ * Released under the MIT license (LICENSE.txt)
+ */
+
+/* Background for the tree. May use for <body> element */
+.jsontree_bg {
+    background: #FFF;
 }
 
-.jsonView>div{
-    display: inline-block;
+/* Styles for the container of the tree (e.g. fonts, margins etc.) */
+.jsontree_tree {
+    margin-left: 30px;
+    font-family: 'PT Mono', monospace;
+    font-size: 14px;
 }
 
-.jsonView.hidden{
+/* Styles for a list of child nodes */
+.jsontree_child-nodes {
     display: none;
+    margin-left: 35px; 
+    margin-bottom: 5px;
+    line-height: 2;
 }
-
-.jsonView>.children, .jsonView.insert{
+.jsontree_node_expanded > .jsontree_value-wrapper > .jsontree_value > .jsontree_child-nodes {
     display: block;
 }
 
-.jsonView>.name{
-    color: rgb(136, 19, 145);
+/* Styles for labels */
+.jsontree_label-wrapper {
+    float: left;
+    margin-right: 8px;
+}
+.jsontree_label {
+    font-weight: normal;
+    vertical-align: top;
+    color: #000;
+    position: relative;
+    padding: 1px;
+    border-radius: 4px;
+    cursor: default;
+}
+.jsontree_node_marked > .jsontree_label-wrapper > .jsontree_label {
+    background: #fff2aa;
 }
 
-.jsonView>.separator:before{
-    content: ":";
+/* Styles for values */
+.jsontree_value-wrapper {
+    display: block;
+    overflow: hidden;
+}
+.jsontree_node_complex > .jsontree_value-wrapper {
+    overflow: inherit;
+}
+.jsontree_value { 
+    vertical-align: top;
+    display: inline;
+}
+.jsontree_value_null {
+    color: #777;
+    font-weight: bold;
+}
+.jsontree_value_string {
+    color: #025900;
+    font-weight: bold;
+}
+.jsontree_value_number {
+    color: #000E59;
+    font-weight: bold;
+}
+.jsontree_value_boolean {
+    color: #600100;
+    font-weight: bold;
 }
 
-.jsonView>.separator{
-    padding-right: 5px;
+/* Styles for active elements */
+.jsontree_expand-button {
+    position: absolute;
+    top: 3px;
+    left: -15px;
+    display: block;
+    width: 11px;
+    height: 11px;
+    background-image: url('icons.svg');
 }
-
-.jsonView>.spacing{
-    display:inline-block;
-    width:15px;
+.jsontree_node_expanded > .jsontree_label-wrapper > .jsontree_label > .jsontree_expand-button {
+    background-position: 0 -11px;
 }
-.jsonView>.spacing::before{
-    content: '1';
-    visibility:hidden;
-}
-
-.jsonView>.value.null, .jsonView>.value.undefined{
-    color: rgb(128, 128, 128);
-}
-
-.jsonView>.value.boolean, .jsonView>.value.number{
-    color: rgb(28, 0, 207);
-}
-
-.jsonView>.value.string:not(.edit):before, .jsonView>.value.string:not(.edit):after{
-    content: "\"";
-}
-
-.jsonView>.value.string {
-    color: rgb(196, 26, 22);
-}
-
-.jsonView>.name:hover, .jsonView>.value:hover{
-    background-color: rgba(56, 121, 217, 0.1);
-}
-
-.jsonView>.expand, .jsonView>.collapse{
-    min-width: 20px;
-    margin-left: -20px;
+.jsontree_show-more {
     cursor: pointer;
 }
-
-.jsonView>.expand:before{
-    content: '\25B6';
-}
-
-.jsonView>.collapse:before{
-    content: '\25BC';
-}
-
-.jsonView>.edit{
-    padding: 0px 5px 0px 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    background-color: transparent;
-}
-
-.jsonView>.edit br{
+.jsontree_node_expanded > .jsontree_value-wrapper > .jsontree_value > .jsontree_show-more {
     display: none;
 }
-
-.jsonView>.edit *{
-    display: inline;
-    white-space: nowrap;
-}
-
-.jsonView>.value.edit{
-    color: rgb(0, 0, 0);
-}
-
-.jsonView>.delete:before{
-    content: '+';
-    transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-    -o-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    display: inline-block;
-}
-
-.jsonView>.delete{
-    opacity: 0;
-    display: inline;
-    padding: 3px;
-    cursor: pointer;
-    color: rgb(150, 150, 150);
-}
-
-.jsonView>.item:hover~.delete{
-    opacity: 1;
-    color: rgb(150, 150, 150);
-}
-.jsonView>.delete:hover{
-    opacity: 1;
-    color: rgb(0, 0, 0);
-    background: rgb(220, 220, 220);
-}
-
-.jsonView.readonly>.insert,.jsonView.readonly>.delete{
+.jsontree_node_empty > .jsontree_label-wrapper > .jsontree_label > .jsontree_expand-button,
+.jsontree_node_empty > .jsontree_value-wrapper > .jsontree_value > .jsontree_show-more {
     display: none !important;
 }
-.jsonView>.insert:before{
-    content: '+';
-}
-
-.jsonView>.insert{
-    display: none;
-    color: rgb(150, 150, 150);
+.jsontree_node_complex > .jsontree_label-wrapper > .jsontree_label {
     cursor: pointer;
 }
-
-.jsonView.expanded>.insert, .jsonView.expanded>.insert{
-    display: inline-block;
-    margin-left: 20px;
-    padding: 3px;
-}
-
-.jsonView>.insert:hover{
-    color: rgb(0, 0, 0);
-    background: rgb(220, 220, 220);
+.jsontree_node_empty > .jsontree_label-wrapper > .jsontree_label {
+    cursor: default !important;
 }

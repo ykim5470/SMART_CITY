@@ -27,7 +27,7 @@
 </head>
 	<body>
 		<h1>모델 관리</h1>
-		<form action="model/register" method="post"><button type="submit">등록</button></form>
+		<button onclick="location.href='/dataAnalysisModelModView?mode=add'"type="submit">등록</button>
 		<input class='del_btn' type="button" onclick="ListDelete()" value="삭제" />
 		<table>
 			<tr>
@@ -50,7 +50,7 @@
 				</td>	
 				<td>{{list_data.indexOf(item)+1}}</td>	
 				<td>{{ item.al_time }}</td>
-				<td><a href='http://localhost:4000/model_registered_show/{{item.md_id}}'>{{item.md_name}}</a></td>
+				<td><a href='http://localhost:4000/dataAnalysisModelsView?md_id={{item.md_id}}'>{{item.md_name}}</a></td>
 				<td>{{item.al_name_mo}}</td>
 				<td>{{item.dateFormat(item.createdAt)}}</td>
 				<td>{{item.run_status}}</td>
@@ -83,6 +83,6 @@
 			</ul>
 		</nav>
 		<script src="/socket.io/socket.io.js"></script>
-		<script src="/js/model/model_manage_board.js"></script>
+		<script src="/js/model/dataAnalysisModels.js"></script>
 	</body>	
 </html>
