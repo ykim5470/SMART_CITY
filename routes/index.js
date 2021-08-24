@@ -42,7 +42,7 @@ router.get('/dataAnalysisModelsView', new_auth.output.view)
 router.get('/dataAnalysisModelModView', new_auth.output.add)
 
 
-router.get("/model_manage_board/:md_id", new_auth.output.manage_status);
+// router.get("/model_manage_board/:md_id", new_auth.output.manage_status);
 
 
 //Dataset

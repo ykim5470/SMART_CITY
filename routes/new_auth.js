@@ -16,6 +16,8 @@ const errorHandling = require("../public/js/helpers/error_handling");
 const base = require("../base");
 const { resolve } = require("path");
 
+const flatten = require("flat").flatten;
+
 // POST URL
 const dataRequest = {
   insert: async (result) => {
@@ -71,7 +73,70 @@ const dataRequest = {
 const output = {
   // test
   test: (req, res) => {
-    res.render("model/test");
+    function getObjectDepth(obj){
+ 
+      if (typeof obj !== "object" || obj === null) {
+          return 0;
+      }
+   
+      const flat = flatten(obj);
+   
+      const keys =  Object.keys(flat);
+   
+      if(keys.length === 0){
+          return 1;
+      }
+   
+      const depthOfKeys = keys.map(key => key.split(".").length);
+   
+      return Math.max(...depthOfKeys);
+  }
+    var data = {
+      type: "childAttribute_test_model1",
+      namespace: "childAttribute1",
+      version: "2.0.1",
+      name: "차일드_어티리뷰트_테스트1",
+      context: ["차일드"],
+      description: "차일드_어트리뷰트_테스트1",
+      attributes: [
+        {
+          name: "reservoirLevelPrediction",
+          isRequired: true,
+          valueType: "Object",
+          objectMembers: [
+            {
+              name: "LevelPrediction",
+              valueType: "Double",
+            },
+            {
+              name: "predictedAt",
+              valueType: "Date",
+            },
+          ],
+          attributeType: "Property",
+          hasObservedAt: true,
+          childAttributes: [
+            {
+              name: "reservoirLevelPrediction_ChildAttr",
+              isRequired: true,
+              valueType: "Double",
+              objectMembers: [
+                {
+                  name: "test",
+                  valueType: "Integer",
+                },
+              ],
+              attributeType: "Property",
+              hasObservedAt: true,
+            },
+          ],
+        },
+      ],
+      createdAt: "2021-08-23T11:30:49,976+09:00",
+      modifiedAt: "2021-08-23T15:54:03,148+09:00",
+    };
+    console.log(flatten(data))
+    res.render("model/test", {json_depth : getObjectDepth(data)} );
   },
   // 데이터 적재 모델 리스트
   list: async (req, res) => {
@@ -93,7 +158,7 @@ const output = {
         .then((result) => {
           const itemCount = result.count; // total posts
           const pageCount = Math.ceil(itemCount / req.query.limit); // per page
-          const base = "dataAnalysisModels"; // base url 
+          const base = "dataAnalysisModels"; // base url
           const pageArray = paging.makeArray(
             base,
             currentPage,
@@ -122,10 +187,10 @@ const output = {
     }
   },
 
-    add: async (req, res) => {
-      try {
-        var {mode} = req.query
-        if(mode === 'add'){
+  add: async (req, res) => {
+    try {
+      var { mode } = req.query;
+      if (mode === "add") {
         output.processed_data().then((processed_dataset_resolve) => {
           var processed_dataset = processed_dataset_resolve;
           output.raw_dataset_select().then((raw_dataset_select_resolve) => {
@@ -135,42 +200,38 @@ const output = {
               raw_dataset_name: raw_dataset_select,
             });
           });
-        });}
-        else if(mode === 'mod'){
-         // view & edit mode 
-         output.mod()
-        }
-        else if(mode === 'status'){
-          // status mode
-          output.status()
-        }
-        else{
-          throw 'Not valid query sent to server'
-        }
-      } catch (err) {
-        console.log(err);
+        });
+      } else if (mode === "mod") {
+        // view & edit mode
+        output.mod();
+      } else if (mode === "status") {
+        // status mode
+        output.status();
+      } else {
+        throw "Not valid query sent to server";
       }
-    },
+    } catch (err) {
+      console.log(err);
+    }
+  },
 
-    mod: async (req, res) => {
-      try {
-        // view & edit logic 
-        console.log('aaa')
-      } catch (err) {
-        console.log(err);
-      }
-    },
+  mod: async (req, res) => {
+    try {
+      // view & edit logic
+      console.log("aaa");
+    } catch (err) {
+      console.log(err);
+    }
+  },
 
-
-    status: async(req,res) =>{
-      try{
-        // status logic
-        console.log('bbb')
-      }catch(err){
-        console.log(err)
-      }
-    },
-
+  status: async (req, res) => {
+    try {
+      // status logic
+      console.log("bbb");
+    } catch (err) {
+      console.log(err);
+    }
+  },
 
   // 원천 데이터 셋 Object GET
   raw_dataset_select: async (req, res) => {
@@ -194,7 +255,7 @@ const output = {
       });
       return dataset_dict;
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
   },
 
