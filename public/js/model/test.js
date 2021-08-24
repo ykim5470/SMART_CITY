@@ -90,6 +90,12 @@ const upsert_json_body = new Object();
 
 // Upsert key select
 const upsert_position_select = (e) => {
+
+  if(e.target.checked == true){
+    var var01 = $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("childAttributes")').text();
+    var var02 = $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("objectMembers")').text();
+    console.log(var01 + var02)
+  }
   try {
     if (e.target.checked) {
       check_arr.push(e.target);
@@ -149,6 +155,9 @@ for (let i = 0; i < node_list.length; i++) {
 
       if (checkbox.checked) {
         check_arr.push(checkbox);
+        var var01 = $(checkbox).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("childAttributes")').text();
+        var var02 = $(checkbox).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("objectMembers")').text();
+        console.log(var01 + var02)
       }
     }
   }
