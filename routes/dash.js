@@ -12,13 +12,52 @@ const { resolve } = require("path");
 
 // Get
 const output = {
-  testtest: async (req, res) => {
-    console.log(req);
-    try {
-      res.send(`dashboard/test`);
-    } catch (err) {
-      console.log(err);
+  get_dataset: async (value) => {
+    const dataset = await axios.get("http://203.253.128.184:18827/datasets", {
+      headers: { Accept: "application/json" },
+    });
+    const dataset_dict = [];
+    dataset.data.filter((el) => {
+      if (value === "raw_data" && el.isProcessed === "원천데이터") {
+        dataset_dict.push({
+          key: el.name,
+          value: {
+            id: el.id,
+            dataModelType: el.dataModelType,
+            dataModelNamespace: el.dataModelNamespace,
+            dataModelVersion: el.dataModelVersion,
+          },
+        });
+      } else if (value === "processed_data" && el.isProcessed !== "원천데이터") {
+        dataset_dict.push({
+          key: el.name,
+          value: {
+            id: el.id,
+            dataModelType: el.dataModelType,
+            dataModelNamespace: el.dataModelNamespace,
+            dataModelVersion: el.dataModelVersion,
+          },
+        });
+      }
+    });
+    return dataset_dict;
+  },
+  check_data: async (dataset) => {
+    for (var i = 0; i < dataset.length; i++) {
+      let uri = `Type=${dataset[i].value.dataModelNamespace}.${dataset[i].value.dataModelType}:${dataset[i].value.dataModelVersion}&datasetId=${dataset[i].value.id}`;
+      console.log(uri)
+      try {
+        await axios.get(`http://203.253.128.184:18227/entities?${uri}`, {
+          headers: { Accept: "application/json" },
+        });
+      } catch (err) {
+        console.log(uri)
+        dataset.splice(i, 1);
+        i--;
+        continue;
+      }
     }
+    return dataset;
   },
   // 대시보드 페이지 Rendering
   dashboard: async (req, res) => {
@@ -29,60 +68,29 @@ const output = {
   dataset_load: async (req, res) => {
     try {
       const selected_value = req.params.data;
-      const dataset = await axios.get("http://203.253.128.184:18827/datasets", {
-        headers: { Accept: "application/json" },
-      });
-      const dataset_dict = [];
-      dataset.data.filter((el) => {
-        if (selected_value == "raw_data") {
-          if (el.isProcessed === "원천데이터") {
-            return dataset_dict.push({
-              key: el.name,
-              value: {
-                id: el.id,
-                dataModelType: el.dataModelType,
-                dataModelNamespace: el.dataModelNamespace,
-                dataModelVersion: el.dataModelVersion,
-              },
-            });
-          }
-        } else {
-          if (el.isProcessed !== "원천데이터") {
-            return dataset_dict.push({
-              key: el.name,
-              value: {
-                id: el.id,
-                dataModelType: el.dataModelType,
-                dataModelNamespace: el.dataModelNamespace,
-                dataModelVersion: el.dataModelVersion,
-              },
-            });
-          }
-        }
-      });
-      return res.send({ data : dataset_dict });
+      const loaded_data = await output.get_dataset(selected_value);
+      //const has_data = await output.check_data(loaded_data);
+      return res.send({ data: loaded_data });
     } catch (err) {
       console.log(err);
       return;
-      // err: 'raw data API calling failed'
     }
   },
   // 대시보드 데이터 GET
   data_load: async (req, res) => {
+    const defineUri = req.params.data;
+    const data_dict = [];
+    const alert = "<script>alert('해당 dataset에 적재된 data가 존재하지 않습니다.'); location.href=history.back();</script>";
     try {
-      const defineUri = req.params.data;
       const dataList = await axios.get(`http://203.253.128.184:18227/entities?${defineUri}`, {
         headers: { Accept: "application/json" },
       });
-      const data_dict = [];
       dataList.data.filter((el) => {
-          return data_dict.push(el.name)
+        return data_dict.push(el.name);
       });
-      return res.send({ data : data_dict });
+      return res.send({ data: data_dict });
     } catch (err) {
-      console.log(err);
-      return;
-      // err: 'raw data API calling failed'
+      res.send(alert)
     }
   },
 };

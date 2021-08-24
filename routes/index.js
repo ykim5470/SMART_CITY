@@ -17,7 +17,6 @@ router.get('/dashboard', dash.output.dashboard)
 //router.get('/dashboard/processed_data_load', dash.output.processed_data_load)
 router.get('/dashboard/dataset_load/:data', dash.output.dataset_load)
 router.get('/dashboard/data_load/:data', dash.output.data_load)
-router.get('/dashboard/test', dash.output.testtest)
 
 
 //Analysis 
