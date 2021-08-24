@@ -2,8 +2,9 @@
 var wrapper = document.getElementById("wrapper");
 
 var depth_length = document.getElementById("depth_length");
-console.log(depth_length.innerText)
+console.log(depth_length.innerText);
 
+var check_arr = new Array();
 
 // Get json-data by javascript-object
 var data = {
@@ -84,92 +85,105 @@ let getSiblings = function (e) {
 const upsert_json_body = new Object();
 
 // Upsert key select
-const upsert_position_select = () => {
-  console.log("a");
+const upsert_position_select = (e) => {
+  check_arr.push(e.target);
+  console.log(e.target.className);
+  console.log(e.target.checked);
+  check_arr.filter((el) => {
+    if (!e.target.checked) {
+      el != e.target;
+    }
+  });
 };
 
-// // IsRequired info
-// const isRequired = (attr_name_node_child_value) => {
-//   console.log(attr_name_node_child_value)
-//   var attr_name_node = attr_name_node_child_value.parentElement;
-//   var attr_name = attr_name_node_child_value.innerText.trim();
-//   var attribute_siblings = getSiblings(attr_name_node); // valueType, isRequired, attributeType, maxLength, etc
-//   var checked_obj = new Object();
-//   attribute_siblings.map((el, idx) => {
-//     if (el.childNodes.length === 4) {
-//       var attr_key = el.childNodes[1];
-//       var attr_value = el.childNodes[3];
-//       if (attr_key.outerText === '"isRequired" :') {
-//         var required_index = attr_value.innerText.split(",")[0];
-//         checked_obj[attr_name] = required_index;
-//         upsert_json_body[attr_name] ={}
-//       }
-//     } else {
-//       return;
-//     }
-//   });
-//   return checked_obj;
-// };
+// IsRequired info
+const isRequired = (attr_name_node_child_value) => {
+  // console.log(attr_name_node_child_value)
+  var attr_name_node = attr_name_node_child_value.parentElement;
+  var attr_name = attr_name_node_child_value.innerText.trim();
+  var attribute_siblings = getSiblings(attr_name_node); // valueType, isRequired, attributeType, maxLength, etc
+  var checked_obj = new Object();
+  attribute_siblings.map((el, idx) => {
+    if (el.childNodes.length === 4) {
+      var attr_key = el.childNodes[1];
+      var attr_value = el.childNodes[3];
+      if (attr_key.outerText === '"isRequired" :') {
+        var required_index = attr_value.innerText.split(",")[0];
+        checked_obj[attr_name] = required_index;
+        upsert_json_body[attr_name] = {};
+      }
+    } else {
+      return;
+    }
+  });
+  return checked_obj;
+};
 
 // Create checkbox for attribute name identify
 var node_list = document.getElementsByClassName("jsontree_node");
 
-const attribute_identification = () => {
-  try {
-    for (let i = 0; i < node_list.length; i++) {
-      var node_list_childNodes = node_list[i].childNodes;
-      if (node_list_childNodes.length == 4) {
-        var node_list_label = node_list_childNodes[1]; // span.jsontree_label-wrapper
-        var node_list_value = node_list_childNodes[3]; // span.jsontree_value-wrapper
+// const attribute_identification = () => {
+//   try {
+//     for (let i = 0; i < node_list.length; i++) {
+//       var node_list_childNodes = node_list[i].childNodes;
+//       if (node_list_childNodes.length == 4) {
+//         var node_list_label = node_list_childNodes[1]; // span.jsontree_label-wrapper
+//         var node_list_value = node_list_childNodes[3]; // span.jsontree_value-wrapper
 
-        if (node_list_label.outerText.trim() == '"name" :') {
-          var name_parent_node = node_list_label.parentNode;
-          var siblings_node = getSiblings(name_parent_node);
-          //  console.log(siblings_node)
-          console.log(
-            name_parent_node.parentNode.parentNode.parentNode.parentNode
-          );
-        }
+//         if (node_list_label.outerText.trim() == '"name" :') {
+//           var name_parent_node = node_list_label.parentNode;
+//           var siblings_node = getSiblings(name_parent_node);
+//           //  console.log(siblings_node)
+//           console.log(
+//             name_parent_node.parentNode.parentNode.parentNode.parentNode
+//           );
+//         }
+//       }
+//     }
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
+
+// attribute_identification();
+
+for (let i = 0; i < node_list.length; i++) {
+  var node_list_childNodes = node_list[i].childNodes;
+  if (node_list_childNodes.length == 4) {
+    var node_list_label = node_list_childNodes[1]; // span.jsontree_label-wrapper
+    var node_list_value = node_list_childNodes[3]; // span.jsontree_value-wrapper
+
+    if (node_list_label.outerText.trim() == '"name" :') {
+      var checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = node_list_value.innerText;
+      checkbox.addEventListener("change", upsert_position_select);
+      node_list_value.insertBefore(checkbox, node_list_value.childNodes[0]);
+      checkbox.checked =
+        Object.values(isRequired(node_list_value)) == "true" ? true : false;
+      checkbox.disabled =
+        Object.values(isRequired(node_list_value)) == "true" ? true : false;
+
+      if (checkbox.checked) {
+        check_arr.push(checkbox);
       }
     }
-  } catch (err) {
-    console.log(err);
   }
-};
+}
 
-attribute_identification();
+// getDepth = function (obj) {
+//   var depth = 0;
+//   if (obj.children) {
+//     obj.children.forEach(function (d) {
+//       var tmpDepth = getDepth(d);
+//       if (tmpDepth > depth) {
+//         depth = tmpDepth;
+//       }
+//     });
+//   }
+//   return 1 + depth;
+// };
 
-// for (let i = 0; i < node_list.length; i++) {
-//   var node_list_childNodes = node_list[i].childNodes;
-// if (node_list_childNodes.length == 4) {
-//   var node_list_label = node_list_childNodes[1]; // span.jsontree_label-wrapper
-//   var node_list_value = node_list_childNodes[3]; // span.jsontree_value-wrapper
+// console.log(getDepth(data.attributes[0].childAttributes))
 
-// if (node_list_label.outerText.trim() == '"name" :') {
-// var checkbox = document.createElement("input");
-// checkbox.type = "checkbox";
-// checkbox.className = node_list_value.innerText;
-// checkbox.addEventListener('change', upsert_position_select)
-// node_list_value.insertBefore(checkbox, node_list_value.childNodes[0]);
-//   checkbox.checked =
-//     Object.values(isRequired(node_list_value)) == "true" ? true : false;
-//   checkbox.disabled =
-//     Object.values(isRequired(node_list_value)) == "true" ? true : false;
-// }
-
-// }
-
-getDepth = function (obj) {
-  var depth = 0;
-  if (obj.children) {
-    obj.children.forEach(function (d) {
-      var tmpDepth = getDepth(d);
-      if (tmpDepth > depth) {
-        depth = tmpDepth;
-      }
-    });
-  }
-  return 1 + depth;
-};
-
-console.log(getDepth(data.attributes[0].childAttributes));
+console.log(check_arr);
