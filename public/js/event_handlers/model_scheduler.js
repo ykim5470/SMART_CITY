@@ -20,7 +20,7 @@ const Path = require("path");
 
 const model_scheduler = (socket) => {
   socket.on("모델 스케쥴러 조작",(data) => {
-    console.log('삭제 시 요청 받았나?')
+    // console.log('삭제 시 요청 받았나?')
     console.log(data)
     const { status, md_id } = data;
     // 선택 모델 정보 GET
@@ -130,7 +130,7 @@ const model_scheduler = (socket) => {
                                 const op_data_str = JSON.stringify(op_data);
                                 const op_data_value = JSON.parse(op_data_str);
 
-                                console.log("실행되는감????");
+                                // console.log("실행되는감????");
                                 let url = `http://localhost:4000/uploads/model/${filename}/model.json`;
                                 let predicted_output = await tensor_shape_convert(
                                   analysis_file_format,
@@ -140,7 +140,7 @@ const model_scheduler = (socket) => {
                                   url
                                 );
 
-                                  // console.log(predicted_output)
+                                  console.log(predicted_output)
                                 // data_upsert_serving(predicted_output, md_id)
                               });
                           } else {

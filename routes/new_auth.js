@@ -190,6 +190,7 @@ const output = {
   add: async (req, res) => {
     try {
       var { mode } = req.query;
+      // console.log(req.query)
       if (mode === "add") {
         output.processed_data().then((processed_dataset_resolve) => {
           var processed_dataset = processed_dataset_resolve;
@@ -206,7 +207,7 @@ const output = {
         output.mod();
       } else if (mode === "status") {
         // status mode
-        output.status();
+        output.status(req,res);
       } else {
         throw "Not valid query sent to server";
       }
@@ -226,8 +227,12 @@ const output = {
 
   status: async (req, res) => {
     try {
-      // status logic
-      console.log("bbb");
+      const{md_id} = req.query
+      const current_status = await model_list.findOne({where: {md_id: md_id}, attributes:['run_status']})
+      return res.render("model/model_status", {
+        md_id: md_id,
+        current_status: current_status.run_status
+      });
     } catch (err) {
       console.log(err);
     }
@@ -692,14 +697,15 @@ const process = {
     }
   },
 
-  // 모델 상태 관리 선택 페이지 이동
-  status_update: async (req, res) => {
-    const { md_id } = req.body;
-    const selected_model = await model_list
-      .findOne({ where: { md_id: md_id } })
-      .then((result) => result.run_status);
-    return res.redirect(`dataAnalysisModels/${md_id}?status=${selected_model}`);
-  },
+  // // 모델 상태 관리 선택 페이지 이동
+  // status_update: async (req, res) => {
+  //   const { md_id } = req.body;
+  //   const {mode } = req.query
+  //   const selected_model = await model_list
+  //     .findOne({ where: { md_id: md_id } })
+  //     .then((result) => result.run_status);
+  //   return res.redirect(`/dataAnalysisModelmodView?mode=${mode}?md_id=${md_id}?status=${selected_model}`);
+  // },
   // 모델 상태 관리 선택; 실행 Or 중지
   edit: async (req, res) => {
     try {
