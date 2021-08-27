@@ -1,88 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>모델 관리</title>
-		<!-- Bootstrap CSS -->
-		<link
-			rel="stylesheet"
-			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-			crossorigin="anonymous"
-		/>
-		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-		<script>
-			function ListDelete() {
-				var chkArray = new Array();
-				$("input:checkbox[name=md_id]:checked").each(function () {
-					chkArray.push(this.value);
-				});
-				console.log(chkArray);
-				$("#delModel").val(chkArray);
-				$("#confirm").submit();
-			}
-		</script>
-</head>
-	<body>
-		<h1>모델 관리</h1>
-		<button onclick="location.href='/dataAnalysisModelModView?mode=add'"type="submit">등록</button>
-		<input class='del_btn' type="button" onclick="ListDelete()" value="삭제" />
-		<table>
-			<tr>
-				<th>No.</th>
-				<th>분석시간</th>
-				<th>모델 이름</th>
-				<th>분석 모델</th>
-				<th>등록일</th>
-				<th>상태</th>
-				<th>관리</th>
-			</tr>
-			
-			{% for item in list_data %}
-			<tr>
-				<td>
-					<form action="/model/list/delete" method="post" id="confirm">
-						<input class='selected_md_del' type="checkbox" name="md_id" value="{{item.md_id}}" />
-						<input type="hidden" name="delModel" id="delModel" value="" />
-					</form>
-				</td>	
-				<td>{{list_data.indexOf(item)+1}}</td>	
-				<td>{{ item.al_time }}</td>
-				<td><a href='http://localhost:4000/dataAnalysisModelsView?md_id={{item.md_id}}'>{{item.md_name}}</a></td>
-				<td>{{item.al_name_mo}}</td>
-				<td>{{item.dateFormat(item.createdAt)}}</td>
-				<td>{{item.run_status}}</td>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>모델 관리</title>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script>
+      function ListDelete() {
+        var chkArray = new Array();
+        $("input:checkbox[name=md_id]:checked").each(function () {
+          chkArray.push(this.value);
+        });
+        console.log(chkArray);
+        $("#delModel").val(chkArray);
+        $("#confirm").submit();
+      }
+    </script>
+  </head>
+  <body>
+    <h1>모델 관리</h1>
+    <button
+      onclick="location.href='/dataAnalysisModelModView?mode=add'"
+      type="submit"
+    >
+      등록
+    </button>
+    <input class="del_btn" type="button" onclick="ListDelete()" value="삭제" />
+    <table>
+      <tr>
+        <th>No.</th>
+        <th>분석시간</th>
+        <th>모델 이름</th>
+        <th>분석 모델</th>
+        <th>등록일</th>
+        <th>상태</th>
+        <th>관리</th>
+      </tr>
 
-				<td>
-					<form action="/model_manage_board" method="post"><button class ='model_status_btn'type="submit" name="md_id" value="{{item.md_id}}">관리</button></form>
-				</td>
-			</tr>
+      {% for item in list_data %}
+      <tr>
+        <td>
+          <form action="/model/list/delete" method="post" id="confirm">
+            <input
+              class="selected_md_del"
+              type="checkbox"
+              name="md_id"
+              value="{{item.md_id}}"
+            />
+            <input type="hidden" name="delModel" id="delModel" value="" />
+          </form>
+        </td>
+        <td>{{list_data.indexOf(item)+1}}</td>
+        <td>{{ item.al_time }}</td>
+        <td>
+          <a
+            href="http://localhost:4000/dataAnalysisModelsView?mode=view?md_id={{item.md_id}}"
+            >{{item.md_name}}</a
+          >
+        </td>
+        <td>{{item.al_name_mo}}</td>
+        <td>{{item.dateFormat(item.createdAt)}}</td>
+        <td>{{item.run_status}}</td>
 
-			{% endfor %}
-			
-		</table>
-		<nav aria-label="Page navigation example">
-			<ul class="pagination">
-				<li class="page-item">
-					<a class="page-link" href="{{prevUrl}}" aria-label="Previous">
-						<span aria-hidden="true">&laquo;</span>
-						<span class="sr-only">Previous</span>
-					</a>
-				</li>
-				{% for pagesNav in pages %}
-				<li class="page-item"><a class="page-link" href="{{pagesNav.url}}">{{pagesNav.number}}</a></li>
-				{%endfor%}
-				<li class="page-item">
-					<a class="page-link" href="{{nextUrl}}" aria-label="Next">
-						<span aria-hidden="true">&raquo;</span>
-						<span class="sr-only">Next</span>
-					</a>
-				</li>
-			</ul>
-		</nav>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="/js/model/dataAnalysisModels.js"></script>
-	</body>	
+        <td>
+          <form action="/dataAnalysisModelmodView?mode=status" method="get">
+            <button
+              class="model_status_btn"
+              type="submit"
+              name="md_id"
+              value="{{item.md_id}}"
+            >
+              관리</button
+            >
+			<input hidden name="mode" value="status" />
+          </form>
+        </td>
+      </tr>
+
+      {% endfor %}
+    </table>
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item">
+          <a class="page-link" href="{{prevUrl}}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Previous</span>
+          </a>
+        </li>
+        {% for pagesNav in pages %}
+        <li class="page-item">
+          <a class="page-link" href="{{pagesNav.url}}">{{pagesNav.number}}</a>
+        </li>
+        {%endfor%}
+        <li class="page-item">
+          <a class="page-link" href="{{nextUrl}}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Next</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/model/dataAnalysisModels.js"></script>
+  </body>
 </html>

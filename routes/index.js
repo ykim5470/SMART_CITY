@@ -75,7 +75,7 @@ router.post("/analysis/insert", newAnaly.process.insert);
 router.post('/model/file_add',uploadFile.single("atch_origin_file_name"), new_auth.process.file_add)
 router.post('/model/register/complete', uploadFile.single("atch_origin_file_name"), new_auth.process.register_complete)
 router.post('/model/list/delete', new_auth.process.delete)
-router.post("/model_manage_board", new_auth.process.status_update);
+// router.post("/dataAnalysisModelmodView", new_auth.process.status_update);
 
 
 //Dataset

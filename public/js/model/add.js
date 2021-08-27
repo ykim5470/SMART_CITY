@@ -157,53 +157,59 @@ socket.on("데이터 선택 완료 및 개별 센서 데이터 calling", (data) 
   });
 });
 
-// output params GET & add to page
-socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
-  const model_column = data;
-  // console.log("DB 반환 데이터 : " + data);
-  // 여기서 output 맵핑 창을 만든다.
+// Output model JSON GET & Create JSON tree view
+socket.on('분석 모델 선택 완료 및 JSON calling', (data)=>{
+  console.log(data)
+})
 
-  const output_box = model_column.map((items) => {
-    return `
-        <tr>
-        <td><input type="hidden" name="op_col_id" value="${items.col_id}" /></td>
-        <td><input name="op_attr_value_type" value="${items.attributeType}" readonly /></td>
-        <td><input name="op_attr_name" value="${items.name}" readonly /></td>
-        <td><input name="user_output_param" /></td>
-        </tr>
-        `;
-  });
+// // output params GET & add to page
+// socket.on("분석 모델 선택 완료 및 아웃풋 calling", (data) => {
+//   console.log('분석 모델 선택 완료?')
+//   const model_column = data;
+//   // console.log("DB 반환 데이터 : " + data);
+//   // 여기서 output 맵핑 창을 만든다.
 
-  const output_look_up_data = `<table>
-  데이터 조회 기간
-  <input
-    class="op_data_lookup"
-    type="number"
-    name="op_data_lookup_date"
-    placeholder="일"
-  />
-  <input
-    class="op_data_lookup"
-    type="number"
-    name="op_data_lookup_hour"
-    placeholder="시간"
-  />
-  <input
-    class="op_data_lookup"
-    type="number"
-    name="op_data_lookup_min"
-    placeholder="분"
-  />
-  <input
-    class="op_data_lookup"
-    type="number"
-    name="op_data_lookup_sec"
-    placeholder="초"
-  />
-</table>`;
-  output_params_insert.innerHTML = output_box.join("");
-  output_look_up_insert.innerHTML = output_look_up_data;
-});
+//   const output_box = model_column.map((items) => {
+//     return `
+//         <tr>
+//         <td><input type="hidden" name="op_col_id" value="${items.col_id}" /></td>
+//         <td><input name="op_attr_value_type" value="${items.attributeType}" readonly /></td>
+//         <td><input name="op_attr_name" value="${items.name}" readonly /></td>
+//         <td><input name="user_output_param" /></td>
+//         </tr>
+//         `;
+//   });
+
+//   const output_look_up_data = `<table>
+//   데이터 조회 기간
+//   <input
+//     class="op_data_lookup"
+//     type="number"
+//     name="op_data_lookup_date"
+//     placeholder="일"
+//   />
+//   <input
+//     class="op_data_lookup"
+//     type="number"
+//     name="op_data_lookup_hour"
+//     placeholder="시간"
+//   />
+//   <input
+//     class="op_data_lookup"
+//     type="number"
+//     name="op_data_lookup_min"
+//     placeholder="분"
+//   />
+//   <input
+//     class="op_data_lookup"
+//     type="number"
+//     name="op_data_lookup_sec"
+//     placeholder="초"
+//   />
+// </table>`;
+//   output_params_insert.innerHTML = output_box.join("");
+//   output_look_up_insert.innerHTML = output_look_up_data;
+// });
 
 const register_submit = () => {
   register_complete.addEventListener("click", async (e) => {

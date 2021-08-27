@@ -8,48 +8,67 @@ var check_arr = new Array();
 
 // Get json-data by javascript-object
 var data = {
-  type: "childAttribute_test_model1",
-  namespace: "childAttribute1",
-  version: "2.0.1",
-  name: "차일드_어티리뷰트_테스트1",
-  context: ["차일드"],
-  description: "차일드_어트리뷰트_테스트1",
-  attributes: [
-    {
-      name: "reservoirLevelPrediction",
-      isRequired: true,
-      valueType: "Object",
-      objectMembers: [
-        {
-          name: "LevelPrediction",
-          valueType: "Double",
-        },
-        {
-          name: "predictedAt",
-          valueType: "Date",
-        },
-      ],
-      attributeType: "Property",
-      hasObservedAt: true,
-      childAttributes: [
-        {
-          name: "reservoirLevelPrediction_ChildAttr",
-          isRequired: true,
-          valueType: "Double",
-          objectMembers: [
-            {
-              name: "test",
-              valueType: "Integer",
-            },
-          ],
-          attributeType: "Property",
-          hasObservedAt: true,
-        },
-      ],
-    },
+  "type": "childAttribute_test_model1",
+  "namespace": "childAttribute1",
+  "version": "2.0.1",
+  "name": "차일드_어티리뷰트_테스트1",
+  "context": [
+      "차일드"
   ],
-  createdAt: "2021-08-23T11:30:49,976+09:00",
-  modifiedAt: "2021-08-23T15:54:03,148+09:00",
+  "description": "차일드_어트리뷰트_테스트1",
+  "attributes": [
+      {
+          "name": "reservoirLevelPrediction",
+          "isRequired": true,
+          "valueType": "Object",
+          "objectMembers": [
+              {
+                  "name": "LevelPrediction",
+                  "valueType": "Double"
+              },
+              {
+                  "name": "predictedAt",
+                  "valueType": "Date"
+              }
+          ],
+          "attributeType": "Property",
+          "hasObservedAt": true,
+          "childAttributes": [
+              {
+                  "name": "reservoirLevelPrediction_ChildAttr",
+                  "isRequired": true,
+                  "valueType": "Double",
+                  "objectMembers": [
+                      {
+                          "name": "test",
+                          "valueType": "Integer",
+                      },
+                      {
+                          "name" : "test_obj",
+                          "valueType": "ArrayObject",
+                          "objectMembers" : [
+                            {
+                              "name" : "nested_test_obj",
+                              "valueType": "String"
+                            }
+                          ]
+                      }
+                  ],
+                  "attributeType": "Property",
+                  "hasObservedAt": true,
+                  "childAttribute": [
+                    {
+                      "name" : "nested_child_attr",
+                      "isRequired": true,
+                      "valueType": "Integer"
+                    }
+                  ]
+              }
+          ]
+      }
+  ],
+  "createdAt": "2021-08-23T11:30:49,976+09:00",
+  "modifiedAt": "2021-08-23T15:54:03,148+09:00"
 };
 
 // Create node tree view
