@@ -1,8 +1,8 @@
 // Get DOM-element for inserting json-tree
 var wrapper = document.getElementById("wrapper");
 
-var depth_length = document.getElementById("depth_length");
-console.log(depth_length.innerText);
+// var depth_length = document.getElementById("depth_length");
+// console.log(depth_length.innerText);
 
 var check_arr = new Array();
 
@@ -56,7 +56,7 @@ var data = {
                   ],
                   "attributeType": "Property",
                   "hasObservedAt": true,
-                  "childAttribute": [
+                  "childAttributes": [
                     {
                       "name" : "nested_child_attr",
                       "isRequired": true,
