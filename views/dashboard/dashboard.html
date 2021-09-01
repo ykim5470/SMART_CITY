@@ -63,12 +63,7 @@
                     <select title="대시보드 데이터 선택" name="dataset_name" id="data_select"></select>
                   </div>
                   <h3 class="data-tit">지점</h3>
-                  <div class="item-check flex flex_one" id="dataset_data_checkbox">
-                    <div class="item-box">
-                      <input type="checkbox" name="listCheck1" id="listCheck1-1" />
-                      <label for="listCheck1-1" title="label01"><span class="check-ico"></span>label01</label>
-                    </div>
-                  </div>
+                  <div class="item-check flex flex_one" id="dataset_data_checkbox"></div>
                   <h3 class="data-tit">Time</h3>
                   <div class="item-input time">
                     <input type="number" placeholder="일" />
@@ -78,39 +73,29 @@
                   </div>
                   <h3 class="data-tit">컬럼 지정</h3>
                   <div class="treeview_box" style="height: 400px">
-                    <ul class="tree_basic">
+                    <!-- <ul class="tree_basic">
                       <li class="tree_in">
-                        신규
+                        happyHome
                         <ul>
-                          <li>신규</li>
+                          <li>jolRyeo</li>
+                          <li>zibgagosipda</li>
                           <li class="tree_in">
-                            신규
+                            childAttributes
                             <ul>
-                              <li>신규</li>
-                              <li>New</li>
-                              <li>New</li>
-                              <li>New</li>
-                              <li>New</li>
-                            </ul>
-                          </li>
-                          <li class="tree_in">
-                            New
-                            <ul>
-                              <li>New</li>
                               <li class="tree_in">
-                                New
+                                WannaGoHome
                                 <ul>
-                                  <li>New</li>
-                                  <li>New</li>
+                                  <li>sleepyy</li>
+                                  <li>pigon</li>
                                 </ul>
                               </li>
-                              <li>New</li>
                             </ul>
                           </li>
-                          <li>New</li>
                         </ul>
                       </li>
-                    </ul>
+                    </ul> -->
+                    <div id="wrapper"></div>
+                    <!-- <div id= "depth_length" hidden>{{json_depth}}</div> -->
                   </div>
                   <h3 class="data-tit">상세 내용</h3>
                   <div class="item-textarea">
@@ -145,6 +130,8 @@
       </div>
       <!-- // 위젯 등록 모달 -->
     </div>
+    <script src ='/js/dashboard/jsonTree.js'></script>
+	  <!-- <script src="/js/dashboard/test.js"></script> -->
     <script src="/resource/windowdefault/nav_toggle.js"></script>
     <script src="/resource/windowdefault/modal.js"></script>
     <script src="/js/dashboard/dashboard.js"></script>

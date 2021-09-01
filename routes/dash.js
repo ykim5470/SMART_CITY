@@ -9,6 +9,7 @@ const unzipper = require("unzipper");
 const errorHandling = require("../public/js/helpers/error_handling");
 const { INGEST_INTERFACE, DATA_MANAGER, DATA_SERVICE_BROKER } = require("../base");
 const { resolve } = require("path");
+// const flatten = require("flat").flatten;
 
 // Get
 const output = {
@@ -45,13 +46,11 @@ const output = {
   check_data: async (dataset) => {
     for (var i = 0; i < dataset.length; i++) {
       let uri = `Type=${dataset[i].value.dataModelNamespace}.${dataset[i].value.dataModelType}:${dataset[i].value.dataModelVersion}&datasetId=${dataset[i].value.id}`;
-      console.log(uri)
       try {
         await axios.get(`http://203.253.128.184:18227/entities?${uri}`, {
           headers: { Accept: "application/json" },
         });
       } catch (err) {
-        console.log(uri)
         dataset.splice(i, 1);
         i--;
         continue;
@@ -80,18 +79,104 @@ const output = {
   data_load: async (req, res) => {
     const defineUri = req.params.data;
     const data_dict = [];
-    const alert = "<script>alert('해당 dataset에 적재된 data가 존재하지 않습니다.'); location.href=history.back();</script>";
+    let flag = false;
     try {
       const dataList = await axios.get(`http://203.253.128.184:18227/entities?${defineUri}`, {
         headers: { Accept: "application/json" },
       });
       dataList.data.filter((el) => {
-        return data_dict.push(el.name);
+        if (el.name == undefined) {
+          flag = true;
+          return res.send({ data: "undefined" });
+        } else {
+          return data_dict.push(el.name);
+        }
       });
+      if (!flag) {
+        return res.send({ data: data_dict });
+      }
+    } catch (err) {
+      if (!flag) {
+        return res.send({ data: "error" });
+      }
+    }
+  },
+  //datamodel attr get
+  attr_load: async (req, res) => {
+    const uri = req.params.data;
+    try {
+      const dataList = await axios.get(`http://203.253.128.184:18827/datamodels/?${uri}`, {
+        headers: { Accept: "application/json" },
+      });
+      let data_dict;
+      dataList.data.filter((el) => {
+        data_dict = el.attributes
+      });
+      data_dict.map((el,index)=>{
+        if(el.name == "name"){
+          data_dict.splice(index,1);
+        }
+      })
       return res.send({ data: data_dict });
     } catch (err) {
-      res.send(alert)
+      res.send({ data: "error" });
     }
+  },
+  treeview: (req, res) => {
+  //   function getObjectDepth(obj){
+ 
+  //     if (typeof obj !== "object" || obj === null) {
+  //         return 0;
+  //     }
+   
+  //     const flat = flatten(obj);
+   
+  //     const keys =  Object.keys(flat);
+   
+  //     if(keys.length === 0){
+  //         return 1;
+  //     }
+   
+  //     const depthOfKeys = keys.map(key => key.split(".").length);
+   
+  //     return Math.max(...depthOfKeys);
+  // }
+  //   var data = {
+  //     attributes: [
+  //       {
+  //         name: "reservoirLevelPrediction",
+  //         isRequired: true,
+  //         valueType: "Object",
+  //         objectMembers: [
+  //           {
+  //             name: "LevelPrediction",
+  //             valueType: "Double",
+  //           },
+  //           {
+  //             name: "predictedAt",
+  //             valueType: "Date",
+  //           },
+  //         ],
+  //         childAttributes: [
+  //           {
+  //             name: "reservoirLevelPrediction_ChildAttr",
+  //             isRequired: true,
+  //             valueType: "Double",
+  //             objectMembers: [
+  //               {
+  //                 name: "test",
+  //                 valueType: "Integer",
+  //               },
+  //             ],
+  //             attributeType: "Property",
+  //             hasObservedAt: true,
+  //           },
+  //         ],
+  //       },
+  //     ]
+  //   };
+  //   console.log(flatten(data))
+    res.render("dashboard/treeTest");
   },
 };
 // Post
