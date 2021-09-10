@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      data_name: {
+      data_id: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -62,6 +62,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.CHAR,
         allowNull: false,
         defaultValue: 'N'
+      },
+      user_id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'user01'
       }
     },
     {

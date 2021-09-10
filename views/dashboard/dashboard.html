@@ -35,6 +35,18 @@
             <button type="button" class="btn btn-c-white float-left js-widget-btn register-widget">위젯 등록</button>
           </div>
         </div>
+        <div class="chart-list" id="sortable">
+          {# {% if widget_title %} {% for widget in widget_title %}
+          <div class="chart-list-item">
+            <div class="chart-list-item-tit clearfix">
+              <h3 class="float-left">{{widget}}</h3>
+              <button type="button" name="button" class="float-right card_del"><img src="img/ico-modal-delete.png" alt="삭제" /></button>
+            </div>
+            <canvas id="{{widget}}" height="301"></canvas>
+          </div>
+          {% endfor %} {% endif%} #}
+          
+        </div>
       </div>
       <!-- //contents-area -->
 
@@ -45,84 +57,63 @@
             <div class="ui-layer__head">
               <h2 class="ui-layer__title">위젯 등록</h2>
             </div>
-            <form id="widgetFrm">
+            <form id="widgetFrm" action="/dashboard/register" method="POST" name="register">
               <div class="ui-layer__body">
                 <div class="ui-layer__body-inner">
                   <h3 class="data-tit">제목</h3>
                   <div class="item-input">
-                    <input type="text" placeholder="제목 입력하세요." />
+                    <input type="text" placeholder="제목 입력하세요." name="title" />
                   </div>
                   <h3 class="data-tit">데이터</h3>
                   <div class="item-select">
                     <select title="대시보드 데이터 선택" name="dataset_type" id="dataset_type">
-                      <option value="원천데이터" >원천 데이터</option>
+                      <option value="원천데이터">원천 데이터</option>
                       <option value="분석데이터">분석 데이터</option>
                     </select>
                   </div>
                   <div class="item-select">
-                    <select title="대시보드 데이터 선택" name="dataset_name" id="data_select"></select>
+                    <select title="대시보드 데이터 선택" name="dataset_info" id="data_select"></select>
+                    <input type="hidden" value="" name="dataset_name" />
                   </div>
                   <h3 class="data-tit">지점</h3>
                   <div class="item-check flex flex_one" id="dataset_data_checkbox"></div>
-                  <h3 class="data-tit">Time</h3>
-                  <div class="item-input time">
-                    <input type="number" placeholder="일" />
-                    <input type="number" placeholder="시" />
-                    <input type="number" placeholder="분" />
-                    <input type="number" placeholder="초" />
-                  </div>
                   <h3 class="data-tit">컬럼 지정</h3>
                   <div class="treeview_box" style="height: 400px">
-                    <!-- <ul class="tree_basic">
-                      <li class="tree_in">
-                        happyHome
-                        <ul>
-                          <li>jolRyeo</li>
-                          <li>zibgagosipda</li>
-                          <li class="tree_in">
-                            childAttributes
-                            <ul>
-                              <li class="tree_in">
-                                WannaGoHome
-                                <ul>
-                                  <li>sleepyy</li>
-                                  <li>pigon</li>
-                                </ul>
-                              </li>
-                            </ul>
-                          </li>
-                        </ul>
-                      </li>
-                    </ul> -->
                     <div id="wrapper"></div>
-                    <!-- <div id= "depth_length" hidden>{{json_depth}}</div> -->
+                  </div>
+                  <h3 class="data-tit">Time</h3>
+                  <div class="item-input time">
+                    <input type="number" placeholder="일" name="time_days" />
+                    <input type="number" placeholder="시" name="time_hours" />
+                    <input type="number" placeholder="분" name="time_minutes" />
+                    <input type="number" placeholder="초" name="time_seconds" />
+                  </div>
+                  <h3 class="data-tit">Limit</h3>
+                  <div class="item-input time">
+                    <input type="number" placeholder="data-limit" name="data_limit" />
+                    <input type="number" placeholder="chart-limit" name="chart_limit" />
                   </div>
                   <h3 class="data-tit">상세 내용</h3>
                   <div class="item-textarea">
-                    <textarea name="teditor" cols="100" rows="10" placeholder="모델 설명을 작성해 주세요" title="모델 설명"></textarea>
+                    <textarea name="description" cols="100" rows="10" placeholder="모델 설명을 작성해 주세요" title="모델 설명"></textarea>
                   </div>
                   <h3 class="data-tit">그래프 대분류</h3>
                   <div class="item-select">
-                    <select title="대시보드 그래프 대분류 선택">
+                    <select title="대시보드 그래프 대분류 선택" name="chart_type">
                       <option value="Line" selected>Line Chart</option>
                       <option value="Bar">Bar Chart</option>
                       <option value="Other">Other Chart</option>
                       <option value="Area">Area Chart</option>
                     </select>
                   </div>
-                  <h3 class="data-tit">그래프 중분류</h3>
-                  <div class="item-select">
-                    <select title="대시보드 그래프 중분류 선택">
-                      <option value="Default" selected>Default</option>
-                    </select>
-                  </div>
                 </div>
               </div>
               <div class="ui-layer__foot">
                 <div class="modal-btns-box">
-                  <button type="button" class="btn btn-c-primary" data-role="layerClose">등록</button>
+                  <button type="button" class="btn btn-c-primary register-btn" data-role="layerClose">등록</button>
                 </div>
               </div>
+              <input type="hidden" name="attr_list" value="" />
             </form>
           </section>
           <div class="over_box" data-role="layerClose"></div>
@@ -130,8 +121,10 @@
       </div>
       <!-- // 위젯 등록 모달 -->
     </div>
-    <script src ='/js/dashboard/jsonTree.js'></script>
-	  <!-- <script src="/js/dashboard/test.js"></script> -->
+    <script src="/socket.io/socket.io.js"></script>
+    {# <script src="/js/model/status.js"></script> #}
+    <script src="/js/dashboard/jsonTree.js"></script>
+    <script src="/js/dashboard/chart.js"></script>
     <script src="/resource/windowdefault/nav_toggle.js"></script>
     <script src="/resource/windowdefault/modal.js"></script>
     <script src="/js/dashboard/dashboard.js"></script>

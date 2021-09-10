@@ -20,7 +20,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      data_name: {
+      data_id: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -51,6 +51,11 @@ module.exports = {
         type: Sequelize.CHAR,
         allowNull: false,
         defaultValue: 'N'
+      },
+      user_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'user01'
       },
       createdAt: {
         allowNull: false,
