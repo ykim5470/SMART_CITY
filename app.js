@@ -46,25 +46,20 @@ app.use("/", index_router);
 const server = app.listen(app.get("port"), () => {
   console.log(`http://localhost:${app.get("port")}`);
 });
-const server1 = app.listen(app.get("port")+"/dashboard/register", () => {
-  console.log(`http://localhost:${app.get("port")}`);
-});
 
 // Socket setup
 const io = socket(server, {
   allowEIO3: true, // false by default
 });
 
-const io1 = socket(server1, {
-  allowEIO3: true, // false by default
-});
-
-module.exports = {io1};
+module.exports = server;
 
 // Socket Connection
 io.on("connection", (socket) => {
   console.log("Made socket connection");
-
+  socket.on("아무거나",(data)=>{
+    console.log(data)
+  })
   // 스케쥴러 조작
   model_scheduler(socket);
 

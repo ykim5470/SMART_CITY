@@ -177,11 +177,24 @@ function treeViewTest(data) {
     }
   }
 }
-// const socket = io();
 const register = document.querySelector(".register-btn");
 register.addEventListener("click", () => {
   check_arr = check_arr.filter((item) => item.replace(/\\"/gi, ""));
-  document.getElementsByName("attr_list")[0].value = check_arr;
-  console.log(document.getElementsByName("attr_list")[0].value);
-  document.register.submit();
+  // document.getElementsByName("attr_list")[0].value = check_arr;
+  // console.log(document.getElementsByName("attr_list")[0].value);
+  var formSerializeArray = $("#widgetFrm").serializeArray();
+  var object = {};
+  for (var i = 0; i < formSerializeArray.length; i++) {
+    if(Object.keys(object).includes(formSerializeArray[i]["name"])){
+      object[formSerializeArray[i]["name"]] += `,${formSerializeArray[i]["value"]}`;
+    }else if(formSerializeArray[i]["name"] == "load_attr"){
+      object[formSerializeArray[i]["name"]] = check_arr;
+    }else{
+      object[formSerializeArray[i]["name"]] = formSerializeArray[i]["value"];
+    }
+  }
+  var json = JSON.stringify(object);
+  console.log(json)
+  // document.register.submit();
+  socket.emit("아무거나", "되냐");
 });

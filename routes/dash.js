@@ -5,7 +5,9 @@ const paging = require("../public/js/helpers/pagination");
 const api_scheduler = require("../public/js/helpers/api_scheduler");
 const moment = require("moment");
 const base = require("../base");
-const {io1} = require("../app")
+// const socket = require("socket.io");
+const socket = require("socket.io");
+
 // const flatten = require("flat").flatten;
 const dataRequest = {
   getData: async (id, startDate, endDate, limit, attr) => {
@@ -158,20 +160,19 @@ const output = {
     }
   },
 };
-const socket = io1()
 // Post
 const process = {
   register: async (req, res) => {
-    const body = req.body;
-    //database
-    const dbTime = `${body.time_days}-${body.time_hours}-${body.time_minutes}-${body.time_seconds}`;
-    body["time"] = dbTime;
-    body.data_id = body.data_id.toString();
-    console.log(body.load_attr);
-    body.load_attr = body.load_attr.toString();
-    console.log(body);
-    const result = await widget.create(body);
-    socket.emit();
+    // const body = req.body;
+    // //database
+    // const dbTime = `${body.time_days}-${body.time_hours}-${body.time_minutes}-${body.time_seconds}`;
+    // body["time"] = dbTime;
+    // body.data_id = body.data_id.toString();
+    // console.log(body.load_attr);
+    // body.load_attr = body.load_attr.toString();
+    // console.log(body);
+    // const result = await widget.create(body);
+    // socket.emit("아무거나","되냐");
     //res.redirect("/dashboard");
   },
   // 대시보드 차트 등록 Complete
