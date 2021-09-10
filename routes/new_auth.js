@@ -16,7 +16,6 @@ const errorHandling = require("../public/js/helpers/error_handling");
 const base = require("../base");
 const { resolve } = require("path");
 
-const flatten = require("flat").flatten;
 
 // POST URL
 const dataRequest = {
@@ -73,70 +72,8 @@ const dataRequest = {
 const output = {
   // test
   test: (req, res) => {
-    function getObjectDepth(obj){
- 
-      if (typeof obj !== "object" || obj === null) {
-          return 0;
-      }
-   
-      const flat = flatten(obj);
-   
-      const keys =  Object.keys(flat);
-   
-      if(keys.length === 0){
-          return 1;
-      }
-   
-      const depthOfKeys = keys.map(key => key.split(".").length);
-   
-      return Math.max(...depthOfKeys);
-  }
-    var data = {
-      type: "childAttribute_test_model1",
-      namespace: "childAttribute1",
-      version: "2.0.1",
-      name: "차일드_어티리뷰트_테스트1",
-      context: ["차일드"],
-      description: "차일드_어트리뷰트_테스트1",
-      attributes: [
-        {
-          name: "reservoirLevelPrediction",
-          isRequired: true,
-          valueType: "Object",
-          objectMembers: [
-            {
-              name: "LevelPrediction",
-              valueType: "Double",
-            },
-            {
-              name: "predictedAt",
-              valueType: "Date",
-            },
-          ],
-          attributeType: "Property",
-          hasObservedAt: true,
-          childAttributes: [
-            {
-              name: "reservoirLevelPrediction_ChildAttr",
-              isRequired: true,
-              valueType: "Double",
-              objectMembers: [
-                {
-                  name: "test",
-                  valueType: "Integer",
-                },
-              ],
-              attributeType: "Property",
-              hasObservedAt: true,
-            },
-          ],
-        },
-      ],
-      createdAt: "2021-08-23T11:30:49,976+09:00",
-      modifiedAt: "2021-08-23T15:54:03,148+09:00",
-    };
-    console.log(flatten(data))
-    res.render("model/test", {json_depth : getObjectDepth(data)} );
+
+    res.render("model/test" );
   },
   // 데이터 적재 모델 리스트
   list: async (req, res) => {

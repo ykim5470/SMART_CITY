@@ -17,6 +17,9 @@ router.get('/dashboard', dash.output.dashboard)
 //router.get('/dashboard/processed_data_load', dash.output.processed_data_load)
 router.get('/dashboard/dataset_load/:data', dash.output.dataset_load)
 router.get('/dashboard/data_load/:data', dash.output.data_load)
+router.get('/dashboard/attr_load/:data', dash.output.attr_load)
+router.get('/dashboard/treeTest/', dash.output.treeview)
+router.get('/dashboard/widget_load/', dash.output.get_widget)
 
 
 //Analysis 
@@ -60,7 +63,7 @@ router.get("/df/view/:df_id", df.output.view);
 
 //==============================POST======================================
 //Dashboard
-router.post('/dashboard/test', dash.process.test)
+router.post('/dashboard/register', dash.process.register)
 //Analysis
 router.post("/analysis/insert", newAnaly.process.insert);
 //Model
