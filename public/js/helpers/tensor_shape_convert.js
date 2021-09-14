@@ -49,8 +49,9 @@ const tensor_shape_convert = (
     });
     return model;
   } else if (analysis_file_format === "loadLayersModel") {
-    console.log(single_processed_data_result)
+    // console.log(single_processed_data_result)
     // 레이어 모델
+
     const model = tf.loadLayersModel(url).then((models) => {
       var tensor_shape_object = new Object();
       user_input_value.map(
@@ -89,12 +90,12 @@ const tensor_shape_convert = (
         )
 
         var sorted_zipped_input = Object.keys(sorted_zipped_input_obj).map(el => zipped_input[el])
-        console.log(sorted_zipped_input)
+        // console.log(sorted_zipped_input)
       
         var predicted_outputs = models.predict(sorted_zipped_input)
         
       console.log("레이어 모델 실행 완료");
-      return [predicted_outputs, op_data_value]
+      return predicted_outputs
     });
     return model;
   } else {

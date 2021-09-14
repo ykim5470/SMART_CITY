@@ -35,7 +35,8 @@ const paging = {
 
 //post url
 const dataRequest = {
-  insert: async (result) => {
+  insert: async (result) => 
+  {
     console.log("========DATA MODEL CREATE REQUEST==========");
     try {
       await axios({

@@ -13,7 +13,7 @@ const {
   sorted_input_param,
   single_processed_data,
 } = require("../helpers/api_scheduler");
-// const  data_upsert_serving = require('../helpers/data_serving')
+const  data_upsert_serving = require('../helpers/data_serving')
 const tensor_shape_convert = require("../helpers/tensor_shape_convert");
 const fs = require("fs");
 const Path = require("path");
@@ -124,7 +124,7 @@ const model_scheduler = (socket) => {
                             model_output
                               .findAll({
                                 where: { op_id: md_id },
-                                attributes: ["op_col_id", "op_value", "op_date_look_up"],
+                                attributes: ["op_sequence", "op_date_look_up"],
                               })
                               .then(async(op_data) => {
                                 const op_data_str = JSON.stringify(op_data);
@@ -132,6 +132,7 @@ const model_scheduler = (socket) => {
 
                                 // console.log("실행되는감????");
                                 let url = `http://localhost:4000/uploads/model/${filename}/model.json`;
+                                // console.log(url)
                                 let predicted_output = await tensor_shape_convert(
                                   analysis_file_format,
                                   op_data_value,
@@ -140,8 +141,8 @@ const model_scheduler = (socket) => {
                                   url
                                 );
 
-                                  console.log(predicted_output)
-                                // data_upsert_serving(predicted_output, md_id)
+                                // console.log(predicted_output)
+                                data_upsert_serving(predicted_output, md_id)
                               });
                           } else {
                             throw "존재하지 않는 변환 파일입니다";

@@ -15,7 +15,7 @@ const unzipper = require("unzipper");
 const errorHandling = require("../public/js/helpers/error_handling");
 const base = require("../base");
 const { resolve } = require("path");
-
+const flatten = require("flat").flatten;
 
 // POST URL
 const dataRequest = {
@@ -72,8 +72,78 @@ const dataRequest = {
 const output = {
   // test
   test: (req, res) => {
+    var data =  {
+      "type": "TransmissivityPrediction",
+      "namespace": "kr.waterdna",
+      "version": "1.2",
+      "name": "LID 투수량 예측",
+      "context": [
+          "http://uri.etsi.org/ngsi-ld/core-context.jsonld"
+      ],
+      "description": "LID 투수량 예측",
+      "attributes": [
+          {
+              "name": "TransmissivityVolume",
+              "isRequired": true,
+              "valueType": "Object",
+              "objectMembers": [
+                  {
+                      "name": "predictedAt",
+                      "valueType": "ArrayString"
+                  },
+                  {
+                      "name": "volume",
+                      "valueType": "ArrayInteger"
+                  }
+              ],
+              "attributeType": "Property",
+              "hasObservedAt": true,
+              "childAttributes": [
+                  {
+                      "name": "TransmissivityRatio",
+                      "isRequired": true,
+                      "valueType": "Object",
+                      "objectMembers": [
+                          {
+                              "name": "predictedAt",
+                              "valueType": "ArrayString"
+                          },
+                          {
+                              "name": "ratio",
+                              "valueType": "ArrayDouble"
+                          }
+                      ],
+                      "attributeType": "Property",
+                      "hasObservedAt": true
+                  }
+              ]
+          }
+      ],
+      "createdAt": "2021-08-31T10:26:00,020+09:00",
+      "modifiedAt": "2021-09-08T12:42:15,900+09:00"
+  };
+    function getObjectDepth(obj) {
+      if (typeof obj !== "object" || obj === null) {
+        return 0;
+      }
 
-    res.render("model/test" );
+      const flat = flatten(obj);
+      console.log(flat)
+
+      const keys = Object.keys(flat);
+
+      if (keys.length === 0) {
+        return 1;
+      }
+
+      const depthOfKeys = keys.map((key) => key.split(".").length);
+
+      return Math.max(...depthOfKeys);
+    }
+
+    console.log(getObjectDepth(JSON.parse(JSON.stringify(data))));
+
+    res.render("model/test");
   },
   // 데이터 적재 모델 리스트
   list: async (req, res) => {
@@ -144,7 +214,7 @@ const output = {
         output.mod();
       } else if (mode === "status") {
         // status mode
-        output.status(req,res);
+        output.status(req, res);
       } else {
         throw "Not valid query sent to server";
       }
@@ -164,11 +234,14 @@ const output = {
 
   status: async (req, res) => {
     try {
-      const{md_id} = req.query
-      const current_status = await model_list.findOne({where: {md_id: md_id}, attributes:['run_status']})
+      const { md_id } = req.query;
+      const current_status = await model_list.findOne({
+        where: { md_id: md_id },
+        attributes: ["run_status"],
+      });
       return res.render("model/model_status", {
         md_id: md_id,
-        current_status: current_status.run_status
+        current_status: current_status.run_status,
       });
     } catch (err) {
       console.log(err);
@@ -451,7 +524,6 @@ const process = {
       analysis_file_format,
       tf_shape,
       tf_shape_index,
-      op_col_id,
       user_output_param,
     } = req.body;
     console.log(req.body);

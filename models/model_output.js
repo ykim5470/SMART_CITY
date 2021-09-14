@@ -15,8 +15,7 @@ module.exports = (sequelize, DataTypes) => {
 	model_output.init(
 		{
 			op_id: { type: DataTypes.UUID, foreignKey:true, allowNull:false },
-			op_col_id: { type: DataTypes.INTEGER, allowNull: false },
-			op_value: { type: DataTypes.STRING, allowNull: false },
+			op_sequence: { type: DataTypes.TEXT, allowNull: false },
 			op_date_look_up: { allowNull: false, type: DataTypes.JSON },
 		},
 		{

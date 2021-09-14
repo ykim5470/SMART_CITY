@@ -555,7 +555,6 @@ const process = {
       analysis_file_format,
       tf_shape,
       tf_shape_index,
-      op_col_id,
       user_output_param
     } = req.body;
     // console.log(req.body)
@@ -709,26 +708,26 @@ const process = {
                 });
               }
 
-              // 아웃풋 파람 생성
-              let op_user_obj = new Object
-              if(typeof user_output_param !== 'string'){
-              user_output_param.filter((el,idx)=>{
-                if(el !== ''){
-                  op_user_obj[op_col_id[idx]] = el
-                }
-              })}else{
-                op_user_obj[op_col_id] = user_output_param
-              }
-              // 아웃풋 TB Create
-              let op_date_look_up = {
-                date: op_data_lookup_date,
-                hour: op_data_lookup_hour,
-                min: op_data_lookup_min,
-                sec: op_data_lookup_sec,
-              };
-              for(j in op_user_obj){
-              model_output.create({op_id: md_id, op_col_id: j, op_value: op_user_obj[j], op_date_look_up: op_date_look_up})
-              }
+              // // 아웃풋 파람 생성
+              // let op_user_obj = new Object
+              // if(typeof user_output_param !== 'string'){
+              // user_output_param.filter((el,idx)=>{
+              //   if(el !== ''){
+              //     op_user_obj[op_col_id[idx]] = el
+              //   }
+              // })}else{
+              //   op_user_obj[op_col_id] = user_output_param
+              // }
+              // // 아웃풋 TB Create
+              // let op_date_look_up = {
+              //   date: op_data_lookup_date,
+              //   hour: op_data_lookup_hour,
+              //   min: op_data_lookup_min,
+              //   sec: op_data_lookup_sec,
+              // };
+              // for(j in op_user_obj){
+              // model_output.create({op_id: md_id, op_col_id: j, op_value: op_user_obj[j], op_date_look_up: op_date_look_up})
+              // }
             });
         });
       return res.redirect("/model_manage_board");

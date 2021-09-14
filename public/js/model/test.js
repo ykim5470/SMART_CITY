@@ -1,75 +1,80 @@
 // Get DOM-element for inserting json-tree
 var wrapper = document.getElementById("wrapper");
 
-// var depth_length = document.getElementById("depth_length");
-// console.log(depth_length.innerText);
-
 var check_arr = new Array();
 
 // Get json-data by javascript-object
 var data = {
-  "type": "childAttribute_test_model1",
-  "namespace": "childAttribute1",
-  "version": "2.0.1",
-  "name": "차일드_어티리뷰트_테스트1",
-  "context": [
-      "차일드"
-  ],
-  "description": "차일드_어트리뷰트_테스트1",
-  "attributes": [
-      {
-          "name": "reservoirLevelPrediction",
-          "isRequired": true,
-          "valueType": "Object",
-          "objectMembers": [
-              {
-                  "name": "LevelPrediction",
-                  "valueType": "Double"
-              },
-              {
-                  "name": "predictedAt",
-                  "valueType": "Date"
-              }
+  type: 'TransmissivityPrediction',
+  namespace: 'kr.waterdna',
+  version: '1.2',
+  name: 'LID 투수량 예측',
+  context: ['http://uri.etsi.org/ngsi-ld/core-context.jsonld'],
+  description: 'LID 투수량 예측',
+  attributes: [
+    {
+      name: 'TransmissivityVolume',
+      isRequired: true,
+      valueType: 'Object',
+      objectMembers: [
+        {
+          name: 'predictedAt',
+          valueType: 'ArrayString',
+        },
+        {
+          name: 'volume',
+          valueType: 'ArrayInteger',
+          objectMembers: [
+            { name: 'predictedAt', valueType: 'ArrayString' },
+            { name: 'volume_nested', valueType: 'ArrayDouble' },
           ],
-          "attributeType": "Property",
-          "hasObservedAt": true,
-          "childAttributes": [
-              {
-                  "name": "reservoirLevelPrediction_ChildAttr",
-                  "isRequired": true,
-                  "valueType": "Double",
-                  "objectMembers": [
-                      {
-                          "name": "test",
-                          "valueType": "Integer",
-                      },
-                      {
-                          "name" : "test_obj",
-                          "valueType": "ArrayObject",
-                          "objectMembers" : [
-                            {
-                              "name" : "nested_test_obj",
-                              "valueType": "String"
-                            }
-                          ]
-                      }
-                  ],
-                  "attributeType": "Property",
-                  "hasObservedAt": true,
-                  "childAttributes": [
-                    {
-                      "name" : "nested_child_attr",
-                      "isRequired": true,
-                      "valueType": "Integer"
-                    }
-                  ]
-              }
-          ]
-      }
+        },
+      ],
+      attributeType: 'Property',
+      hasObservedAt: true,
+      childAttributes: [
+        {
+          name: 'TransmissivityRatio',
+          isRequired: true,
+          valueType: 'Object',
+          objectMembers: [
+            {
+              name: 'predictedAt',
+              valueType: 'ArrayString',
+            },
+            {
+              name: 'ratio',
+              valueType: 'ArrayDouble',
+            },
+          ],
+          attributeType: 'Property',
+          hasObservedAt: true,
+          childAttributes: [
+            {
+              name: 'TransmissivityRatio1',
+              isRequired: true,
+              valueType: 'Object',
+              objectMembers: [
+                {
+                  name: 'predictedAt',
+                  valueType: 'ArrayString',
+                },
+                {
+                  name: 'ratio1',
+                  valueType: 'ArrayDouble',
+                },
+              ],
+              attributeType: 'Property',
+              hasObservedAt: true,
+            },
+          ],
+        },
+      ],
+    },
   ],
-  "createdAt": "2021-08-23T11:30:49,976+09:00",
-  "modifiedAt": "2021-08-23T15:54:03,148+09:00"
-};
+  createdAt: '2021-08-31T10:26:00,020+09:00',
+  modifiedAt: '2021-09-08T12:42:15,900+09:00',
+};;
 
 // Create node tree view
 var data_attributes = data.attributes;

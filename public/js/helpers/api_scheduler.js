@@ -99,6 +99,23 @@ const start_end_time_generator = (date_look_up, current_time) => {
   return res;
 };
 
+// 아웃풋 데이터 예측 좋회 기간 startTime 계산 모듈
+const predict_time_generator = (date_look_up, current_time) => {
+  const { date, hour, min, sec } = date_look_up; // '2' '3' '' ''
+  let res =
+    date != ""
+      ? moment(current_time).add(Number(date), "d").format()
+      : current_time;
+  res = hour != "" ? moment(res).add(Number(hour), "h").format() : res;
+  res = min != "" ? moment(res).add(Number(min), "m").format() : res;
+  res = sec != "" ? moment(res).add(Number(sec), "s").format() : res;
+
+  var moment_time = moment(res).toISOString(true).split('.')
+  var observed_time = moment_time.join(',')
+  console.log(observed_time)
+  return observed_time;
+};
+
 // 싱글 데이터 센서 선택 시 맵핑 데이터 생성 모듈
 const single_processed_data = (
   user_input_value_count,
@@ -298,6 +315,7 @@ const data_mapped_filling = (select_input_count, raw_data, sortable, load) => {
 module.exports = {
   my_scheduleJob,
   start_end_time_generator,
+  predict_time_generator,
   sorted_input_param,
   single_processed_data,
   options,

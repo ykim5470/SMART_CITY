@@ -18,12 +18,8 @@ module.exports = {
         },
         type: Sequelize.UUID,
       },
-      op_col_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      op_value: {
-        type: Sequelize.STRING,
+      op_sequence: {
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       op_date_look_up: { type: Sequelize.JSON, allowNull: false },
