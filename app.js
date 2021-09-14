@@ -7,6 +7,7 @@ const nunjucks = require("nunjucks");
 const methodOverride = require("method-override");
 const socket = require("socket.io");
 const model_scheduler = require("./public/js/event_handlers/model_scheduler");
+const dash_handler = require("./public/js/dashboard/dash_handler")
 // const old_dataset_select = require("./public/js/event_handlers/old_dataset_select");
 // const old_analysis_select = require("./public/js/event_handlers/old_analysis_select");
 const dataset_select = require("./public/js/event_handlers/dataset_select");
@@ -57,9 +58,8 @@ module.exports = server;
 // Socket Connection
 io.on("connection", (socket) => {
   console.log("Made socket connection");
-  socket.on("아무거나",(data)=>{
-    console.log(data)
-  })
+  //대시보드
+  dash_handler(socket)
   // 스케쥴러 조작
   model_scheduler(socket);
 

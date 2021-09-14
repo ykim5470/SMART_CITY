@@ -246,10 +246,10 @@ body {background-color: #f4f4f4; }
 
 /* form */
 .item-radio,
-.item-check {position: relative;display: inline-block;vertical-align: middle;gap: 10px 0px;} 
+.item-check {position: relative;display: inline-block;vertical-align: middle;gap: 10px 0px;max-height: 500px;overflow-y: auto;} 
 .item-check .item-box{display:inline-block;margin-right: 10px;}
 .item-check .item-box:first-child:last-child{margin-right:0;}
-.item-check.flex .item-box{width: calc(25% - 10px);}
+.item-check.flex .item-box{width: 100%;}
 .item-radio +.item-radio,
 .item-check + .item-check {margin-left: 30px; } 
 .item-radio input,

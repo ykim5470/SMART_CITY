@@ -170,7 +170,7 @@ function treeViewTest(data) {
         checkbox.type = "checkbox";
         checkbox.className = node_list_value.innerText;
         checkbox.name = "load_attr";
-        checkbox.value = node_list_value.innerText;
+        checkbox.value = node_list_value.innerText.replace(/\"/gi, "");
         checkbox.addEventListener("change", upsert_position_select);
         node_list_value.insertBefore(checkbox, node_list_value.childNodes[0]);
       }
@@ -179,22 +179,25 @@ function treeViewTest(data) {
 }
 const register = document.querySelector(".register-btn");
 register.addEventListener("click", () => {
-  check_arr = check_arr.filter((item) => item.replace(/\\"/gi, ""));
-  // document.getElementsByName("attr_list")[0].value = check_arr;
-  // console.log(document.getElementsByName("attr_list")[0].value);
   var formSerializeArray = $("#widgetFrm").serializeArray();
   var object = {};
   for (var i = 0; i < formSerializeArray.length; i++) {
     if(Object.keys(object).includes(formSerializeArray[i]["name"])){
-      object[formSerializeArray[i]["name"]] += `,${formSerializeArray[i]["value"]}`;
-    }else if(formSerializeArray[i]["name"] == "load_attr"){
-      object[formSerializeArray[i]["name"]] = check_arr;
+      if(formSerializeArray[i]["name"] == "load_attr"){
+        object[formSerializeArray[i]["name"]] += formSerializeArray[i]["value"].trim();
+      }else{
+        object[formSerializeArray[i]["name"]] += `,${formSerializeArray[i]["value"].trim()}`;
+      }
     }else{
-      object[formSerializeArray[i]["name"]] = formSerializeArray[i]["value"];
+      object[formSerializeArray[i]["name"]] = formSerializeArray[i]["value"].trim();
     }
   }
   var json = JSON.stringify(object);
-  console.log(json)
+  json = JSON.parse(json)
+  // if(json["load_attr"].charAt(json["load_attr"].length-1) == ","){
+  //   json["load_attr"] = json["load_attr"].slice(0,-1);
+  // }
+  json["load_attr"] = json["load_attr"].replace(/,$/,'');
   // document.register.submit();
-  socket.emit("아무거나", "되냐");
+  socket.emit("widget_register", json);
 });
