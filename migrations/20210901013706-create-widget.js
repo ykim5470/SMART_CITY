@@ -57,6 +57,9 @@ module.exports = {
         allowNull: false,
         defaultValue: 'user01'
       },
+      plugin: {
+        type:Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

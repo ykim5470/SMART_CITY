@@ -1,9 +1,0 @@
-{%- macro qcodePanel(arguments) %}
-    <div class="grid-unit unit-{{ arguments.name }} {{ arguments.additional }}">
-        <div class="grid-content">
-            <h3 class="grid-headline">{{ arguments.headline | safe }}</h3>
-            <div class="grid-subtitle">{{ arguments.subtitle | safe }}</div>
-            <div class="grid-description">{{ arguments.desc | safe }}</div>
-        </div>
-    </div>
-{%- endmacro %}

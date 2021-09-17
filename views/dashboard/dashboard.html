@@ -36,16 +36,12 @@
           </div>
         </div>
         <div class="chart-list" id="sortable">
-          {# {% if widget_title %} {% for widget in widget_title %}
-          <div class="chart-list-item">
+          <div class="chart-list-item" style="display: none;">
             <div class="chart-list-item-tit clearfix">
-              <h3 class="float-left">{{widget}}</h3>
+              <h3 class="float-left"></h3>
               <button type="button" name="button" class="float-right card_del"><img src="img/ico-modal-delete.png" alt="삭제" /></button>
             </div>
-            <canvas id="{{widget}}" height="301"></canvas>
           </div>
-          {% endfor %} {% endif%} #}
-          
         </div>
       </div>
       <!-- //contents-area -->
@@ -97,14 +93,40 @@
                   <div class="item-textarea">
                     <textarea name="description" cols="100" rows="10" placeholder="모델 설명을 작성해 주세요" title="모델 설명"></textarea>
                   </div>
-                  <h3 class="data-tit">그래프 대분류</h3>
+                  <h3 class="data-tit">차트 선택</h3>
                   <div class="item-select">
-                    <select title="대시보드 그래프 대분류 선택" name="chart_type">
-                      <option value="Line" selected>Line Chart</option>
-                      <option value="Bar">Bar Chart</option>
-                      <option value="Other">Other Chart</option>
-                      <option value="Area">Area Chart</option>
+                    <select name="chart_type">
+                      <optgroup label="Line">
+                        <option value="lineChart" selected>Line Chart</option>
+                        <option value="multiAxisLineChart">Multi Axis Line Chart</option>
+                        <option value="steppedLineChart">Stepped Line Chart</option>
+                        <option value="lineChartStacked">Line Chart Stacked</option>
+                        <option value="lineStyling">Line Styling</option>
+                        <option value="pointStyle">Point Style</option>
+                        <option value="gridConfiguration">Grid Configuration</option>
+                      </optgroup>
+                      <optgroup label="Bar">
+                        <option value="verticalBarChart">Vertical Bar Chart</option>
+                        <option value="programmaticEventTriggers">Programmatic Event Triggers</option>
+                        <option value="horizontalBarChart">Horizontal Bar Chart</option>
+                        <option value="stackedBarChart">Stacked Bar Chart</option>
+                        <option value="barChartBorderRadius">Bar Chart Border Radius</option>
+                      </optgroup>
+                      <optgroup label="Other">
+                        <option value="scatter">Scatter</option>
+                        <option value="doughnut">Doughnut</option>
+                        <option value="pie">Pie</option>
+                        <option value="polarArea">Polar Area</option>
+                        <option value="radar">Radar</option>
+                      </optgroup>
                     </select>
+                  </div>
+                  <h3 class="data-tit">Add Chart Style</h3>
+                  <div class="item-box">
+                    <input type="radio" name="plugin" id="border" value="areaBorder" />
+                    <label for="border"><span class="check-ico"></span>Chart Area Border</label>
+                    <input type="radio" name="plugin" id="quadrants" value="quadrants" />
+                    <label for="quadrants"><span class="check-ico"></span>Quadrants</label>
                   </div>
                 </div>
               </div>
@@ -122,9 +144,9 @@
       <!-- // 위젯 등록 모달 -->
     </div>
     <script src="/socket.io/socket.io.js"></script>
-    {# <script src="/js/model/status.js"></script> #}
-    <script src="/js/dashboard/jsonTree.js"></script>
+    <!-- <script src="/js/model/status.js"></script>  -->
     <script src="/js/dashboard/chart.js"></script>
+    <script src="/js/dashboard/jsonTree.js"></script>
     <script src="/resource/windowdefault/nav_toggle.js"></script>
     <script src="/resource/windowdefault/modal.js"></script>
     <script src="/js/dashboard/dashboard.js"></script>

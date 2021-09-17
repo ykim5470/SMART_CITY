@@ -29,7 +29,12 @@ const socket = io();
 //   widget_box.innerHTML = widget_contents.join("");
 //   await make_chart(data);
 // });
-
+const user = "user01"
+socket.emit("widget_onload",user)
+socket.on("widget_loaded",(data)=>{
+    console.log(data)
+    make_chart(data)
+})
 const dataset_type = document.querySelector("#dataset_type");
 const dataset_select_box = document.querySelector("#data_select");
 const regi_widget = document.querySelector(".register-widget");
@@ -182,22 +187,23 @@ register.addEventListener("click", () => {
   var formSerializeArray = $("#widgetFrm").serializeArray();
   var object = {};
   for (var i = 0; i < formSerializeArray.length; i++) {
-    if(Object.keys(object).includes(formSerializeArray[i]["name"])){
-      if(formSerializeArray[i]["name"] == "load_attr"){
-        object[formSerializeArray[i]["name"]] += formSerializeArray[i]["value"].trim();
-      }else{
-        object[formSerializeArray[i]["name"]] += `,${formSerializeArray[i]["value"].trim()}`;
-      }
-    }else{
+    if (Object.keys(object).includes(formSerializeArray[i]["name"])) {
+      object[formSerializeArray[i]["name"]] += `,${formSerializeArray[i]["value"].trim()}`;
+    } else {
       object[formSerializeArray[i]["name"]] = formSerializeArray[i]["value"].trim();
     }
   }
   var json = JSON.stringify(object);
-  json = JSON.parse(json)
-  // if(json["load_attr"].charAt(json["load_attr"].length-1) == ","){
-  //   json["load_attr"] = json["load_attr"].slice(0,-1);
-  // }
-  json["load_attr"] = json["load_attr"].replace(/,$/,'');
-  // document.register.submit();
+  json = JSON.parse(json);
+  document.getElementById("widgetFrm").reset();
+
+
+
   socket.emit("widget_register", json);
+  //이부분 상의 필요 >>>>>>> reload가 없이 등록 되면 socket으로만 움직이니, checkbox 값이 이상...> socket.on 동작도 이상.. emit은 한개씩되는데 on은 누적됨..
+  
+  socket.on("registered_data",(data)=>{
+    console.log("33333333333333333333333333333333333333333")
+    make_chart(data)
+  })
 });
