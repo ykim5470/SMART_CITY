@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>스마트시티 데이터 실시간 분석 대시보드</title>
+    <link rel="stylesheet" href="/css/common.css" />
+    <link rel="stylesheet" href="/css/login.css" />
+  </head>
+
+  <body>
+    <div class="login-contents">
+      <h1 class="hidden">스마트시티 데이터 실시간 분석 로그인 페이지</h1>
+      <div class="login-aside">
+        <p class="login-aside-icon"><span class="hidden">스마트 시티</span></p>
+        <p class="login-aside-img">
+          <span class="hidden">스마트시티 데이터 실시간 분석 대시보드</span>
+        </p>
+        <!-- <p class="login-aside-notice">
+          이 사이트는 Chrome 브라우저와<br />해상도 1920x1080에 최적화되어
+          있습니다.
+        </p> -->
+      </div>
+      <div class="login-form">
+        <h2 class="login-form-title">
+          <span>스마트시티</span><br />데이터 실시간 분석 대시보드
+        </h2>
+        <form action="/login/auth" method="POST">
+          <dl class="login-form-input">
+            <dt class="login-text-user"><label for="login-id">ID</label></dt>
+            <dd>
+              <div class="item-input login-icon-id">
+                <input
+                  type="text"
+                  id="USERID"
+                  name="USERID"
+                  placeholder="아이디를 입력하세요."
+                  required
+                />
+              </div>
+            </dd>
+            <dt class="login-text-user">
+              <label for="login-pw">Password</label>
+            </dt>
+            <dd>
+              <div class="item-input login-icon-pw">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="비밀번호를 입력하세요."
+                  required
+                />
+              </div>
+            </dd>
+          </dl>
+          <div class="join-link">
+            <a href="/register">회원가입</a>
+          </div>
+
+          <div style="color: red; position: absolute; margin-top: 3px">
+            {{message}}
+          </div>
+          <button type="submit" class="login-form-button">로그인</button>
+        </form>
+      </div>
+      <p class="login-copyright">
+        <!-- Copyright &copy; 이노커스. all rights reserved. -->
+      </p>
+    </div>
+  </body>
+</html>
