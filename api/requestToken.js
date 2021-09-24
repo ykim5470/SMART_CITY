@@ -26,7 +26,6 @@ exports.requestToken = async (req, res) => {
         refresh_expires_in,
       ];
 
-    //   console.log(tokenArr);
       return tokenArr;
     });
   } catch (err) {

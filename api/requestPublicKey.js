@@ -3,11 +3,12 @@ const axios = require("axios");
 exports.requestPublicKey = async function () {
   try {
     return axios
-      .get({
-        uri: `${OAUTHURL}/security/publickey`,
+      ({
+        method: 'get',
+        url: `${OAUTHURL}/security/publickey`,
       })
       .then((result) => {
-        return result.publickey;
+        return result.data.publickey;
       });
   } catch (err) {
     console.log(err);

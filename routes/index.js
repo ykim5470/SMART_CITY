@@ -13,6 +13,7 @@ const login = require("./login");
 //================================GET==================================
 // auth Homepage
 router.get("/", (req, res) => {
+  console.log('거침')
   res.redirect(
     "http://203.253.128.181:30084/oauth2.0/authorize?response_type=code&redirect_uri=" +
       REDIRECT_URI +

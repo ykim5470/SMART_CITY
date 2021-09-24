@@ -10,12 +10,15 @@ const model_scheduler = require("./public/js/event_handlers/model_scheduler");
 const dash_handler = require("./public/js/dashboard/dash_handler");
 const dataset_select = require("./public/js/event_handlers/dataset_select");
 const analysis_select = require("./public/js/event_handlers/analysis_select");
+// const user_info = require('./public/js/event_handlers/user_info')
 const { tokenToJson } = require("./api/tokenToJson");
 const { requestPublicKey } = require("./api/requestPublicKey");
 const { requestToken } = require("./api/requestToken");
 const { requestRefreshToken } = require("./api/requestRefreshToken");
 const { userCheck } = require("./api/userCheck");
 const { auth } = require("./models");
+const jwt = require("jsonwebtoken");
+
 
 //routers
 const index_router = require("./routes/index");
@@ -57,27 +60,35 @@ let tokenArray;
 let refresh_token_result = new Array();
 
 app.get("/Oauth/token", async (req, res, next) => {
-  if (STATE === res.req.query.state) {
-    // 토큰 요청
-    tokenArray = await requestToken(req, res);
+  try {
+    if (STATE === res.req.query.state) {
+      // 토큰 요청
+      tokenArray = await requestToken(req, res);
 
-    // 쿠키 생성 (access_token을 expires_in만큼 쿠키 생성)
-    res.cookie("token", tokenArray[0], {
-      httpOnly: true,
-      maxAge: 3600000, //access_token 유효기간 1시간(1000ms==1s)
-    });
+      // 쿠키 생성 (access_token을 expires_in만큼 쿠키 생성)
+      res.cookie("token", tokenArray[0], {
+        httpOnly: true,
+        maxAge: 3600000, //access_token 유효기간 1시간(1000ms==1s)
+      });
 
-    // 로그인 할 때 유저 정보 DB 처리 및 dashboard redirect
-    res.redirect("/userCheck");
-  } else {
-    console.log("보낸 STATE와 받은 STATE가 일치하지 않습니다. 즉, 로그인 실패");
+      const token = await tokenToJson(req, res);
+
+      // 로그인 할 때 유저 정보 DB 처리 및 dashboard redirect
+      await userCheck(req, res, token, tokenArray);
+    } else {
+      console.log(
+        "보낸 STATE와 받은 STATE가 일치하지 않습니다. 즉, 로그인 실패"
+      );
+    }
+  } catch (err) {
+    console.log(err);
   }
 });
 
-app.use("/userCheck", async (req, res) => {
-  const token = await tokenToJson(req, res);
-  await userCheck(req, res, token, tokenArray);
-});
+// app.use("/userCheck", async (req, res) => {
+//   const token = await tokenToJson(req, res);
+//   await userCheck(req, res, token, tokenArray);
+// });
 
 app.use(async (req, res, next) => {
   let token = req.cookies.token;
@@ -95,16 +106,19 @@ app.use(async (req, res, next) => {
       .findOne({ where: { userId: userId }, attributes: ["refreshToken"] })
       .then((result) => {
         if (result != null) {
+          console.log(result.refreshToken)
           refresh_token_result[0] = result.refreshToken;
         } else {
           console.log("Refresh Token not found error");
         }
       });
+      console.log(tokenjson.exp)
 
     // 토큰 만료시간이 10분 이하일 때 토큰 재발급
     if (
       tokenjson.exp - Math.floor(Date.now() / 1000) < 10 * 60 &&
       refresh_token_result.length !== 0
+      // refresh_token_result.length !== 0
     ) {
       // 토큰 재발급 전 기존 쿠키 삭제
       res.clearCookie("token");
@@ -114,12 +128,19 @@ app.use(async (req, res, next) => {
 
       // 토큰 검증
       let publicKey = await requestPublicKey();
+      console.log('as13415142')
       let verifyOptions = {
         issuer: "urn:datahub:cityhub:security",
         algorithm: "RS256",
       };
       try {
+        console.log(token)
+        console.log(publicKey)
+        console.log(';sdoafhoqwfpqwn')
         let decoded = jwt.verify(token, publicKey, verifyOptions);
+        console.log('as-dfquwefhqu')
+        console.log(decoded)
+        console.log('---------142213')
         if (decoded.userId.length === 0 || decoded.userId === undefined) {
           console.log("토큰만료. 로그인창으로 이동");
           res.redirect("/");
@@ -127,10 +148,10 @@ app.use(async (req, res, next) => {
       } catch (err) {
         console.log(err);
       }
-      // 새로운 토큰 정보 DB 업데이트
-      res.redirect("/userCheck");
     }
+    return;
   }
+  next()
 });
 
 // Auth global variables

@@ -29,6 +29,10 @@ const socket = io();
 //   widget_box.innerHTML = widget_contents.join("");
 //   await make_chart(data);
 // });
+
+socket.on('로그인 유저 정보 GET', (data)=>{
+  console.log(data)
+})
 const user = "user01";
 socket.emit("widget_onload", user);
 socket.on("widget_loaded", (data) => {
