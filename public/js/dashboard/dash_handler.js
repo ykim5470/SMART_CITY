@@ -21,7 +21,6 @@ const dataRequest = {
     }
   },
 };
-
 const dash_handler = (socket) => {
   socket.on("widget_register", async (data) => {
     //database
@@ -47,7 +46,6 @@ const dash_handler = (socket) => {
     socket.emit("registered_data", temp);
   });
 
-  
   socket.on("widget_onload", async (data) => {
     const charts = await widget.findAll({ where: { widget_delYn: "N", user_id: data } });
     if (charts.length > 0) {

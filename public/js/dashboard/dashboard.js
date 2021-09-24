@@ -29,12 +29,11 @@ const socket = io();
 //   widget_box.innerHTML = widget_contents.join("");
 //   await make_chart(data);
 // });
-const user = "user01"
-socket.emit("widget_onload",user)
-socket.on("widget_loaded",(data)=>{
-    console.log(data)
-    make_chart(data)
-})
+const user = "user01";
+socket.emit("widget_onload", user);
+socket.on("widget_loaded", (data) => {
+  make_chart(data);
+});
 const dataset_type = document.querySelector("#dataset_type");
 const dataset_select_box = document.querySelector("#data_select");
 const regi_widget = document.querySelector(".register-widget");
@@ -136,6 +135,7 @@ dataset_type.addEventListener("change", () => {
   dataset_list_load();
 });
 regi_widget.addEventListener("click", async () => {
+  document.getElementById("widgetFrm").reset();
   dataset_list_load();
 });
 dataset_select_box.addEventListener("change", () => {
@@ -195,15 +195,9 @@ register.addEventListener("click", () => {
   }
   var json = JSON.stringify(object);
   json = JSON.parse(json);
-  document.getElementById("widgetFrm").reset();
-
-
-
   socket.emit("widget_register", json);
-  //이부분 상의 필요 >>>>>>> reload가 없이 등록 되면 socket으로만 움직이니, checkbox 값이 이상...> socket.on 동작도 이상.. emit은 한개씩되는데 on은 누적됨..
-  
-  socket.on("registered_data",(data)=>{
-    console.log("33333333333333333333333333333333333333333")
-    make_chart(data)
-  })
+});
+socket.on("registered_data", (data) => {
+  console.log(`=====================${Object.keys(data)}=================`)
+  make_chart(data)
 });
