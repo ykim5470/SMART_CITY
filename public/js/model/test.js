@@ -3,6 +3,13 @@ var wrapper = document.getElementById("wrapper");
 
 var check_arr = new Array();
 
+$(document).ready(function(){
+  $(".jsontree_label-wrapper:contains('childAttributes')").addClass("in_child")
+  $(".jsontree_label-wrapper:contains('objectMembers')").addClass("in_obj")
+  $(".in_child").each(function(index) {$(this).children(".jsontree_label").append('<p class="none">:"'+ (index + 1) +'",</p>')})
+  $(".in_obj").each(function(index) {$(this).children(".jsontree_label").append('<p class="none">:"'+ (index + 1) +'",</p>')})
+})
+
 // Get json-data by javascript-object
 var data = {
   type: 'TransmissivityPrediction',
@@ -118,7 +125,17 @@ const upsert_position_select = (e) => {
   if(e.target.checked == true){
     var var01 = $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("childAttributes")').text();
     var var02 = $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("objectMembers")').text();
-    console.log(var01 + var02)
+
+    var strArray01 = var01.split(',').reverse();
+    var strArray02 = var02.split(',').reverse();
+
+    var arr01 = new Array(strArray01)
+    var arr02 = new Array(strArray02)
+    var test01 = arr01
+    var test02 = arr02
+
+    console.log(test01 + test02)
+    // console.log(test02)
   }
   try {
     if (e.target.checked) {
@@ -130,6 +147,7 @@ const upsert_position_select = (e) => {
     console.log(err);
   }
 };
+
 
 // IsRequired info
 const isRequired = (attr_name_node_child_value) => {
@@ -195,5 +213,4 @@ console.log(check_arr) // 나중에 다음과 같은 구조로 변환될 예정.
   'attributes.0.childAttributes.0.name': 'reservoirLevelPrediction_ChildAttr',
   'attributes.0.childAttributes.0.objectMembers.0.name': 'test',
 */
-
 

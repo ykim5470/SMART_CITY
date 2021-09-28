@@ -105,3 +105,5 @@
 .jsontree_node_empty > .jsontree_label-wrapper > .jsontree_label {
     cursor: default !important;
 }
+
+.none{text-indent:-9999px; display:none;}
