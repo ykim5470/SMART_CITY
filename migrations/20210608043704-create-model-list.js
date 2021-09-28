@@ -7,6 +7,10 @@ module.exports = {
         type: Sequelize.UUID,
         primaryKey: true,
       },
+      user_id: {
+        allowNull: false, 
+        type: Sequelize.STRING
+      },
       al_time: {
         type: Sequelize.INTEGER,
       },
@@ -56,6 +60,7 @@ module.exports = {
       date_look_up: { allowNull: false, type: Sequelize.JSON },
       data_processing_option: { allowNull: true, type: Sequelize.STRING },
       analysis_file_format: { allowNull: false, type: Sequelize.STRING },
+      soft_delete: {allowNull: false, type:Sequelize.STRING},
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

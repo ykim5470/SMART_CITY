@@ -29,8 +29,8 @@
         <div class="contents-header clearfix">
           <h2 class="contents-title float-left"><span>스마트시티</span> 데이터 실시간 분석 대시보드</h2>
           <div class="user float-right clearfix">
-            <a href="../mypage.html" class="user-name float-left">User 01</a>
-            <button type="button" class="float-left btn btn-c-secondary btn-size-sm logout-btn">로그아웃</button>
+            <a href="../mypage.html" class="user-name float-left">{{nickName}}</a>
+            <button type="button" class="float-left btn btn-c-secondary btn-size-sm logout-btn" onclick="location.href='/logout'">로그아웃</button>
           </div>
         </div>
       </div>
@@ -58,8 +58,36 @@
         
         <div class="table-list-box thead-box">
           <div class="table-list">
+            {% if type %}
             <table>
-              <caption class="hidden">No, 분석시간, 모델 이름, 분석 모델, 등록일, 상태, 관리</caption>
+              <caption class="hidden">No, 분석시간, 모델 이름, 분석 모델, 등록일, 상태, 유저, 관리</caption>
+              <colgroup>
+                <col style="width:90px">
+                <col style="width:100px">
+                <col style="width:200px">
+                <col style="width:200px">
+                <col style="width:200px">
+                <col style="width:200px">
+                <col style="width:200px">
+                <col style="width:200px">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>No.</th>
+                  <th>분석시간</th>
+                  <th>모델 이름</th>
+                  <th>분석 모델</th>
+                  <th>시간</th>
+                  <th>상태</th>
+                  <th>유저</th>
+                  <th>관리</th>
+                </tr>
+              </thead>
+            </table>
+            {%else%}
+            <table>
+              <caption class="hidden">No, 분석시간, 모델 이름, 분석 모델, 등록일, 상태,관리</caption>
               <colgroup>
                 <col style="width:90px">
                 <col style="width:100px">
@@ -83,27 +111,28 @@
                 </tr>
               </thead>
             </table>
+            {%endif%}
           </div>
         </div>
-        
         <div class="table-list-box">
           <div class="table-list template-overflow-unset">
+            {% if type %}
             <table>
-              <caption class="hidden">No, 분석시간, 모델 이름, 분석 모델, 등록일, 상태, 관리</caption>
+              <caption class="hidden">No, 분석시간, 모델 이름, 분석 모델, 등록일, 상태, 유저, 관리</caption>
               <colgroup>            
                 <col style="width:90px">
+                <col style="width:300px">
+                <col style="width:200px">
+                <col style="width:200px">
+                <col style="width:200px">
                 <col style="width:100px">
-                <col style="width:200px">
-                <col style="width:200px">
-                <col style="width:200px">
-                <col style="width:200px">
-                <col style="width:200px">
+                <col style="width:100px">
                 <col style="width:200px">
               </colgroup>
               {% for item in list_data %}
               <tr>
                 <td>
-                  <form action="/model/list/delete" method="post" id="confirm">
+                  <form action="/admin/model/list/delete" method="post" id="confirm">
                     <input
                       class="selected_md_del"
                       type="checkbox"
@@ -116,10 +145,59 @@
                 <td>{{list_data.indexOf(item)+1}}</td>
                 <td>{{ item.al_time }}</td>
                 <td>
-                  <a
-                    href="http://localhost:4000/dataAnalysisModelsView?mode=view?md_id={{item.md_id}}"
-                    >{{item.md_name}}</a
-                  >
+                  <button type="button" onclick="location.href='/dataAnalysisModelModView?mode=view&md_id={{item.md_id}}' ">{{item.md_name}}</button>
+                </td>
+                <td>{{item.al_name_mo}}</td>
+                <td>{{item.dateFormat(item.createdAt)}}</td>
+                <td>{{item.run_status}}</td>
+                <td>{{item.user_id}}</td>
+                <td>
+                  <form action="/dataAnalysisModelmodView?mode=status" method="get">
+                    <button
+                      class="model_status_btn"
+                      type="submit"
+                      name="md_id"
+                      value="{{item.md_id}}"
+                    >
+                      관리</button
+                    >
+                    <input hidden name="mode" value="status" />
+                  </form>
+                </td>
+              </tr>
+
+              {% endfor %}
+            </table>  
+            {% else %}
+            <table>
+              <caption class="hidden">No, 분석시간, 모델 이름, 분석 모델, 등록일, 상태, 관리</caption>
+              <colgroup>            
+                <col style="width:90px">
+                <col style="width:100px">
+                <col style="width:200px">
+                <col style="width:200px">
+                <col style="width:200px">
+                <col style="width:100px">
+                <col style="width:200px">
+                <col style="width:200px">
+              </colgroup>
+              {% for item in list_data %}
+              <tr>
+                <td>
+                    <form action="/model/list/delete" method="post" id="confirm">
+                    <input
+                      class="selected_md_del"
+                      type="checkbox"
+                      name="md_id"
+                      value="{{item.md_id}}"
+                    />
+                    <input type="hidden" name="delModel" id="delModel" value="" />
+                  </form>
+                </td>
+                <td>{{list_data.indexOf(item)+1}}</td>
+                <td>{{ item.al_time }}</td>
+                <td>
+                  <button type="button" onclick="location.href='/dataAnalysisModelModView?mode=view&md_id={{item.md_id}}' ">{{item.md_name}}</button>
                 </td>
                 <td>{{item.al_name_mo}}</td>
                 <td>{{item.dateFormat(item.createdAt)}}</td>
@@ -140,7 +218,8 @@
               </tr>
 
               {% endfor %}
-            </table>   
+            </table>  
+            {%endif%} 
           </div>     
           <div class="table-pagenation">
             <div class="pagination-box">

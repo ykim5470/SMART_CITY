@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: UUIDV4,
         primaryKey: true,
       },
+      user_id: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
       al_time: { type: DataTypes.INTEGER, allowNull: false },
       md_name: {
         type: DataTypes.STRING,
@@ -73,6 +77,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.STRING,
       },
+      soft_delete: {
+        allowNull: false,
+        defaultValue: '0',
+        type: DataTypes.ENUM('0','1')
+      }
     },
 
     {

@@ -44,11 +44,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      is_logged: { type: Sequelize.STRING, allowNull: true },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
       refreshToken : {
         allowNull: true, 
         type: Sequelize.STRING

@@ -22,11 +22,6 @@ module.exports = (sequelize, DataTypes) => {
       exp: { type: DataTypes.INTEGER, allowNull: false },
       aud: { type: DataTypes.STRING, allowNull: true },
       iss: { type: DataTypes.STRING, allowNull: true },
-      is_logged: {
-        type: DataTypes.ENUM('0', '1'),
-        defaultValue: '0',
-        allowNull: true,
-      },
       refreshToken: {
         type: DataTypes.STRING, allowNull: true
       }

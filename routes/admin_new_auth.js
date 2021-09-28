@@ -70,50 +70,7 @@ const dataRequest = {
   },
 };
 
-// DB GET
-const database_get = {
-  // Model_list data get
-  list: async (md_id) => {
-    try {
-      return await model_list.findOne({
-        attributes: {
-          exclude: ["updatedAt", "createdAt"],
-        },
-        where: { md_id: md_id },
-        include: [
-          { model: model_des, required: false, attributes: ["des_text"] },
-          {
-            model: atch_file_tb,
-            required: false,
-            attributes: ["originalname"],
-          },
-        ],
-        raw: true,
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  },
-};
-
 const output = {
-  // sub_dataset GET
-  subDataset: async (data_model_name) => {
-    let sub_data_queries = data_model_name.split(",");
-    let sub_data_attr = ["id", "type", "name", "version"];
-    const attr_obj = Object.fromEntries(
-      sub_data_attr.map((key, index) => [key, sub_data_queries[index]])
-    );
-    return (sub_data_info = await axios
-      .get(
-        `http://203.253.128.184:18227/entities?Type=${attr_obj.name}.${attr_obj.type}:${attr_obj.version}&datasetId=${attr_obj.id}`,
-        { headers: { Accept: "application/json" } }
-      )
-      .then((res) => {
-        return res.data;
-      }));
-  },
-
   // test
   test: (req, res) => {
     var data = {
@@ -190,8 +147,8 @@ const output = {
   // 데이터 적재 모델 리스트
   list: async (req, res) => {
     try {
-      const userId = req.session.userInfo.userId;
-      const nickName = req.session.userInfo.nickname;
+      const type = req.session.userInfo.type
+      const nickName = req.session.userInfo.nickname
       const currentPage = req.query.page;
       const temp = req.url;
       let offset = 0;
@@ -200,7 +157,6 @@ const output = {
       }
       await model_list
         .findAndCountAll({
-          where: { user_id: userId, soft_delete: "0" },
           limit: req.query.limit,
           offset: offset,
           attributes: {
@@ -228,11 +184,12 @@ const output = {
           model_list.prototype.dateFormat = (date) =>
             moment(date).format("YYYY.MMM.DD - hh:mm A");
           return res.render(`model/dataAnalysisModels`, {
+            type: type, 
             list_data: result.rows,
             pages: pageArray,
             nextUrl: hasMore,
             prevUrl: hasprev,
-            nickName: nickName,
+            nickName: nickName
           });
         });
     } catch (err) {
@@ -243,6 +200,7 @@ const output = {
   add: async (req, res) => {
     try {
       var { mode } = req.query;
+      // console.log(req.query)
       if (mode === "add") {
         output.processed_data().then((processed_dataset_resolve) => {
           var processed_dataset = processed_dataset_resolve;
@@ -254,93 +212,24 @@ const output = {
             });
           });
         });
-      } else if (mode === "view") {
-        // view mode
-        var { md_id } = req.query;
-        var model_info = database_get.list(md_id);
-        model_info.then(async(result) => {
-          const {
-            md_name,
-            al_time,
-            al_name_mo,
-            dataset_id,
-            file_id,
-            data_model_name,
-            date_look_up,
-            sub_data,
-            data_processing_option,
-            analysis_file_format,
-          } = result;
-          let date_look_up_prev = Object.values(JSON.parse(date_look_up));
-          let md_name_prev = md_name;
-          let al_time_prev = al_time;
-          let al_name_mo_prev = al_name_mo;
-          let dataset_id_prev = dataset_id;
-          let raw_data_model_name_prev = data_model_name;
-          let md_desc_prev = result["model_des.des_text"];
-          let file_name_prev = result["atch_file_tb.originalname"];
-          let processed_dataset_edit = new Array();
-          let processed_dataset_edit_removed = new Array();
-          let raw_data_model_key_prev;
-          let processed_selected_name;
-          let data_processing_option_visiable = "none";
-
-          var sub_data_info = output.subDataset(data_model_name);
-          data_processing_option_visiable =
-            data_processing_option === null ? "none" : "";
-
-          sub_data_info.then((sub_data_list) => {
-            // 유저 인풋 값 GET
-            model_input
-              .findAll({
-                where: { md_id: md_id },
-                attirbutes: ["ip_param", "ip_value"],
-              })
-              .then((results) => {
-                const model_input_info_str = JSON.stringify(results);
-                const model_input_info_value = JSON.parse(model_input_info_str);
-
-                // 등록 된 원천 데이터 셋 이름 GET
-                const raw_dataset_name_edit = output.raw_dataset_select();
-                raw_dataset_name_edit.then((dataset_name_result) => {
-                  dataset_name_result.filter((el) => {
-                    if (
-                      el.value.id === raw_data_model_name_prev.split(",")[0]
-                    ) {
-                      raw_data_model_key_prev = el;
-                    }
-                  });
-
-                  return res.render(`model/dataAnalysisModelsView`, {
-                    md_id: md_id,
-                    md_name: md_name_prev,
-                    al_time: al_time_prev,
-                    date_look_up: date_look_up_prev,
-                    processed_dataset_edit_removed:
-                      processed_dataset_edit_removed,
-                    raw_data_model_key_prev: raw_data_model_key_prev,
-                    md_desc: md_desc_prev,
-                    data_model_name: raw_data_model_name_prev,
-                    model_input_info_value: model_input_info_value,
-                    file_name_prev: file_name_prev,
-                    al_name_mo_prev: al_name_mo_prev,
-                    processed_selected_name: processed_selected_name,
-                    sub_data_list: sub_data_list,
-                    sub_data: sub_data,
-                    data_processing_option_visiable:
-                      data_processing_option_visiable,
-                    data_processing_option: data_processing_option,
-                  });
-                });
-              });
-          });
-        });
+      } else if (mode === "mod") {
+        // view & edit mode
+        output.mod();
       } else if (mode === "status") {
         // status mode
         output.status(req, res);
       } else {
         throw "Not valid query sent to server";
       }
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  mod: async (req, res) => {
+    try {
+      // view & edit logic
+      console.log("aaa");
     } catch (err) {
       console.log(err);
     }
@@ -419,133 +308,6 @@ const output = {
         err: "manage board page calling failed",
       });
     }
-  },
-
-  view: async (req, res) => {
-    console.log(req.query);
-    const md_id = req.query.md_id;
-    try {
-      console.log(md_id);
-      // console.log('---1')
-      // console.log(md_id)
-      // var list_info = database_get.list(md_id)
-      // console.log(list_info)
-      return res.render(`model/dataAnalysisModelsView`, { md_id: md_id });
-    } catch (err) {
-      console.log(err);
-    }
-
-    //   // 등록 된 모델 정보 GET
-    //   model_list
-    //     .findAll({
-    //       attributes: {
-    //         exclude: ["updatedAt", "createdAt"],
-    //       },
-    //       where: { md_id: md_id },
-    //       include: [
-    //         { model: model_des, required: false, attributes: ["des_text"] },
-    //         {
-    //           model: atch_file_tb,
-    //           required: false,
-    //           attributes: ["originalname"],
-    //         },
-    //       ],
-    //       raw: true,
-    //     })
-    //     .then((result) => {
-    //       // 등록 된 모델 정보 변수 설정
-    //       const model_edit_str = JSON.stringify(result);
-    //       const model_edit_value = JSON.parse(model_edit_str)[0];
-    //       const {
-    //         md_name,
-    //         al_time,
-    //         al_name_mo,
-    //         dataset_id,
-    //         file_id,
-    //         data_model_name,
-    //         date_look_up,
-    //         sub_data,
-    //         data_processing_option,
-    //         analysis_file_format,
-    //       } = model_edit_value;
-    //       console.log(model_edit_value);
-    //       let date_look_up_prev = Object.values(JSON.parse(date_look_up));
-    //       let md_name_prev = md_name;
-    //       let al_time_prev = al_time;
-    //       let al_name_mo_prev = al_name_mo;
-    //       let dataset_id_prev = dataset_id;
-    //       let raw_data_model_name_prev = data_model_name;
-    //       let md_desc_prev = model_edit_value["model_des.des_text"];
-    //       let file_name_prev = model_edit_value["atch_file_tb.originalname"];
-    //       let processed_dataset_edit = new Array();
-    //       let processed_dataset_edit_removed = new Array();
-    //       let raw_data_model_key_prev;
-    //       let processed_selected_name;
-    //       let data_processing_option_visiable = "none";
-
-    //       // sub_dataset 값 GET
-    //       let sub_data_queries = data_model_name.split(",");
-    //       let sub_data_attr = ["id", "type", "name", "version"];
-    //       const attr_obj = Object.fromEntries(
-    //         sub_data_attr.map((key, index) => [key, sub_data_queries[index]])
-    //       );
-    //       const sub_data_info = axios
-    //         .get(
-    //           `http://203.253.128.184:18227/entities?Type=${attr_obj.name}.${attr_obj.type}:${attr_obj.version}&datasetId=${attr_obj.id}`,
-    //           { headers: { Accept: "application/json" } }
-    //         )
-    //         .then((res) => {
-    //           return res.data;
-    //         });
-
-    //       // data_processing_option 추가
-
-    //       data_processing_option_visiable =
-    //         data_processing_option === null ? "none" : '';
-
-    //       sub_data_info.then((sub_data_list) => {
-    //         // 유저 인풋 값 GET
-    //         model_input
-    //           .findAll({
-    //             where: { md_id: md_id },
-    //             attirbutes: ["ip_param", "ip_value"],
-    //           })
-    //           .then((results) => {
-    //             const model_input_info_str = JSON.stringify(results);
-    //             const model_input_info_value = JSON.parse(model_input_info_str);
-
-    //             // 등록 된 원천 데이터 셋 이름 GET
-    //             const raw_dataset_name_edit = output.raw_dataset_select();
-    //             raw_dataset_name_edit.then((dataset_name_result) => {
-    //               dataset_name_result.filter((el) => {
-    //                 if (el.value.id === raw_data_model_name_prev.split(",")[0]) {
-    //                   raw_data_model_key_prev = el;
-    //                 }
-    //               });
-
-    //               return res.render(`model/model_registered_show`, {
-    //                 md_id: md_id,
-    //                 md_name: md_name_prev,
-    //                 al_time: al_time_prev,
-    //                 date_look_up: date_look_up_prev,
-    //                 processed_dataset_edit_removed:
-    //                   processed_dataset_edit_removed,
-    //                 raw_data_model_key_prev: raw_data_model_key_prev,
-    //                 md_desc: md_desc_prev,
-    //                 data_model_name: raw_data_model_name_prev,
-    //                 model_input_info_value: model_input_info_value,
-    //                 file_name_prev: file_name_prev,
-    //                 al_name_mo_prev: al_name_mo_prev,
-    //                 processed_selected_name: processed_selected_name,
-    //                 sub_data_list: sub_data_list,
-    //                 sub_data: sub_data,
-    //                 data_processing_option_visiable: data_processing_option_visiable,
-    //                 data_processing_option: data_processing_option
-    //               });
-    //             });
-    //           });
-    //       });
-    //     });
   },
 };
 
@@ -648,7 +410,7 @@ const process = {
     } = req.body;
     console.log(req.body);
 
-    const user_id = req.session.userInfo.userId;
+    const user_id = req.session.userInfo.userId
     // Error handling from server
     try {
       errorHandling.al_time_handling(al_time); // 3600
@@ -705,7 +467,7 @@ const process = {
       await model_list
         .create({
           md_name: md_name,
-          user_id: user_id,
+          user_id: user_id, 
           file_id: file_id,
           al_time: al_time,
           al_name_mo: al_name_mo.split(",")[0],
@@ -857,9 +619,9 @@ const process = {
   delete: async (req, res) => {
     const delModelList = req.body.delModel.split(",");
     await delModelList.map((el) => {
-      model_list.update({ soft_delete: "1" }, { where: { md_id: el } });
+      model_list.destroy({ where: { md_id: el } });
     });
-    console.log("소프트 삭제 완료");
+    console.log("삭제 완료");
 
     res.redirect("/dataAnalysisModels");
   },

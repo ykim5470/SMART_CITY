@@ -132,7 +132,10 @@ const output = {
   // 대시보드 페이지 Rendering
   dashboard: async (req, res) => {
     const userId = req.session.userInfo.userId
-    res.render(`dashboard/dashboard`, {userId: userId});
+    const type = req.session.userInfo.type
+    if(type == 'adminSystem'){
+      res.render(`dashboard/dashboard`, {userId: userId, type: type});
+    }
   },
   get_widget: async (req, res) => {
     const charts = await widget.findAll({ where: { widget_delYn: "N" } });

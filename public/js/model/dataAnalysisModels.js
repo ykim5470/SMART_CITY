@@ -25,3 +25,4 @@ del_btn.addEventListener("click", (e) => {
          await socket.emit('모델 스케쥴러 조작', {status, md_id: md_list})
     })
 });
+

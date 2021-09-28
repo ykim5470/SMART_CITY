@@ -1,9 +1,8 @@
 const base64 = require("base-64");
-// const { resolve } = require("path");
 
 exports.tokenToJson = async function (req, res) {
     try {
-      const token = req.cookies.token;
+      const token = await req.cookies.token;
   
       let tokenBase64 = token.split(".")[1];
       let tokenStr = base64.decode(tokenBase64); // 복호화

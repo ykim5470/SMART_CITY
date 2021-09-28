@@ -11,17 +11,33 @@
         </a>
       </li>
       <li class="gnb-item gnb-item-template">
-        <a href="list.html" class="gnb-link">
+        {% if type %}
+        <button
+          class="gnb-link"
+          type="button"
+          onclick="location.href='/admin/dataAnalysisModels?userId={{userId}}' "
+        >
+        {% else %}
+        <button
+        class="gnb-link"
+        type="button"
+        onclick="location.href='/dataAnalysisModels?userId={{userId}}' "
+      >
+      {% endif %}
           <span class="gnb-link-icon"></span>
           <p class="gnb-link-text">나의 모델 관리</p>
-        </a>
+        </button>
       </li>
-      <li class="gnb-item gnb-item-template">
-        <a href="admin/list.html" class="gnb-link">
+      <!-- <li class="gnb-item gnb-item-template">
+        <button
+          class="gnb-link"
+          type="button"
+          onclick="location.href='/admin/dataAnalysisModels?userId={{userId}}?type={{type}}' "
+        >
           <span class="gnb-link-icon"></span>
           <p class="gnb-link-text">전체 사용자 모델 관리</p>
-        </a>
-      </li>
+        </button>
+      </li> -->
     </ul>
   </nav>
   <button class="gnb-toggle-btn">

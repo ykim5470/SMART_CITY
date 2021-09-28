@@ -1,19 +1,28 @@
 const express = require("express");
 const router = express.Router();
 const new_auth = require("./new_auth");
+const admin_new_auth = require("./admin_new_auth");
 const newAnaly = require("./newAnaly");
 const ds = require("./ds");
 const df = require("./df");
 const dash = require("./dash");
+const admin_dash = require('./admin_dash')
 const uploadFile = require("../public/js/helpers/upload_dir");
 const ui = require("./ui");
 const paginate = require("express-paginate");
-const login = require("./login");
+const { userController } = require("./controller");
+const { tokenToJson } = require("../api/tokenToJson");
+const { requestLogout } = require("../api/requestLogout");
+const cookieParser = require("cookie-parser");
+
 
 //================================GET==================================
-// auth Homepage
+// SSO Homepage
 router.get("/", (req, res) => {
-  console.log('거침')
+  console.log(REDIRECT_URI)
+  console.log(CLIENT_ID)
+  console.log(STATE)
+  console.log("거침");
   res.redirect(
     "http://203.253.128.181:30084/oauth2.0/authorize?response_type=code&redirect_uri=" +
       REDIRECT_URI +
@@ -24,16 +33,19 @@ router.get("/", (req, res) => {
   );
 });
 
-router.get('userCheck', async(req,res)=>{
-  const token = await tokenToJson(req,res)
-  await userCheck(req,res, token, tokenArray)
-}
-)
 
+router.get('/logout', async(req,res)=>{
+  console.log((req.cookies))
+  let tokenjson = await tokenToJson(req,res)
+  await requestLogout(req,res)
+  res.clearCookie('token')
+  req.session.destroy();
+  res.redirect('/')
+})
 
 // Dashboard
 router.get("/dashboard", dash.output.dashboard);
-//router.get('/dashboard/processed_data_load', dash.output.processed_data_load)
+router.get("/admin/dashboard", admin_dash.output.dashboard)
 router.get("/dashboard/dataset_load/:data", dash.output.dataset_load);
 router.get("/dashboard/data_load/:data", dash.output.data_load);
 router.get("/dashboard/attr_load/:data", dash.output.attr_load);
@@ -54,22 +66,26 @@ router.get("/analysis/admin/deleted", newAnaly.output.viewDelList);
 router.get("/analysis/duplication/check/:checkType", newAnaly.output.dupCheck);
 router.get("/analysis/editCheck/:id", newAnaly.output.editChk);
 //Model
-// router.get('/model_manage_board/edit/:md_id', auth.output.register_edit)
-// router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage_board);
-// router.get("/model_manage_board/:md_id", auth.output.manage_status);
-// router.get("/model_register_board", auth.output.model_register_board);
-// router.get('/model_registered_show/:md_id', auth.output.registered_show);
-
 router.get("/test", new_auth.output.test);
 router.get(
   "/dataAnalysisModels",
   paginate.middleware(10, 50),
   new_auth.output.list
 );
-router.get("/dataAnalysisModelsView", new_auth.output.view);
-router.get("/dataAnalysisModelModView", new_auth.output.add);
+router.get(
+  "/admin/dataAnalysisModels",
+  userController(),
+  paginate.middleware(10, 50),
+  admin_new_auth.output.list
+);
+// router.get("/dataAnalysisModelsView", new_auth.output.view);
 
-// router.get("/model_manage_board/:md_id", new_auth.output.manage_status);
+router.get("/dataAnalysisModelModView", new_auth.output.add);
+router.get(
+  "/admin/dataAnalysisModelModView",
+  userController(),
+  admin_new_auth.output.add
+);
 
 //Dataset
 router.get("/ds/insert", ds.output.insert);
@@ -86,22 +102,12 @@ router.get("/df/list/:page", paginate.middleware(10, 50), df.output.list);
 router.get("/df/view/:df_id", df.output.view);
 
 //==============================POST======================================
-// Login
-router.post("/login/auth", login.process.auth);
 
 //Dashboard
 router.post("/dashboard/register", dash.process.register);
 //Analysis
 router.post("/analysis/insert", newAnaly.process.insert);
 //Model
-// router.post("/model_manage_board", auth.process.status_update);
-// router.post("/model/register", auth.process.register_init);
-// router.post('/model/list/delete', auth.process.delete)
-// router.post('/model/file_add',uploadFile.single("atch_origin_file_name"), auth.process.file_add)
-// router.post('/model/register/complete', uploadFile.single("atch_origin_file_name"), auth.process.register_complete)
-// router.post('/model/register/edit', uploadFile.single("atch_origin_file_name"), auth.process.register_edit)
-// router.post('/model/redirect/edit', auth.process.edit_redirect)
-
 router.post(
   "/model/file_add",
   uploadFile.single("atch_origin_file_name"),
@@ -113,8 +119,7 @@ router.post(
   new_auth.process.register_complete
 );
 router.post("/model/list/delete", new_auth.process.delete);
-// router.post("/dataAnalysisModelmodView", new_auth.process.status_update);
-
+router.post('/admin/model/list/delete',userController(), admin_new_auth.process.delete)
 //Dataset
 router.post("/ds/inserted", ds.process.insert);
 //Dataset flow
@@ -126,7 +131,6 @@ router.put("/analysis/softDel/:al_id", newAnaly.process.softDelOne);
 router.put("/analysis/softListDelete", newAnaly.process.softDelList);
 router.put("/analysis/edited/:al_id", newAnaly.process.edit);
 //Model
-// router.put("/model_manage_board/:md_id", auth.process.edit);
 router.put("/model_manage_board/:md_id", new_auth.process.edit);
 
 //Dataset
@@ -142,3 +146,21 @@ router.put("/df/softDelList", df.process.softDelList);
 router.use("/ui", ui);
 
 module.exports = router;
+
+//==============================OLD======================================
+// router.put("/model_manage_board/:md_id", auth.process.edit);
+// router.post("/dataAnalysisModelmodView", new_auth.process.status_update);
+// router.post("/model_manage_board", auth.process.status_update);
+// router.post("/model/register", auth.process.register_init);
+// router.post('/model/list/delete', auth.process.delete)
+// router.post('/model/file_add',uploadFile.single("atch_origin_file_name"), auth.process.file_add)
+// router.post('/model/register/complete', uploadFile.single("atch_origin_file_name"), auth.process.register_complete)
+// router.post('/model/register/edit', uploadFile.single("atch_origin_file_name"), auth.process.register_edit)
+// router.post('/model/redirect/edit', auth.process.edit_redirect)
+// router.get("/model_manage_board/:md_id", new_auth.output.manage_status);
+// router.get('/model_manage_board/edit/:md_id', auth.output.register_edit)
+// router.get("/model_manage_board",paginate.middleware(10, 50), auth.output.manage_board);
+// router.get("/model_manage_board/:md_id", auth.output.manage_status);
+// router.get("/model_register_board", auth.output.model_register_board);
+// router.get('/model_registered_show/:md_id', auth.output.registered_show);
+//router.get('/dashboard/processed_data_load', dash.output.processed_data_load)
