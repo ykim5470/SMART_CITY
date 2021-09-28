@@ -11,7 +11,7 @@ const dataRequest = {
     console.log("================Get Data===============");
     try {
       endDate = moment(endDate).format();
-      const result = await axios.get(`${base.DATA_SERVICE_BROKER}/temporal/entities/${id}?timerel=between&time=2021-08-10T18:04:10+09:00&endtime=2021-10-09T18:04:10+09:00&limit=${limit}&lastN=${limit}&timeproperty=observedAt`, { headers: { Accept: "application/json" } });
+      const result = await axios.get(`${base.DATA_SERVICE_BROKER}/temporal/entities/${id}?timerel=between&time=${startDate}&endtime=${endDate}&limit=${limit}&lastN=${limit}&timeproperty=observedAt`, { headers: { Accept: "application/json" } });
       const tt = `${base.DATA_SERVICE_BROKER}/temporal/entities/${id}?timerel=between&time=${startDate}&endtime=${endDate}&limit=${limit}&lastN=${limit}&timeproperty=observedAt`;
       console.log(tt);
       console.log("=================================");
@@ -39,6 +39,7 @@ const dash_handler = (socket) => {
     }
     temp[result.title]["data_type"] = result.dataset_type;
     temp[result.title]["chart_type"] = result.chart_type;
+    temp[result.title]["widgetId"] = result.widget_num;
     if (result.plugin != undefined) {
       temp[result.title]["plugin"] = result.plugin;
     }
@@ -49,7 +50,6 @@ const dash_handler = (socket) => {
   socket.on("widget_onload", async (data) => {
     const charts = await widget.findAll({ where: { widget_delYn: "N", user_id: data } });
     if (charts.length > 0) {
-      // const endDate = moment(new Date()).format(); 이거 윤호님께 말씀드리기 이렇게 하니까 날짜가 뒤죽박죽 현재 시간이 10 월이 되고 미래가 되네욥
       const endDate = new Date();
       const req_result = new Object();
       const name_list = new Array();
@@ -65,6 +65,7 @@ const dash_handler = (socket) => {
         }
         req_result[charts[i].title]["data_type"] = charts[i].dataset_type;
         req_result[charts[i].title]["chart_type"] = charts[i].chart_type;
+        req_result[charts[i].title]["widgetId"] = charts[i].widget_num;
         if (charts[i].plugin != undefined) {
           req_result[charts[i].title]["plugin"] = charts[i].plugin;
         }
@@ -74,5 +75,8 @@ const dash_handler = (socket) => {
       socket.emit("widget_loaded", req_result);
     }
   });
+  socket.on("widget_delete",async(data)=>{
+    await widget.update({widget_delYn:'Y'},{where:{widget_num:data}})
+  })
 };
 module.exports = dash_handler;

@@ -5,8 +5,7 @@ module.exports = {
       widget_num: {
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
       },
       title: {
         allowNull: false,

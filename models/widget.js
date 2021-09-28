@@ -1,5 +1,5 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, UUIDV4 } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class widget extends Model {
     /**
@@ -14,10 +14,10 @@ module.exports = (sequelize, DataTypes) => {
   widget.init(
     {
       widget_num: {
+        type: DataTypes.UUID,
         allowNull: false,
+        defaultValue: UUIDV4,
         primaryKey: true,
-        autoIncrement: true,
-        type: DataTypes.INTEGER,
       },
       title: {
         allowNull: false,
