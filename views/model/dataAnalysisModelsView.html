@@ -4,18 +4,22 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>모델 {{md_id}}</title>
+    <title>모델 수정</title>
   </head>
   <body>
-    <form action="/model/redirect/edit" method="post">
-      <input name="md_id" value="{{md_id}}" hidden />
+    <form
+      action="/model/dataAnalysisModelModView/edit"
+      method="POST"
+      id="register_complete"
+      enctype="multipart/form-data"
+    >
       <div>
         <table>
           <thead>
             모델 이름
           </thead>
           <tbody>
-            <input type="text" name="md_name" value="{{md_name}}" disabled />
+            <input type="text" name="md_name" class="md_name" />
           </tbody>
         </table>
         <table>
@@ -30,63 +34,62 @@
                 id="al_time"
                 name="al_time"
                 placeholder="요청 시간"
-                value="{{al_time}}"
-                disabled
               />
             </td>
           </tbody>
         </table>
         <table>
-          데이터 조회 기간 {% for item in date_look_up %}
+          데이터 조회 기간
           <input
             class="data_lookup"
+            id="data_lookup_date"
             type="number"
             name="data_lookup_date"
-            placeholder=""
-            value="{{item}}"
-            disabled
+            placeholder="일"
           />
-          {% endfor %}
+          <input
+            class="data_lookup"
+            id="data_lookup_hour"
+            type="number"
+            name="data_lookup_hour"
+            placeholder="시간"
+          />
+          <input
+            class="data_lookup"
+            id="data_lookup_min"
+            type="number"
+            name="data_lookup_min"
+            placeholder="분"
+          />
+          <input
+            class="data_lookup"
+            id="data_lookup_sec"
+            type="number"
+            name="data_lookup_sec"
+            placeholder="초"
+          />
         </table>
         <table>
           <thead>
             데이터 선택
           </thead>
           <tbody>
-            <td>
-              <select name="dataset_id" id="data_select" disabled>
-                <option value="{{data_model_name}}">
-                  {{ raw_data_model_key_prev.key}}
+            <td class='selector'>
+              <select name="dataset_id" id="data_select">
+                <option id ='default_data_model'></option>
+                {% for name in raw_dataset_name%}
+                <option
+                  value="{{name.value.id}},{{name.value.dataModelType}},{{name.value.dataModelNamespace}},{{name.value.dataModelVersion}}"
+                >
+                  {{name.key}}
                 </option>
+                {% endfor %}
               </select>
             </td>
           </tbody>
         </table>
-		<table class='sub_data_insert'>
-			{%for item in sub_data_list%}
-			<tr>
-				<td>
-					{% if item.id === sub_data %}
-					<input type='checkbox' checked disabled class='sub_data_select' name='sub_data_select' value=${item.id}/>
-					{%else%}
-					<input type='checkbox' disabled class='sub_data_select' name='sub_data_select' value=${item.id}/>
-					{%endif%}
-				</td>
-				<td>{{item.name.value}}</td>
-			<tr>
-			{%endfor%}
-		</table>
-		<table class="sub_data_insert_option">
-			<td display: {{data_processing_option_visiable}}>
-				<label for="data_processing">옵션 선택: </label>
-				<select name="data_processing" disabled>
-					<option value="">선택</option>
-					<option value="add">합</option>
-					<option value="average">평균</option>
-				</select>
-			</td>
-
-		</table>
+        <table class="sub_data_insert"></table>
+        <table class="sub_data_insert_option"></table>
         <table>
           <thead>
             input 파라미터 매칭
@@ -95,39 +98,9 @@
             <th>값 타입</th>
             <th>속성</th>
             <th>파라미터</th>
-
-            <table class="input_params_insert">
-              <tr>
-                {%for input_collections in model_input_info_value%}
-              </tr>
-
-              <tr>
-                <td>
-                  <input
-                    name="ip_attr_value_type"
-                    value="{{input_collections.ip_type}}"
-                    disabled
-                  />
-                </td>
-                <td>
-                  <input
-                    class="ip_attr_name"
-                    name="ip_attr_name"
-                    value="{{input_collections.ip_param}}"
-                    disabled
-                  />
-                </td>
-                <td>
-                  <input
-                    class="user_input_param"
-                    name="user_input_param"
-                    value="{{input_collections.ip_value}}"
-                    disabled
-                  />
-                </td>
-              </tr>
-              {%endfor%}
-            </table>
+            <th>파라미터 로드 갯수</th>
+            <th>파라미터 텐서 타입</th>
+            <table class="input_params_insert"></table>
           </tbody>
         </table>
         <table>
@@ -137,32 +110,17 @@
           <tbody>
             <td>
               <label for="al_name_mo">/분석 테이블/</label>
-              <select name="al_name_mo" id="al_select" disabled>
-                <option value="{{al_name_mo_prev}},{{dataset_id_prev}}">
-                  {{processed_selected_name}}
-                </option>
-                {% for el in processed_dataset_edit_removed %}
-                <option value="{{el.dataModelType}},{{el.dataset_id}}">
+              <select name="al_name_mo" id="al_select">
+                <option value="">-선택-</option>
+                {% for el in processed_dataset %}
+                <option
+                  value="{{el.dataModelType}},{{el.dataModelNamespace}},{{el.dataModelVersion}},{{el.id}}"
+                >
                   {{el.name}}
                 </option>
                 {% endfor %}
               </select>
             </td>
-          </tbody>
-        </table>
-        <table>
-          <thead>
-            분석 모델
-          </thead>
-          <tbody>
-            <input
-              type="file"
-              id="file_select"
-              name="atch_origin_file_name"
-              value="{{file_name_prev}}"
-              style="width: 75px; opacity: 30"
-              disabled
-            />
           </tbody>
         </table>
         <table>
@@ -174,21 +132,44 @@
             <th>속성 이름</th>
             <th>아웃풋 값</th>
             <table class="output_params_insert"></table>
+            <table class="output_look_up_insert"></table>
           </tbody>
         </table>
         <table>
+          <table>
+            <thead>
+              분석 모델
+            </thead>
+            <tbody>
+              <tr>
+                <input
+                  type="file"
+                  id="file_select"
+                  name="atch_origin_file_name"
+                />
+              </tr>
+              <td>
+                <label for="analysis_file_format">분석 파일 포맷</label>
+                <select name="analysis_file_format">
+                  <option value="">--선택--</option>
+                  <option value="loadLayersModel">Layers</option>
+                  <option value="loadGraphModel">Graph</option>
+                </select>
+              </td>
+            </tbody>
+          </table>
           <thead>
             내용 (500자 내외로 작성해주세요)
             <div></div>
             <input
-              style="width: 200px; height: 100px"
+              type="text"
+              class="md_desc"
               name="model_desc"
-              value="{{md_desc}}"
-              disabled
+              style="width: 200px; height: 100px"
             />
           </thead>
         </table>
-        <button>수정</button>
+        <button type="button" id="submitBtn">수정 완료</button>
       </div>
       <script src="/socket.io/socket.io.js"></script>
       <script src="/js/model/dataAnalysisModelsView.js"></script>

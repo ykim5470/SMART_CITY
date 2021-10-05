@@ -126,6 +126,7 @@ router.post(
   userController(),
   admin_new_auth.process.delete,
 )
+router.post('/model/dataAnalysisModelModView/edit', new_auth.process.edit)
 //Dataset
 router.post('/ds/inserted', ds.process.insert)
 //Dataset flow
@@ -136,8 +137,7 @@ router.post('/df/inserted', df.process.insert)
 router.put('/analysis/softDel/:al_id', newAnaly.process.softDelOne)
 router.put('/analysis/softListDelete', newAnaly.process.softDelList)
 router.put('/analysis/edited/:al_id', newAnaly.process.edit)
-//Model
-router.put('/model_manage_board/:md_id', new_auth.process.edit)
+
 
 //Dataset
 router.put('/ds/softDel/:dataset_id', ds.process.dsSofeDel)
