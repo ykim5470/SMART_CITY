@@ -65,8 +65,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       user_id: {
         type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: 'user01'
+        allowNull: false
       },
       plugin :{
         type: DataTypes.STRING

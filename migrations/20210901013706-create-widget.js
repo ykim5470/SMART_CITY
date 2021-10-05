@@ -53,8 +53,7 @@ module.exports = {
       },
       user_id: {
         type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: 'user01'
+        allowNull: false
       },
       plugin: {
         type:Sequelize.STRING

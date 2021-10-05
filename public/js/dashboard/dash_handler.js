@@ -14,7 +14,7 @@ const dataRequest = {
       const result = await axios.get(`${base.DATA_SERVICE_BROKER}/temporal/entities/${id}?timerel=between&time=${startDate}&endtime=${endDate}&limit=${limit}&lastN=${limit}&timeproperty=observedAt`, { headers: { Accept: "application/json" } });
       const tt = `${base.DATA_SERVICE_BROKER}/temporal/entities/${id}?timerel=between&time=${startDate}&endtime=${endDate}&limit=${limit}&lastN=${limit}&timeproperty=observedAt`;
       console.log(tt);
-      console.log("=================================");
+      console.log("=====================================");
       return result.data;
     } catch (err) {
       console.log(err);

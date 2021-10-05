@@ -1,39 +1,34 @@
 // Client socket instance create
 const socket = io();
+// function setCookie(cName, cValue, cDay) {
+//   var expire = new Date();
+//   expire.setDate(expire.getDate() + cDay);
+//   cookies = cName + "=" + escape(cValue) + "; path=/ ";
+//   if (typeof cDay != "undefined") cookies += ";expires=" + expire.toGMTString() + ";";
+//   document.cookie = cookies;
+// }
 
-/*
-    - 데이터 타입 선택 select
-    - 하위 센서 데이터 선택 select
-    - API query input box; date, hour, min, sec
-    - max limit 
-    - attr matching input box
- */
-// const widget_load = async () => {
-//   let widget = await fetch(`/dashboard/widget_load`).then((res) => res.json());
-//   return widget.widget_data;
-// };
-// let test = widget_load();
-// let widget_contents = new Array();
-// const widget_box = document.querySelector("#sortable");
-// test.then(async (data) => {
-//   for (var i = 0; i < data.length; i++) {
-//     widget_contents.push(`
-//       <div class="chart-list-item">
-//         <div class="chart-list-item-tit clearfix">
-//           <h3 class="float-left">${Object.keys(data[i]).toString()}</h3>
-//           <button type="button" name="button" class="float-right card_del"><img src="img/ico-modal-delete.png" alt="삭제" /></button>
-//         </div>
-//         <canvas id="${Object.keys(data[i]).toString()}" height="301"></canvas>
-//       </div>`);
+// function getCookie(name) {
+//   var nameOfCookie = name + "=";
+//   var x = 0;
+//   while (x <= document.cookie.length) {
+//     var y = x + nameOfCookie.length;
+//     if (document.cookie.substring(x, y) == nameOfCookie) {
+//       if ((endOfCookie = document.cookie.indexOf(";", y)) == -1) endOfCookie = document.cookie.length;
+//       return unescape(document.cookie.substring(y, endOfCookie));
+//     }
+//     x = document.cookie.indexOf(" ", x) + 1;
+//     if (x == 0) break;
 //   }
-//   widget_box.innerHTML = widget_contents.join("");
-//   await make_chart(data);
+//   return "없어";
+// }
+// // setCookie("test","test","123")
+// socket.on("로그인 유저 정보 GET", (data) => {
+//   console.log(data);
 // });
-
-socket.on('로그인 유저 정보 GET', (data)=>{
-  console.log(data)
-})
-const user = "user01";
+//const user = getCookie("user_id");
+const user = document.querySelector("#userIdInfo").innerText;
+console.log(user) // cookie 동작이 안되면 이걸로 하자
 socket.emit("widget_onload", user);
 socket.on("widget_loaded", (data) => {
   make_chart(data);
@@ -199,9 +194,10 @@ register.addEventListener("click", () => {
   }
   var json = JSON.stringify(object);
   json = JSON.parse(json);
+  json["user_id"] = user
   socket.emit("widget_register", json);
 });
 socket.on("registered_data", (data) => {
-  console.log(`=====================${Object.keys(data)}=================`)
-  make_chart(data)
+  console.log(`=====================${Object.keys(data)}=================`);
+  make_chart(data);
 });

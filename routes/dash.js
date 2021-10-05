@@ -132,6 +132,7 @@ const output = {
   // 대시보드 페이지 Rendering
   dashboard: async (req, res) => {
     const userId = req.session.userInfo.userId
+    // res.cookie("user_id",userId)
     res.render(`dashboard/dashboard`, {userId: userId});
   },
   get_widget: async (req, res) => {
