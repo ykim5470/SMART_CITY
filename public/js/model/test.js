@@ -8,58 +8,62 @@ $(document).ready(function(){
   $(".jsontree_label-wrapper:contains('objectMembers')").addClass("in_obj")
   $(".in_child").each(function(index) {$(this).children(".jsontree_label").append('<p class="none">"0"</p>')})
   $(".in_obj").each(function(index) {$(this).children(".jsontree_label").append('<p class="none"></p>')})
-
+  $(".jsontree_tree").each(function(index) {$(this).append('<p class="none">'+ index +'</p>')})
   // $(".jsontree_child-nodes").children(".jsontree_node_complex").siblings(".jsontree_node").find("input").attr("disabled", true);
 })
 
 // Get json-data by javascript-object
-var data ={
-  "type": "TransmissivityPrediction",
-  "namespace": "kr.waterdna",
-  "version": "1.5",
-  "name": "LID 투수량 예측",
-  "context": [
-      "http://uri.etsi.org/ngsi-ld/core-context.jsonld"
-  ],
-  "description": "LID 투수량 예측",
-  "attributes": [
-      {
-          "name": "TrPredicted",
-          "isRequired": true,
-          "valueType": "Object",
-          "objectMembers": [
-              {
-                  "name": "predictedAt",
-                  "valueType": "ArrayString"
-              },
-              {
-                  "name": "volume",
-                  "valueType": "ArrayDouble"
-              }
+var data = {
+  type: 'TransmissivityPrediction',
+  namespace: 'kr.waterdna',
+  version: '1.2',
+  name: 'LID 투수량 예측',
+  context: ['http://uri.etsi.org/ngsi-ld/core-context.jsonld'],
+  description: 'LID 투수량 예측',
+  attributes: [
+    {
+      name: 'TransmissivityVolume',
+      isRequired: true,
+      valueType: 'Object',
+      objectMembers: [
+        {
+          name: 'predictedAt',
+          valueType: 'ArrayString',
+        },
+        {
+          name: 'volume',
+          valueType: 'ArrayInteger',
+          objectMembers: [
+            { name: 'predictedAt', valueType: 'ArrayString' },
+            { name: 'volume_nested', valueType: 'ArrayDouble' },
           ],
-          "attributeType": "Property",
-          "hasObservedAt": true
-      },
-      {
-          "name": "TrChild",
-          "isRequired": true,
-          "valueType": "Object",
-          "objectMembers": [
-              {
-                  "name": "predictedAt",
-                  "valueType": "ArrayString"
-              },
-              {
-                  "name": "childVolume",
-                  "valueType": "ArrayDouble"
-              }
+        },
+      ],
+      attributeType: 'Property',
+      hasObservedAt: true,
+      childAttributes: [
+        {
+          name: 'TransmissivityRatio',
+          isRequired: true,
+          valueType: 'Object',
+          objectMembers: [
+            {
+              name: 'predictedAt',
+              valueType: 'ArrayString',
+            },
+            {
+              name: 'ratio',
+              valueType: 'ArrayDouble',
+            },
           ],
-          "attributeType": "Property",
-          "hasObservedAt": true
-      }
+          attributeType: 'Property',
+          hasObservedAt: true,
+        },
+      ],
+    },
   ],
-  "createdAt": "2021-10-07T15:25:11,121+09:00",
-  "modifiedAt": "2021-10-07T15:25:11,121+09:00"
+  createdAt: '2021-08-31T10:26:00,020+09:00',
+  modifiedAt: '2021-09-08T12:42:15,900+09:00',
 }
 
 // Create node tree view
@@ -100,38 +104,20 @@ const upsert_json_body = new Object();
 
 // Upsert key select
 const upsert_position_select = (e) => {
-
   if(e.target.checked == true){
-
     $(".over").removeClass("over")
     $(e.target).parent().parent().parent().parent().parent().parent(".jsontree_node_complex").addClass("over");
     var over = $(".over").children(".jsontree_label-wrapper").children(".jsontree_label").text()
     $(".over").parent().parent().parent().siblings(".in_obj").children(".jsontree_label").children("p").text(over + ",");
-
-    // console.log(over)
-    // var var03 = $(e.target).parent().parent().parent().parent().parent().siblings(".jsontree_label-wrapper").children(".jsontree_label").text()
-    // var var03 = $(e.target).parents(".jsontree_node_complex").children(".jsontree_label-wrapper").find(".jsontree_label").text()
-
-    // console.log(var03)
-
     $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("objectMembers")').find("p").text();
-    $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("childAttributes")').find("p").text();
-    
-
+    $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("childAttributes")').find("p").text();    
     var var01 = $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("childAttributes")').text();
     var var02 = $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("objectMembers")').text();
-    // var var03 = $(e.target).parent().parent().parent().parent().parent().siblings(".jsontree_label-wrapper").children(".jsontree_label").text()
-
+    var var03 = $(e.target).parents(".jsontree_tree").children("p").text()
     var strArray01 = var02.split(",").reverse();
-    // var strArray02 = var02.split(',').reverse();
-
     var arr01 = new Array(strArray01)
-    // var arr02 = new Array(strArray02)
-
     var test01 = arr01
-    // var test02 = arr02
-
-    console.log(var01 + test01 + ", name")
+    console.log('"TransmissivityVolume"' + '"' + var03 + '"' + var01 + test01 + "name")
   }
   try {
     if (e.target.checked) {
