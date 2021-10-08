@@ -6,8 +6,10 @@ var check_arr = new Array();
 $(document).ready(function(){
   $(".jsontree_label-wrapper:contains('childAttributes')").addClass("in_child")
   $(".jsontree_label-wrapper:contains('objectMembers')").addClass("in_obj")
-  $(".in_child").each(function(index) {$(this).children(".jsontree_label").append('<p class="none">:"'+ (index + 1) +'",</p>')})
-  $(".in_obj").each(function(index) {$(this).children(".jsontree_label").append('<p class="none">:"'+ (index + 1) +'",</p>')})
+  $(".in_child").each(function(index) {$(this).children(".jsontree_label").append('<p class="none">"0"</p>')})
+  $(".in_obj").each(function(index) {$(this).children(".jsontree_label").append('<p class="none"></p>')})
+
+  // $(".jsontree_child-nodes").children(".jsontree_node_complex").siblings(".jsontree_node").find("input").attr("disabled", true);
 })
 
 // Get json-data by javascript-object
@@ -123,19 +125,36 @@ const upsert_json_body = new Object();
 const upsert_position_select = (e) => {
 
   if(e.target.checked == true){
+
+    $(".over").removeClass("over")
+    $(e.target).parent().parent().parent().parent().parent().parent(".jsontree_node_complex").addClass("over");
+    var over = $(".over").children(".jsontree_label-wrapper").children(".jsontree_label").text()
+    $(".over").parent().parent().parent().siblings(".in_obj").children(".jsontree_label").children("p").text(over + ",");
+
+    // console.log(over)
+    // var var03 = $(e.target).parent().parent().parent().parent().parent().siblings(".jsontree_label-wrapper").children(".jsontree_label").text()
+    // var var03 = $(e.target).parents(".jsontree_node_complex").children(".jsontree_label-wrapper").find(".jsontree_label").text()
+
+    // console.log(var03)
+
+    $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("objectMembers")').find("p").text();
+    $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("childAttributes")').find("p").text();
+    
+
     var var01 = $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("childAttributes")').text();
     var var02 = $(e.target).parents("li.jsontree_node_complex").children(".jsontree_label-wrapper").children('span.jsontree_label:contains("objectMembers")').text();
+    // var var03 = $(e.target).parent().parent().parent().parent().parent().siblings(".jsontree_label-wrapper").children(".jsontree_label").text()
 
-    var strArray01 = var01.split(',').reverse();
-    var strArray02 = var02.split(',').reverse();
+    var strArray01 = var02.split(",").reverse();
+    // var strArray02 = var02.split(',').reverse();
 
     var arr01 = new Array(strArray01)
-    var arr02 = new Array(strArray02)
-    var test01 = arr01
-    var test02 = arr02
+    // var arr02 = new Array(strArray02)
 
-    console.log(test01 + test02)
-    // console.log(test02)
+    var test01 = arr01
+    // var test02 = arr02
+
+    console.log(var01 + test01 + ", name")
   }
   try {
     if (e.target.checked) {
