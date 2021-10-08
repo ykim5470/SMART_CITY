@@ -13,77 +13,54 @@ $(document).ready(function(){
 })
 
 // Get json-data by javascript-object
-var data = {
-  type: 'TransmissivityPrediction',
-  namespace: 'kr.waterdna',
-  version: '1.2',
-  name: 'LID 투수량 예측',
-  context: ['http://uri.etsi.org/ngsi-ld/core-context.jsonld'],
-  description: 'LID 투수량 예측',
-  attributes: [
-    {
-      name: 'TransmissivityVolume',
-      isRequired: true,
-      valueType: 'Object',
-      objectMembers: [
-        {
-          name: 'predictedAt',
-          valueType: 'ArrayString',
-        },
-        {
-          name: 'volume',
-          valueType: 'ArrayInteger',
-          objectMembers: [
-            { name: 'predictedAt', valueType: 'ArrayString' },
-            { name: 'volume_nested', valueType: 'ArrayDouble' },
-          ],
-        },
-      ],
-      attributeType: 'Property',
-      hasObservedAt: true,
-      childAttributes: [
-        {
-          name: 'TransmissivityRatio',
-          isRequired: true,
-          valueType: 'Object',
-          objectMembers: [
-            {
-              name: 'predictedAt',
-              valueType: 'ArrayString',
-            },
-            {
-              name: 'ratio',
-              valueType: 'ArrayDouble',
-            },
-          ],
-          attributeType: 'Property',
-          hasObservedAt: true,
-          childAttributes: [
-            {
-              name: 'TransmissivityRatio1',
-              isRequired: true,
-              valueType: 'Object',
-              objectMembers: [
-                {
-                  name: 'predictedAt',
-                  valueType: 'ArrayString',
-                },
-                {
-                  name: 'ratio1',
-                  valueType: 'ArrayDouble',
-                },
-              ],
-              attributeType: 'Property',
-              hasObservedAt: true,
-            },
-          ],
-        },
-      ],
-    },
+var data ={
+  "type": "TransmissivityPrediction",
+  "namespace": "kr.waterdna",
+  "version": "1.5",
+  "name": "LID 투수량 예측",
+  "context": [
+      "http://uri.etsi.org/ngsi-ld/core-context.jsonld"
   ],
-  createdAt: '2021-08-31T10:26:00,020+09:00',
-  modifiedAt: '2021-09-08T12:42:15,900+09:00',
-};;
+  "description": "LID 투수량 예측",
+  "attributes": [
+      {
+          "name": "TrPredicted",
+          "isRequired": true,
+          "valueType": "Object",
+          "objectMembers": [
+              {
+                  "name": "predictedAt",
+                  "valueType": "ArrayString"
+              },
+              {
+                  "name": "volume",
+                  "valueType": "ArrayDouble"
+              }
+          ],
+          "attributeType": "Property",
+          "hasObservedAt": true
+      },
+      {
+          "name": "TrChild",
+          "isRequired": true,
+          "valueType": "Object",
+          "objectMembers": [
+              {
+                  "name": "predictedAt",
+                  "valueType": "ArrayString"
+              },
+              {
+                  "name": "childVolume",
+                  "valueType": "ArrayDouble"
+              }
+          ],
+          "attributeType": "Property",
+          "hasObservedAt": true
+      }
+  ],
+  "createdAt": "2021-10-07T15:25:11,121+09:00",
+  "modifiedAt": "2021-10-07T15:25:11,121+09:00"
+}
 
 // Create node tree view
 var data_attributes = data.attributes;
