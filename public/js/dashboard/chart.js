@@ -15,6 +15,28 @@ const chartAreaBorder = {
     ctx.restore();
   },
 };
+const quadrants = {
+  id: "quadrants",
+  beforeDraw(chart, args, options) {
+    const {
+      ctx,
+      chartArea: { left, top, right, bottom },
+      scales: { x, y },
+    } = chart;
+    const midX = x.getPixelForValue(0);
+    const midY = y.getPixelForValue(0);
+    ctx.save();
+    ctx.fillStyle = options.topLeft;
+    ctx.fillRect(left, top, midX - left, midY - top);
+    ctx.fillStyle = options.topRight;
+    ctx.fillRect(midX, top, right - midX, midY - top);
+    ctx.fillStyle = options.bottomRight;
+    ctx.fillRect(midX, midY, right - midX, bottom - midY);
+    ctx.fillStyle = options.bottomLeft;
+    ctx.fillRect(left, midY, midX - left, bottom - midY);
+    ctx.restore();
+  },
+};
 let colorchip = [
   "0,255,255",
   "127,255,212",
@@ -63,7 +85,6 @@ let colorchip = [
   "102,51,153",
   "255,0,0",
   "65,105,225",
-  "46,139,87",
   "135,206,235",
   "106,90,205",
   "255,99,71",
@@ -74,21 +95,44 @@ let colorchip = [
 const lineCha = ["lineChart", "multiAxisLineChart", "steppedLineChart", "lineChartStacked", "lineStyling", "pointStyle", "gridConfiguration"];
 const barCha = ["verticalBarChart", "programmaticEventTriggers", "horizontalBarChart", "stackedBarChart", "barChartBorderRadius"];
 const otherCha = ["scatter", "doughnut", "pie", "polarArea", "radar"];
-const exceptList = ["data_type", "chart_type", "type", "modifiedAt", "name", "datasetId", "id", "widgetId", "value", "observedAt", "plugin"];
-let stanCon = {
-  responsive: true,
-  plugins: {
-    legend: {
+const exceptList = ["data_type", "chart_type", "type", "modifiedAt", "name", "datasetId", "id", "widgetId", "value", "observedAt", "plugin", "location"];
+const multiAxisCon = {
+  y: {
+    type: "linear",
+    display: true,
+    position: "left",
+  },
+  y1: {
+    type: "linear",
+    display: true,
+    position: "right",
+    grid: { drawOnChartArea: false },
+  },
+};
+const gridCon = {
+  x: {
+    grid: {
       display: true,
+      drawBorder: true,
+      drawOnChartArea: true,
+      drawTicks: true,
     },
-    chartAreaBorder: {
-      borderColor: "red",
-      borderWidth: 3,
-      borderDash: [10, 10],
+  },
+  y: {
+    grid: {
+      drawBorder: false,
+      color: function (context) {
+        if (context.tick.value > 0) {
+          return `rgba(255, 50, 59)`;
+        } else if (context.tick.value < 0) {
+          return `rgba(42, 50, 255)`;
+        }
+        return "#000000";
+      },
     },
   },
 };
-function RootAttribute(data) {
+function Attribute(data) {
   let values = new Array();
   this.get_child = function (data) {
     for (el in data) {
@@ -149,7 +193,6 @@ function RootAttribute(data) {
     for (key in data) {
       let t = new Object();
       if (!exceptList.includes(key)) {
-        console.log(key);
         t["label"] = key;
         t["data"] = [];
         data[key].map((el) => {
@@ -184,7 +227,7 @@ const make_chart = async (data) => {
     can.height = "301";
     html.appendChild(can);
     parent_chart.insertBefore(html, null);
-    chart_config(data[widget[i]], widget[i]);
+    chart_maker(data[widget[i]], widget[i]);
   }
   $(".card_del").on("click", function () {
     let widget_id = $(this).attr("id");
@@ -193,37 +236,151 @@ const make_chart = async (data) => {
     // $(this).removeClass('float-right card_del');
   });
 };
-const chart_config = (data, title) => {
-  if (lineCha.includes(data.chart_type)) {
-    line_maker(data, title);
-  } else if (barCha.includes(data.chart_type)) {
-  } else if (otherCha.includes(data.chart_type)) {
-  }
-};
-const line_maker = (data, title) => {
-  let thisChartCon = new Object();
+// const chart_config = (data, title) => {
+//   if (lineCha.includes(data.chart_type)) {
+//     line_maker(data, title);
+//   } else if (barCha.includes(data.chart_type)) {
+//     bar_maker(data, title);
+//   } else if (otherCha.includes(data.chart_type)) {
+//   }
+// };
+const chart_maker = (data, title) => {
+  let options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+      },
+      chartAreaBorder: {
+        borderColor: "red",
+        borderWidth: 3,
+        borderDash: [10, 10],
+      },
+      quadrants: {
+        topLeft: "rgba(255,191,209)",
+        topRight: "rgba(173,216,255)",
+        bottomRight: "rgba(184,255,203)",
+        bottomLeft: "rgba(255,255,164)",
+      },
+    },
+    stacked: false,
+  };
+  let thisChartCon = {};
   thisChartCon["data"] = {};
-  thisChartCon["type"] = "line";
-  thisChartCon["options"] = stanCon;
+  if (lineCha.includes(data.chart_type)) {
+    thisChartCon["type"] = "line";
+  } else if (barCha.includes(data.chart_type)) {
+    thisChartCon["type"] = "bar";
+  }
   chart = $(`#${title}`);
-  console.log(data);
+  let y = new Array();
   for (key in data) {
     if (!exceptList.includes(key)) {
-      let a = new RootAttribute(data[key]);
-      let y;
+      let a = new Attribute(data[key]);
       if (data.data_type === "분석데이터") {
         y = a.get_processed_data();
       } else {
         y = a.get_source_data();
       }
-      console.log(y);
-      thisChartCon["data"]["datasets"] = y;
     }
   }
+  switch (data.chart_type) {
+    case "multiAxisLineChart":
+      if (y.length == 2) {
+        y[0]["yAxisID"] = "y";
+        y[1]["yAxisID"] = "y1";
+        options["scales"] = multiAxisCon;
+      }
+      break;
+    case "steppedLineChart":
+      for (var i = 0; i < y.length; i++) {
+        y[i]["stepped"] = true;
+      }
+      break;
+    case "lineChartStacked":
+      for (var i = 0; i < y.length; i++) {
+        y[i]["fill"] = true;
+      }
+      break;
+    case "lineStyling":
+      for (var i = 0; i < y.length; i++) {
+        if (i % 3 == 1) {
+          y[i]["borderDash"] = [5, 5];
+        } else if (i % 3 == 2) {
+          y[i]["fill"] = true;
+        }
+      }
+      break;
+    case "pointStyle":
+      for (var i = 0; i < y.length; i++) {
+        y[i]["borderWidth"] = 1;
+        y[i]["pointStyle"] = "rectRot";
+        y[i]["pointRadius"] = 5;
+        y[i]["pointBorderColor"] = "rgb(0, 0, 0)";
+      }
+      break;
+    case "gridConfiguration":
+      options["scales"] = gridCon;
+      break;
+    case "programmaticEventTriggers":
+      for (var i = 0; i < y.length; i++) {
+        y[i]["hoverBorderWidth"] = 3;
+        y[i]["hoverBorderColor"] = "rgb(0, 0, 0)";
+      }
+      break;
+    case "horizontalBarChart":
+      options["indexAxis"] = "y";
+      let label = new Array();
+      for (var i = 0; i < y.length; i++) {
+        let value = new Array();
+        let a = y[i].data;
+        for (var j = 0; j < a.length; j++) {
+          if (!label.includes(a[j].x)) {
+            label.push(a[j].x);
+          }
+          value.push(a[j].y);
+        }
+        y[i].data = value;
+      }
+      thisChartCon["data"]["labels"] = label;
+      break;
+    case "stackedBarChart":
+      options["scales"] = {
+        x: { stacked: true },
+        y: { stacked: true },
+      };
+      break;
+    case "barChartBorderRadius":
+      for (var i = 0; i < y.length; i++) {
+        y[i].backgroundColor = y[i].backgroundColor.replace(")", ",0.6)");
+        y[i]["borderWidth"] = 3;
+        y[i]["borderRadius"] = Math.floor(Math.random() * 101);
+        y[i]["borderSkipped"] = false;
+      }
+      break;
+    case "scatter" :
+      thisChartCon["type"] = "scatter";
+      for (var i = 0; i < y.length; i++) {
+        let a = y[i].data;
+        for (var j = 0; j < a.length; j++) {
+          y[i].data[j].x = j
+        }
+      }
+      console.log(y)
+      break;
+    case "polarArea" :
+      console.log(y)
+      break;
+  }
+  thisChartCon["options"] = options;
+  thisChartCon["data"]["datasets"] = y;
   if (data.hasOwnProperty("plugin")) {
     if (data["plugin"] === "areaBorder") {
-      thisChartCon["plugins"] = [chartAreaBorder]
+      thisChartCon["plugins"] = [chartAreaBorder];
     }
+    // if (data["plugin"] === "quadrants") {
+    //   thisChartCon["plugins"] = [quadrants];
+    // }
   }
   let makeCha = new Chart(chart, thisChartCon);
 };
