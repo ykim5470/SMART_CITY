@@ -17,8 +17,10 @@ const analysis_select = (socket) => {
         `http://203.253.128.184:18827/datamodels/${model_namespace}/${model_type}/${model_version}`,
         { headers: { Accept: "application/json" } }
       );
-    //   console.log(selected_analysis_data_model.data.attributes);
-    socket.emit('분석 모델 선택 완료 및 JSON calling', selected_analysis_data_model.data.attributes)
+
+  
+      // console.log(selected_analysis_data_model.data);
+    socket.emit('분석 모델 선택 완료 및 JSON calling', selected_analysis_data_model.data)
     });
   } catch (err) {
     console.log(err);

@@ -8,16 +8,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      col_name: {
-        type: Sequelize.STRING,
-        allowNull:false
-      },
-      col_id:{
-        type:Sequelize.STRING,
-        allowNull:false
-      },
-      operation:{type:Sequelize.STRING,allowNull:false},
-      err_code:{type:Sequelize.STRING,allowNull:false},
+      err_code:{type:Sequelize.INTEGER,allowNull:false},
+      err_desc: {type:Sequelize.STRING,allowNull:false},
+      err_model: {type:Sequelize.STRING,allowNull:false},
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

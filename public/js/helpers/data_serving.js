@@ -1,18 +1,25 @@
 const { model_list, model_output } = require("../../../models");
 const axios = require("axios");
 const { predict_time_generator } = require("../helpers/api_scheduler");
-const moment = require('moment')
+const moment = require('moment');
 
 function check_recursion(single_sequence, last_value) {
+  // console.log('-----뭔지는 몰라도 여기서 문제가 있는 듯 하다.')
+  // console.log(single_sequence)
+  // console.log(single_sequence.length)
   var sequence_key_position_length = single_sequence.length; // 4
+  // console.log('-------key를 못 찾는다는데?')
+  // console.log(last_value)
   while (sequence_key_position_length > 0) {
     var increment = 0;
     let element = single_sequence[increment]; // 0 objectMembers 0 name
-    last_value = last_value[element]; // something
+    last_value_arg = last_value[element]; // something
     increment += 1;
     single_sequence.shift();
-    return check_recursion(single_sequence, last_value);
+    return check_recursion(single_sequence, last_value_arg);
   }
+  // console.log('--------------1')
+  // console.log(last_value)
   return last_value;
 }
 
@@ -82,11 +89,11 @@ function valueTypeCheck(valueType) {
   return temp_value;
 }
 
-const data_model_get = async () => {
+const data_model_get = async (model_type, model_namespace, model_version) => {
   try {
     return axios
       .get(
-        `http://203.253.128.184:18827/datamodels/kr.waterdna/TransmissivityPrediction/1.3`,
+        `http://203.253.128.184:18827/datamodels/${model_namespace}/${model_type}/${model_version}`,
         { headers: { Accept: "application/json" } }
       )
       .then((result) => {
@@ -116,7 +123,7 @@ const data_mapping = async (predicted_output, md_id) => {
         where: { op_id: md_id },
         attributes: ["op_sequence", "op_date_look_up"],
       })
-      .then((res) => {
+      .then(async(res) => {
         const { op_sequence, op_date_look_up } = res;
         const op_sequence_list = op_sequence.split(",");
 
@@ -133,11 +140,29 @@ const data_mapping = async (predicted_output, md_id) => {
           l += 1;
         }
 
-        const user_arr = data_model_get().then((result) => {
+       let model_info = await model_list.findOne({where: {md_id: md_id}, attributes: ['processed_model']}).then(result => {
+          const {processed_model}  = result 
+          
+          let model_type = processed_model.split(',')[0]
+          let model_namespace =processed_model.split(',')[1]
+          let model_version = processed_model.split(',')[2]
+          return {'model_type': model_type, 'model_namespace': model_namespace, 'model_version': model_version}
+        })
+        console.log('이건 테스트 밖')
+        console.log(model_info)
+        model_type = model_info.model_type
+        model_namespace = model_info.model_namespace
+        model_version = model_info.model_version
+
+        const user_arr = data_model_get(model_type, model_namespace, model_version).then((result) => {
           let i = 0;
           op_sequence_list.map((el) => {
             var to_string = el.replace(/'/gi, "").split(".");
+            // console.log('check recursion 함수 인자가 잘못 되었나?')
+            // console.log(to_string, result.attributes)
             var name_check = check_recursion(to_string, result.attributes);
+            console.log('그래서 결과가 뭐지?')
+            console.log(name_check)
             if (name_check == "predictedAt") {
               temp_obj[el.replace(/'/gi, "")] = predicted_time_list;
             } else {
@@ -150,8 +175,11 @@ const data_mapping = async (predicted_output, md_id) => {
             //   console.log(final_array)
             temp_obj = {};
           });
+          console.log(final_array)
           return temp_obj;
         });
+        console.log('user_arr을 못 찾는다고?')
+        console.log(user_arr)
         return user_arr;
       });
     // final_array.push(output_sequence)
@@ -164,7 +192,20 @@ const data_mapping = async (predicted_output, md_id) => {
 // 최종 적재 과정
 const data_upsert_serving = async (predicted_output, md_id) => {
   try {
-    const data = await data_model_get().then(async (result) => {
+    let model_info = await model_list.findOne({where: {md_id: md_id}, attributes: ['processed_model']}).then(result => {
+      const {processed_model} = result 
+      let model_type = processed_model.split(',')[0]
+      let model_namespace =processed_model.split(',')[1]
+      let model_version = processed_model.split(',')[2]
+
+      return {model_type: model_type, model_namespace: model_namespace, model_version : model_version}
+    })
+
+    console.log(model_info)
+    model_type = model_info.model_type
+    model_namespace = model_info.model_namespace
+    model_version = model_info.model_version
+    const data = await data_model_get(model_type, model_namespace, model_version).then(async (result) => {
       // 데이터 예측 맵핑
       var user_arr = await data_mapping(predicted_output, md_id);
 
@@ -258,19 +299,28 @@ const data_upsert_serving = async (predicted_output, md_id) => {
             type: this.attributeType,
           };
 
+          console.log('이건 attributeType인 Property 구성')
+          console.log(instance)
+
+
           let value_key = new Object();
           if (this.objectMembers != undefined) {
+            console.log('현재 instance의 index는 0과 1이 나와야 함.')
+            console.log(this.instance_index)
             const object_attributeType = objectMember_obj.insert(
               user_arr,
               this.instance_index
             );
-            //   console.log(object_attributeType);
+            
+            console.log('objectMembers가 존재하니 실행되는 코드')
+            console.log(object_attributeType)
 
             value_key[attrType] = object_attributeType[0];
           } else {
             value_key[attrType] = temp_value;
           }
           let type_value_obj = { ...instance[this.name], ...value_key };
+          
 
           let observedTime = new Object();
           if (this.hasObservedAt) {
@@ -287,6 +337,8 @@ const data_upsert_serving = async (predicted_output, md_id) => {
 
           this.instance_index += 1;
           this.depth -= 1;
+          // console.log('인스턴스가 어떻게 나오길래 이렇지?')
+          // console.log(instance)
           this.temp_arr.push(instance);
           // If depth is not less than 0, update current this value to childAttributes
           if (this.childAttributes != undefined) {
@@ -344,6 +396,7 @@ const data_upsert_serving = async (predicted_output, md_id) => {
         };
 
         this.fill = async (user_arr, attributes) => {
+          // console.log(attributes)
           for (let [key, value] of Object.entries(attributes)) {
             switch (key) {
               case "name":
@@ -410,6 +463,10 @@ const data_upsert_serving = async (predicted_output, md_id) => {
         this.arr = new Array();
 
         this.insert = function (user_arr, instanceIndex) {
+          console.log('objectMembers에 insert인데 user_arr은 아마 전체 데이터, instanceIndex는 0과 1이겠지.'
+          )
+          console.log(user_arr)
+          console.log(instanceIndex)
           for (let i = 0; i < user_arr.length; i++) {
             var sequence_key = Object.keys(user_arr[i]);
             var sequence_key_position = sequence_key[0].split(".");
@@ -437,6 +494,8 @@ const data_upsert_serving = async (predicted_output, md_id) => {
               this.iter_nested(user_arr, sequence_key_position, sequence_value);
             }
           }
+          console.log('0이라고 가정하고 한다면 this.iter이 실행')
+          console.log(this.arr)
           return this.arr;
         };
 
@@ -467,7 +526,7 @@ const data_upsert_serving = async (predicted_output, md_id) => {
             }
             return last_value;
           }
-          let second_nested_instacne_key = check_recursion(
+          let second_nested_instence_key = check_recursion(
             parent_name_sequence,
             result.attributes
           );
@@ -481,10 +540,10 @@ const data_upsert_serving = async (predicted_output, md_id) => {
           nested_obj[instance_key] = sequence_value; // 애가 {volume_nested: [1,2,3]} 과 {volume_nested1: [4,5,6]}이고
 
           var parent_obj = new Object();
-          parent_obj[second_nested_instacne_key.name] = nested_obj;
-          this.obj[second_nested_instacne_key.name] = mergeDeep(
+          parent_obj[second_nested_instence_key.name] = nested_obj;
+          this.obj[second_nested_instence_key.name] = mergeDeep(
             nested_obj,
-            this.obj[second_nested_instacne_key.name]
+            this.obj[second_nested_instence_key.name]
           );
         };
 
@@ -507,31 +566,71 @@ const data_upsert_serving = async (predicted_output, md_id) => {
             result.attributes
           );
 
+          console.log('iter 중간 단계인 이 instance_key는 뭐지? 4개가 나오나? 4개의 input을 넣었는데 ')
+          console.log(instance_key)
+
           this.obj[instance_key] = sequence_value;
+          console.log(this.obj)
         };
         return this.arr.push(this.obj);
       }
-
-
+      // console.log('여기 length 못 찾나?')
+      // console.log(result.attributes.length)
       for (let k = 0; k < result.attributes.length; k++) {
         var rootAttribute = new Attribute();
         var data_model_json_attribute = result.attributes[k];
-        await rootAttribute.fill(user_arr, data_model_json_attribute);
+        // console.log('---------여기 실행을 못 하나?')
+        // console.log(user_arr, data_model_json_attribute)
+        // console.log('이게 user_arr이다.')
+        // console.log(user_arr)
+        
+        await rootAttribute.fill(user_arr.slice(2*k, 2*k+2), data_model_json_attribute);
         f.push(rootAttribute.temp_arr);
       }
+      
 
-      console.log(f[0][0]['TransmissivityVolume'])
+      // console.log('이거 결과 어떻게 나오지?')
+      // console.log(f[0][0])
+      // console.log('attr이 두 개 이상일 때 어떻게 나오지?')
+      // console.log(f[1][0])
+      // // console.log(f[0][0]['TrPredicted']['value'])
 
+      let entities_body = new Object
+      // Attributes가 한 개 일때
+      if(f.length <= 1){
+        entities_body = f[0][0]
+      }
+      // Attributes가 한 개 이상일 때 
+      else{
+        for(let i = 0; i < f.length; i++){
+          entities_body = mergeDeep(entities_body, f[i][0])
+        }
+      }
 
+      console.log('적재 entities')
+      console.log(entities_body)
+
+      let upsert_info_obj = await model_list.findOne({where: {md_id: md_id}, attributes: ['processed_model'] }).then(
+        (upsert_info) => {
+          const {processed_model} = upsert_info
+          let upsert_name_space =  processed_model.split(',')[0]
+          let upsert_type = processed_model.split(',')[1]
+          let upsert_version = processed_model.split(',')[2]
+          let upsert_dataset_name = processed_model.split(',')[3]
+          return {'upsert_name_space': upsert_name_space, "upsert_type":upsert_type, 'upsert_version':upsert_version,"upsert_dataset_name":upsert_dataset_name }
+        }
+      )
+
+      const {upsert_name_space, upsert_type, upsert_version, upsert_dataset_name} = upsert_info_obj
       // console.log(f[0][0]);
       let upsert_JSON_body = new Object();
       let entities = new Array();
-      let entities_body = f[0][0];
-      upsert_JSON_body["datasetId"] = "waterDataset31";
+      // let entities_body = f[0][0];
+      upsert_JSON_body["datasetId"] =  upsert_dataset_name // "waterDataset27";
       let entities_id = new Object();
-      entities_id["id"] = "urn:waterDataset31:vredutest";
+      entities_id["id"] = `urn:${upsert_dataset_name}:vredutest`;
       let entities_type = new Object();
-      entities_type["type"] = "kr.waterdna.TransmissivityPrediction:1.3";
+      entities_type["type"] = `${upsert_type}.${upsert_name_space}:${upsert_version}`;
       entities.push({
         ...entities_id,
         ...entities_type,

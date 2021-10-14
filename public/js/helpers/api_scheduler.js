@@ -10,6 +10,7 @@ const my_scheduleJob = (
   function_name,
   cancel
 ) => {
+  try{
   var options = {
     tz: mxTimezones,
   };
@@ -51,12 +52,12 @@ const my_scheduleJob = (
   rule.tz = mxTimezones;
 
   let jobId = String(id);
-  if (cancel) {
+  if (cancel == "running") {
     schedule.scheduleJob(jobId, rule, () => {
       console.log(jobId + "실행");
       function_name();
     });
-  } else {
+  } else if (cancel == "stop") {
     let jobs = schedule.scheduledJobs;
     var running_jobs = jobs[jobId];
     if (Object.keys(jobs).length === 0 && jobs.constructor === Object) {
@@ -66,7 +67,30 @@ const my_scheduleJob = (
       running_jobs.cancel();
       console.log("실행중이던 job 중지");
     }
+  } else if (cancel == "halt") {
+    running_jobs.cancel();
+    console.log("실행중이던 job 중지");
   }
+  // if (cancel) {
+  //   schedule.scheduleJob(jobId, rule, () => {
+  //     console.log(jobId + "실행");
+  //     function_name();
+  //   });
+  // } else {
+  // let jobs = schedule.scheduledJobs;
+  // var running_jobs = jobs[jobId];
+  // if (Object.keys(jobs).length === 0 && jobs.constructor === Object) {
+  //   console.log("실행중이던 job 존재하지 않음");
+  //   return;
+  // } else {
+  //   running_jobs.cancel();
+  //   console.log("실행중이던 job 중지");
+  // }
+  // }
+}catch(err){
+  console.log('여기서 잡히나?????')
+  console.log(err)
+}
 };
 
 // 클론 시간 표현 값 변환 모듈
@@ -110,9 +134,9 @@ const predict_time_generator = (date_look_up, current_time) => {
   res = min != "" ? moment(res).add(Number(min), "m").format() : res;
   res = sec != "" ? moment(res).add(Number(sec), "s").format() : res;
 
-  var moment_time = moment(res).toISOString(true).split('.')
-  var observed_time = moment_time.join(',')
-  console.log(observed_time)
+  var moment_time = moment(res).toISOString(true).split(".");
+  var observed_time = moment_time.join(",");
+  console.log(observed_time);
   return observed_time;
 };
 
@@ -136,7 +160,7 @@ const single_processed_data = (
       sorted_input_param,
       variable_load
     );
-    var variable_attr_ip_value = Object.values(sorted_input_param)[j]
+    var variable_attr_ip_value = Object.values(sorted_input_param)[j];
     running_result[variable_attr_ip_value] = variable_attr_data;
   }
   return running_result;
@@ -172,7 +196,7 @@ const average_processing = (pre_processed_data) => {
   let promise_resolver = Promise.all(pre_processed_data).then((values) => {
     let add_processed = list_add(values);
     let attr = Object.keys(values[0]);
-    let divider = pre_processed_data.length
+    let divider = pre_processed_data.length;
 
     let average_processed = new Object();
     // 평균 로직
@@ -228,17 +252,17 @@ const list_add = (list_values) => {
   // 합 적용
   for (let q = 0; q < attr.length; q++) {
     let add_result = chunks[q].reduce(function (array1, array2) {
-      isNum = array1.every(x => typeof x === 'number')
-      if(isNum){
-      return array1.map(function (value, index) {
-        return value + array2[index];
-      });
-    }else{
-      let pre_array = array1.map(function (value, index){
-        return (value.concat(' ', array2[index]))
-      })
-      return pre_array[0].split(' ')
-    }
+      isNum = array1.every((x) => typeof x === "number");
+      if (isNum) {
+        return array1.map(function (value, index) {
+          return value + array2[index];
+        });
+      } else {
+        let pre_array = array1.map(function (value, index) {
+          return value.concat(" ", array2[index]);
+        });
+        return pre_array[0].split(" ");
+      }
     });
     add_processed[attr[q]] = add_result;
   }
@@ -247,12 +271,11 @@ const list_add = (list_values) => {
 
 // 유저 인풋 attr & value sorting
 const sorted_input_param = (user_input_value) => {
-  var sorted_input_param = new Object
-  user_input_value.map(el => sorted_input_param[el.ip_param] = el.ip_value)
+  var sorted_input_param = new Object();
+  user_input_value.map((el) => (sorted_input_param[el.ip_param] = el.ip_value));
 
   return sorted_input_param;
 };
-
 
 // 인풋 데이터 원천 데이터 맵핑
 const data_mapped_filling = (select_input_count, raw_data, sortable, load) => {

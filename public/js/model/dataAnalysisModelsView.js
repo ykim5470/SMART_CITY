@@ -10,6 +10,7 @@ const sub_data_insert_option = document.querySelector(
   ".sub_data_insert_option"
 );
 const register_complete = document.querySelector("#submitBtn");
+const analysis_select_input = document.querySelector("#al_select");
 
 // 모델 id 서버 전달
 socket.emit("model_uuid", { md_id: myParam });
@@ -48,6 +49,9 @@ socket.on("data_model_name", (data) => {
   const { data_model_name } = data;
   const data_model_name_el = document.querySelector("#default_data_model");
   data_model_name_el.value = data_model_name;
+  let select = document.querySelector("#data_select");
+  let value = select.options[select.selectedIndex].text;
+  data_model_name_el.text = value;
   for (let i = 0; i < data_select_input.options.length; i++) {
     if (data_select_input[i].value == data_model_name) {
       data_select_input[i].setAttribute("selected", true);
@@ -60,15 +64,17 @@ socket.on("data_model_name", (data) => {
 });
 
 // 데이터 모델 설명 Fill
-socket.on('model_des', data =>{
-  const {model_des} = data
-  document.querySelector('.md_desc').value = model_des
-})
-
+socket.on("model_des", (data) => {
+  const { model_des } = data;
+  document.querySelector(".md_desc").value = model_des;
+});
 
 window.addEventListener("load", (e) => {
+  // let select = document.querySelector('#data_select')
+  // let value = select.options[select.selectedIndex].text
+  // select.text = value
+  // console.log(value)
   if (data_select_input.value != "") {
-    console.log("이거");
     socket.emit("데이터 선택", {
       dataset_info: data_select_input.value,
     });
@@ -94,7 +100,7 @@ data_select_input.addEventListener("change", (e) => {
 socket.on("input_param", (user_param) => {
   socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
     const data_model = attr;
-    console.log(user_param)
+    console.log(user_param);
 
     const input_box = data_model.map((items, index) => {
       return `
@@ -122,13 +128,11 @@ socket.on("input_param", (user_param) => {
     });
 
     // 데이터 선택 후 유저 입력 여부 확인 및 테이블 데이터 INSERT
-    const user_input_param =
-      document.getElementsByName("user_input_param");
+    const user_input_param = document.getElementsByName("user_input_param");
     const input_arr = Array.from(user_input_param);
 
-
     input_arr.map((el, index) => {
-      if(el.value != ''){
+      if (el.value != "") {
         let max_data_load_box = document.querySelector(
           `#max_data_load_box${index}`
         );
@@ -173,14 +177,14 @@ socket.on("input_param", (user_param) => {
     user_param.map((el, idx) => {
       for (let j = 0; j < ip_attr.length; j++) {
         if (ip_attr[j].value == el.ip_param) {
-          console.log(el)
+          console.log(el);
           document.querySelector(`.max_data_load_limit${j}`).value = el.ip_load;
-          document.querySelector(`.tf_shape${j}`).value = JSON.parse(el.ip_param_type)
+          document.querySelector(`.tf_shape${j}`).value = JSON.parse(
+            el.ip_param_type
+          );
         }
       }
     });
-
-
   });
 });
 
@@ -280,13 +284,11 @@ socket.on("sub_data", (selected_data) => {
   });
 });
 
-
 const register_submit = () => {
   register_complete.addEventListener("click", async (e) => {
     // 파일 정보 post
-    return await document.querySelector("#register_complete").submit();
+    return await document.querySelector("#modify_complete").submit();
   });
 };
 
 register_submit();
-

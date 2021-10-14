@@ -81,9 +81,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: '0',
         type: DataTypes.ENUM('0','1')
-      }
+      },
+      processed_model: {
+        allowNull: false, 
+        type: DataTypes.STRING
+      },
     },
-
     {
       sequelize,
       modelName: "model_list",

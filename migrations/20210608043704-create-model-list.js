@@ -61,6 +61,10 @@ module.exports = {
       data_processing_option: { allowNull: true, type: Sequelize.STRING },
       analysis_file_format: { allowNull: false, type: Sequelize.STRING },
       soft_delete: {allowNull: false, type:Sequelize.STRING},
+      processed_model: {
+        allowNull: false, 
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

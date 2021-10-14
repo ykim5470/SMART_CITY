@@ -70,32 +70,6 @@ const dataRequest = {
   },
 };
 
-// DB GET
-const database_get = {
-  // Model_list data get
-  list: async (md_id) => {
-    try {
-      return await model_list.findOne({
-        attributes: {
-          exclude: ["updatedAt", "createdAt"],
-        },
-        where: { md_id: md_id },
-        include: [
-          { model: model_des, required: false, attributes: ["des_text"] },
-          {
-            model: atch_file_tb,
-            required: false,
-            attributes: ["originalname"],
-          },
-        ],
-        raw: true,
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  },
-};
-
 const output = {
   // sub_dataset GET
   subDataset: async (data_model_name) => {
@@ -114,284 +88,6 @@ const output = {
       }));
   },
 
-  // test
-  test: (req, res) => {
-    var data = {
-      type: "TransmissivityPrediction",
-      namespace: "kr.waterdna",
-      version: "1.2",
-      name: "LID 투수량 예측",
-      context: ["http://uri.etsi.org/ngsi-ld/core-context.jsonld"],
-      description: "LID 투수량 예측",
-      attributes: [
-        {
-          name: "TransmissivityVolume",
-          isRequired: true,
-          valueType: "Object",
-          objectMembers: [
-            {
-              name: "predictedAt",
-              valueType: "ArrayString",
-            },
-            {
-              name: "volume",
-              valueType: "ArrayInteger",
-            },
-          ],
-          attributeType: "Property",
-          hasObservedAt: true,
-          childAttributes: [
-            {
-              name: "TransmissivityRatio",
-              isRequired: true,
-              valueType: "Object",
-              objectMembers: [
-                {
-                  name: "predictedAt",
-                  valueType: "ArrayString",
-                },
-                {
-                  name: "ratio",
-                  valueType: "ArrayDouble",
-                },
-              ],
-              attributeType: "Property",
-              hasObservedAt: true,
-            },
-          ],
-        },
-      ],
-      createdAt: "2021-08-31T10:26:00,020+09:00",
-      modifiedAt: "2021-09-08T12:42:15,900+09:00",
-    };
-    function getObjectDepth(obj) {
-      if (typeof obj !== "object" || obj === null) {
-        return 0;
-      }
-
-      const flat = flatten(obj);
-      console.log(flat);
-
-      const keys = Object.keys(flat);
-
-      if (keys.length === 0) {
-        return 1;
-      }
-
-      const depthOfKeys = keys.map((key) => key.split(".").length);
-
-      return Math.max(...depthOfKeys);
-    }
-
-    console.log(getObjectDepth(JSON.parse(JSON.stringify(data))));
-
-    res.render("model/test");
-  },
-
-  // test
-  test1: (req, res) => {
-    var data = {
-      type: "TransmissivityPrediction",
-      namespace: "kr.waterdna",
-      version: "1.2",
-      name: "LID 투수량 예측",
-      context: ["http://uri.etsi.org/ngsi-ld/core-context.jsonld"],
-      description: "LID 투수량 예측",
-      attributes: [
-        {
-          name: "TransmissivityVolume",
-          isRequired: true,
-          valueType: "Object",
-          objectMembers: [
-            {
-              name: "predictedAt",
-              valueType: "ArrayString",
-            },
-            {
-              name: "volume",
-              valueType: "ArrayInteger",
-            },
-          ],
-          attributeType: "Property",
-          hasObservedAt: true,
-        },
-      ],
-      createdAt: "2021-08-31T10:26:00,020+09:00",
-      modifiedAt: "2021-09-08T12:42:15,900+09:00",
-    };
-    function getObjectDepth(obj) {
-      if (typeof obj !== "object" || obj === null) {
-        return 0;
-      }
-
-      const flat = flatten(obj);
-      console.log(flat);
-
-      const keys = Object.keys(flat);
-
-      if (keys.length === 0) {
-        return 1;
-      }
-
-      const depthOfKeys = keys.map((key) => key.split(".").length);
-
-      return Math.max(...depthOfKeys);
-    }
-
-    console.log(getObjectDepth(JSON.parse(JSON.stringify(data))));
-
-    res.render("model/test1");
-  },
-  // test
-  test2: (req, res) => {
-    var data = {
-      type: "TransmissivityPrediction",
-      namespace: "kr.waterdna",
-      version: "1.2",
-      name: "LID 투수량 예측",
-      context: ["http://uri.etsi.org/ngsi-ld/core-context.jsonld"],
-      description: "LID 투수량 예측",
-      attributes: [
-        {
-          name: "TransmissivityVolume",
-          isRequired: true,
-          valueType: "Object",
-          objectMembers: [
-            {
-              name: "predictedAt",
-              valueType: "ArrayString",
-            },
-            {
-              name: "volume",
-              valueType: "ArrayInteger",
-            },
-          ],
-          attributeType: "Property",
-          hasObservedAt: true,
-          childAttributes: [
-            {
-              name: "TransmissivityRatio",
-              isRequired: true,
-              valueType: "Object",
-              objectMembers: [
-                {
-                  name: "predictedAt",
-                  valueType: "ArrayString",
-                },
-                {
-                  name: "ratio",
-                  valueType: "ArrayDouble",
-                },
-              ],
-              attributeType: "Property",
-              hasObservedAt: true,
-            },
-          ],
-        },
-      ],
-      createdAt: "2021-08-31T10:26:00,020+09:00",
-      modifiedAt: "2021-09-08T12:42:15,900+09:00",
-    };
-    function getObjectDepth(obj) {
-      if (typeof obj !== "object" || obj === null) {
-        return 0;
-      }
-
-      const flat = flatten(obj);
-      console.log(flat);
-
-      const keys = Object.keys(flat);
-
-      if (keys.length === 0) {
-        return 1;
-      }
-
-      const depthOfKeys = keys.map((key) => key.split(".").length);
-
-      return Math.max(...depthOfKeys);
-    }
-
-    console.log(getObjectDepth(JSON.parse(JSON.stringify(data))));
-
-    res.render("model/test2");
-  },
-  // test
-  test3: (req, res) => {
-    var data = {
-      type: "TransmissivityPrediction",
-      namespace: "kr.waterdna",
-      version: "1.2",
-      name: "LID 투수량 예측",
-      context: ["http://uri.etsi.org/ngsi-ld/core-context.jsonld"],
-      description: "LID 투수량 예측",
-      attributes: [
-        {
-          name: "TransmissivityVolume",
-          isRequired: true,
-          valueType: "Object",
-          objectMembers: [
-            {
-              name: "predictedAt",
-              valueType: "ArrayString",
-            },
-            {
-              name: "volume",
-              valueType: "ArrayInteger",
-              objectMembers: [
-                { name: "predictedAt", valueType: "ArrayString" },
-                { name: "volume_nested", valueType: "ArrayDouble" },
-              ],
-            },
-          ],
-          attributeType: "Property",
-          hasObservedAt: true,
-          childAttributes: [
-            {
-              name: "TransmissivityRatio",
-              isRequired: true,
-              valueType: "Object",
-              objectMembers: [
-                {
-                  name: "predictedAt",
-                  valueType: "ArrayString",
-                },
-                {
-                  name: "ratio",
-                  valueType: "ArrayDouble",
-                },
-              ],
-              attributeType: "Property",
-              hasObservedAt: true,
-            },
-          ],
-        },
-      ],
-      createdAt: "2021-08-31T10:26:00,020+09:00",
-      modifiedAt: "2021-09-08T12:42:15,900+09:00",
-    };
-    function getObjectDepth(obj) {
-      if (typeof obj !== "object" || obj === null) {
-        return 0;
-      }
-
-      const flat = flatten(obj);
-      console.log(flat);
-
-      const keys = Object.keys(flat);
-
-      if (keys.length === 0) {
-        return 1;
-      }
-
-      const depthOfKeys = keys.map((key) => key.split(".").length);
-
-      return Math.max(...depthOfKeys);
-    }
-
-    console.log(getObjectDepth(JSON.parse(JSON.stringify(data))));
-
-    res.render("model/test3");
-  },
   // 데이터 적재 모델 리스트
   list: async (req, res) => {
     try {
@@ -461,7 +157,7 @@ const output = {
         });
       } else if (mode === "view") {
         // view mode
-        const {md_id} = req.query
+        const { md_id } = req.query;
         output.processed_data().then((processed_dataset_resolve) => {
           var processed_dataset = processed_dataset_resolve;
           output.raw_dataset_select().then((raw_dataset_select_resolve) => {
@@ -544,30 +240,20 @@ const output = {
   },
 
   // 모델 상태 관리 페이지
-  manage_status: (req, res) => {
+  manage_status: async(req, res) => {
     try {
-      const { status } = req.query;
-      const { md_id } = req.params;
-      return res.render("model/model_status", {
-        current_status: status,
-        md_id: md_id,
-      });
+      console.log('여기 이동')
+      const {status_md_id, new_status} = req.query
+      await model_list.update({run_status: new_status}, {where: {md_id: status_md_id}})
+
+      res.redirect(`/dataAnalysisModels`)
+     
     } catch (err) {
       return res.status(500).json({
         err: "manage board page calling failed",
       });
     }
   },
-
-  // view: async (req, res) => {
-  //   console.log(req.query);
-  //   const md_id = req.query.md_id;
-  //   try {
-  //     return res.render(`model/dataAnalysisModelsView`, { md_id: md_id });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // },
 };
 
 // POST
@@ -640,38 +326,246 @@ const process = {
 
   // 모델 등록 Complete
   register_complete: async (req, res) => {
-    const {
-      md_name,
-      al_name_mo,
-      al_time,
-      dataset_id,
-      model_desc,
-      ip_attr_name,
-      user_input_order,
-      user_input_param,
-      ip_attr_value_type,
-      sub_data_select,
-      data_lookup_date,
-      data_lookup_hour,
-      data_lookup_min,
-      data_lookup_sec,
-      op_data_lookup_date,
-      op_data_lookup_hour,
-      op_data_lookup_min,
-      op_data_lookup_sec,
-      max_data_load,
-      max_data_load_index,
-      data_processing,
-      analysis_file_format,
-      tf_shape,
-      tf_shape_index,
-      user_output_param,
-    } = req.body;
     console.log(req.body);
-
-    const user_id = req.session.userInfo.userId;
-    // Error handling from server
     try {
+      const {
+        md_name,
+        al_name_mo,
+        al_time,
+        dataset_id,
+        model_desc,
+        ip_attr_name,
+        user_input_order,
+        user_input_param,
+        ip_attr_value_type,
+        sub_data_select,
+        data_lookup_date,
+        data_lookup_hour,
+        data_lookup_min,
+        data_lookup_sec,
+        op_data_lookup_date,
+        op_data_lookup_hour,
+        op_data_lookup_min,
+        op_data_lookup_sec,
+        max_data_load,
+        max_data_load_index,
+        data_processing,
+        analysis_file_format,
+        tf_shape,
+        tf_shape_index,
+        user_output_param,
+      } = req.body;
+      console.log(req.body);
+
+      const user_id = req.session.userInfo.userId;
+      // Error handling from server
+      try {
+        errorHandling.al_time_handling(al_time); // 3600
+        errorHandling.dataset_handling(dataset_id); // dataset_0625,now test,kr.citydatahub,2.0
+        errorHandling.input_param_handling(user_input_param); // ['유량','','','','','',''] or ''
+        errorHandling.al_name_mo_handling(al_name_mo); // lewis-dataset111
+        errorHandling.file_upload_handling(req.file); // {file_name: '', mimtype: '', etc}
+        errorHandling.data_look_up_handling(
+          data_lookup_date,
+          data_lookup_hour,
+          data_lookup_min,
+          data_lookup_sec
+        );
+        errorHandling.data_look_up_handling(
+          op_data_lookup_date,
+          op_data_lookup_hour,
+          op_data_lookup_min,
+          op_data_lookup_sec
+        );
+        errorHandling.max_data_load_handling(max_data_load); // limit 48, 5, 2
+        errorHandling.data_processing_option_handling(
+          sub_data_select,
+          data_processing
+        );
+        errorHandling.tf_shape_handling(
+          max_data_load,
+          tf_shape,
+          analysis_file_format
+        );
+        let date_look_up = {
+          date: data_lookup_date,
+          hour: data_lookup_hour,
+          min: data_lookup_min,
+          sec: data_lookup_sec,
+        };
+
+        let file_id;
+        let md_id;
+        let user_obj = new Object();
+
+        // 파일 TB Create
+        await process.file_add(req, res);
+
+        // 파일 TB file_id GET
+        await atch_file_tb
+          .findAll({ order: [["createdAt", "DESC"]] })
+          .then((res) => {
+            const model_from_file = JSON.stringify(res);
+            const model_from_file_value = JSON.parse(model_from_file)[0];
+            return (file_id = model_from_file_value.file_id);
+          });
+
+        // 모델 리스트 TB Create
+        await model_list
+          .create({
+            md_name: md_name,
+            user_id: user_id,
+            file_id: file_id,
+            al_time: al_time,
+            al_name_mo: al_name_mo.split(",")[0],
+            data_model_name: dataset_id,
+            sub_data: sub_data_select,
+            date_look_up: date_look_up,
+            data_processing_option: data_processing,
+            analysis_file_format: analysis_file_format,
+            processed_model: al_name_mo
+          })
+          .then(() => {
+            // 생성된 모델 리스트 TB의 md_id GET
+            model_list
+              .findAll({
+                limit: 1,
+                where: { al_time: al_time },
+                order: [["createdAt", "DESC"]],
+              })
+              .then(async (res) => {
+                let md_id_str = JSON.stringify(res);
+                let md_id_value = JSON.parse(md_id_str)[0];
+                md_id = md_id_value.md_id;
+                // 모델 설명 TB Create
+                model_des.create({
+                  des_id: md_id,
+                  des_text: model_desc,
+                });
+                // 인풋 파람 필요 데이터 갯수 정의
+                let data_load_obj = new Object();
+                if (
+                  Array.isArray(max_data_load_index) &&
+                  Array.isArray(max_data_load)
+                ) {
+                  max_data_load_index.map((user_index, idx) => {
+                    data_load_obj[user_index] = max_data_load[idx];
+                  });
+                } else if (typeof max_data_load_index == "string") {
+                  data_load_obj[max_data_load_index] = max_data_load;
+                }
+                // 인풋 파람 필요 텐서 타입 정의
+                let tf_shape_obj = new Object();
+                if (Array.isArray(tf_shape_index) && Array.isArray(tf_shape)) {
+                  tf_shape_index.map((user_index, idx) => {
+                    tf_shape_obj[user_index] = tf_shape[idx];
+                  });
+                } else if (typeof tf_shape_index == "string") {
+                  tf_shape_obj[tf_shape_index] = tf_shape;
+                }
+
+                // 인풋 파람 TB 생성
+                if (typeof user_input_param === "string") {
+                  [user_input_param].filter((el, index) => {
+                    if (el != "" && typeof ip_attr_value_type != "string") {
+                      user_obj[ip_attr_name[index]] = [
+                        el,
+                        ip_attr_value_type[index],
+                      ];
+                    } else {
+                      user_obj[ip_attr_name] = [el, ip_attr_value_type];
+                    }
+                  });
+                } else {
+                  user_input_param.filter((el, index) => {
+                    if (el !== "") {
+                      user_obj[ip_attr_name[index]] = [
+                        el,
+                        ip_attr_value_type[index],
+                        data_load_obj[index],
+                        tf_shape_obj[index],
+                        user_input_order[index],
+                      ];
+                    }
+                  });
+                }
+                for (i in user_obj) {
+                  await model_input.create({
+                    md_id: md_id,
+                    ip_param: i,
+                    ip_value: user_obj[i][0],
+                    ip_type: user_obj[i][1],
+                    ip_load: user_obj[i][2],
+                    ip_param_type: user_obj[i][3],
+                    ip_order: user_obj[i][4],
+                  });
+                }
+
+                // 아웃풋 TB Create
+                let op_date_look_up = {
+                  date: op_data_lookup_date,
+                  hour: op_data_lookup_hour,
+                  min: op_data_lookup_min,
+                  sec: op_data_lookup_sec,
+                };
+
+                model_output.create({
+                  op_id: md_id,
+                  op_sequence: user_output_param,
+                  op_date_look_up: op_date_look_up,
+                });
+              });
+          });
+        console.log("등록 완료");
+        return res.redirect("/dataAnalysisModels");
+      } catch (err) {
+        console.log(err);
+        return res.send(
+          `<script>alert("${err}");location.href=history.back();</script>`
+        );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  // // // 모델 상태 관리 선택 페이지 이동
+  // status_update: async (req, res) => {
+  //   const { md_id } = req.body;
+  //   const {mode } = req.query
+  //   const selected_model = await model_list
+  //     .findOne({ where: { md_id: md_id } })
+  //     .then((result) => result.run_status);
+  //   return res.redirect(`/dataAnalysisModelmodView?mode=${mode}?md_id=${md_id}?status=${selected_model}`);
+  // },
+  // 모델 상태 관리 선택; 실행 Or 중지
+  edit: async (req, res) => {
+    try {
+      const { md_id } = req.query;
+      const {
+        md_name,
+        al_name_mo,
+        al_time,
+        dataset_id,
+        model_desc,
+        ip_attr_name,
+        user_input_order,
+        user_input_param,
+        ip_attr_value_type,
+        sub_data_select,
+        data_lookup_date,
+        data_lookup_hour,
+        data_lookup_min,
+        data_lookup_sec,
+        max_data_load,
+        max_data_load_index,
+        data_processing,
+        analysis_file_format,
+        tf_shape_index,
+        tf_shape,
+      } = req.body;
+
+      const user_id = req.session.userInfo.userId;
       errorHandling.al_time_handling(al_time); // 3600
       errorHandling.dataset_handling(dataset_id); // dataset_0625,now test,kr.citydatahub,2.0
       errorHandling.input_param_handling(user_input_param); // ['유량','','','','','',''] or ''
@@ -690,15 +584,16 @@ const process = {
       //   op_data_lookup_sec
       // );
       errorHandling.max_data_load_handling(max_data_load); // limit 48, 5, 2
-      errorHandling.data_processing_option_handling(
-        sub_data_select,
-        data_processing
-      );
+      // errorHandling.data_processing_option_handling(
+      //   sub_data_select,
+      //   data_processing
+      // );
       errorHandling.tf_shape_handling(
         max_data_load,
         tf_shape,
         analysis_file_format
       );
+
       let date_look_up = {
         date: data_lookup_date,
         hour: data_lookup_hour,
@@ -707,7 +602,6 @@ const process = {
       };
 
       let file_id;
-      let md_id;
       let user_obj = new Object();
 
       // 파일 TB Create
@@ -722,157 +616,95 @@ const process = {
           return (file_id = model_from_file_value.file_id);
         });
 
-      // 모델 리스트 TB Create
+      // 모델 리스트 TB Update
       await model_list
-        .create({
-          md_name: md_name,
-          user_id: user_id,
-          file_id: file_id,
-          al_time: al_time,
-          al_name_mo: al_name_mo.split(",")[0],
-          data_model_name: dataset_id,
-          sub_data: sub_data_select,
-          date_look_up: date_look_up,
-          data_processing_option: data_processing,
-          analysis_file_format: analysis_file_format,
-        })
-        .then(() => {
-          // 생성된 모델 리스트 TB의 md_id GET
-          model_list
-            .findAll({
-              limit: 1,
-              where: { al_time: al_time },
-              order: [["createdAt", "DESC"]],
-            })
-            .then(async (res) => {
-              let md_id_str = JSON.stringify(res);
-              let md_id_value = JSON.parse(md_id_str)[0];
-              md_id = md_id_value.md_id;
-              // 모델 설명 TB Create
-              model_des.create({
-                des_id: md_id,
-                des_text: model_desc,
-              });
-              // 인풋 파람 필요 데이터 갯수 정의
-              let data_load_obj = new Object();
-              if (
-                Array.isArray(max_data_load_index) &&
-                Array.isArray(max_data_load)
-              ) {
-                max_data_load_index.map((user_index, idx) => {
-                  data_load_obj[user_index] = max_data_load[idx];
-                });
-              } else if (typeof max_data_load_index == "string") {
-                data_load_obj[max_data_load_index] = max_data_load;
-              }
-              // 인풋 파람 필요 텐서 타입 정의
-              let tf_shape_obj = new Object();
-              if (Array.isArray(tf_shape_index) && Array.isArray(tf_shape)) {
-                tf_shape_index.map((user_index, idx) => {
-                  tf_shape_obj[user_index] = tf_shape[idx];
-                });
-              } else if (typeof tf_shape_index == "string") {
-                tf_shape_obj[tf_shape_index] = tf_shape;
-              }
-
-              // 인풋 파람 TB 생성
-              if (typeof user_input_param === "string") {
-                [user_input_param].filter((el, index) => {
-                  if (el != "" && typeof ip_attr_value_type != "string") {
-                    user_obj[ip_attr_name[index]] = [
-                      el,
-                      ip_attr_value_type[index],
-                    ];
-                  } else {
-                    user_obj[ip_attr_name] = [el, ip_attr_value_type];
-                  }
-                });
-              } else {
-                user_input_param.filter((el, index) => {
-                  if (el !== "") {
-                    user_obj[ip_attr_name[index]] = [
-                      el,
-                      ip_attr_value_type[index],
-                      data_load_obj[index],
-                      tf_shape_obj[index],
-                      user_input_order[index],
-                    ];
-                  }
-                });
-              }
-              for (i in user_obj) {
-                await model_input.create({
-                  md_id: md_id,
-                  ip_param: i,
-                  ip_value: user_obj[i][0],
-                  ip_type: user_obj[i][1],
-                  ip_load: user_obj[i][2],
-                  ip_param_type: user_obj[i][3],
-                  ip_order: user_obj[i][4],
-                });
-              }
-
-              // // 아웃풋 파람 생성
-              // let op_user_obj = new Object();
-              // if (typeof user_output_param !== "string") {
-              //   user_output_param.filter((el, idx) => {
-              //     if (el !== "") {
-              //       op_user_obj[op_col_id[idx]] = el;
-              //     }
-              //   });
-              // } else {
-              //   op_user_obj[op_col_id] = user_output_param;
-              // }
-              // // 아웃풋 TB Create
-              // let op_date_look_up = {
-              //   date: op_data_lookup_date,
-              //   hour: op_data_lookup_hour,
-              //   min: op_data_lookup_min,
-              //   sec: op_data_lookup_sec,
-              // };
-              // for (j in op_user_obj) {
-              //   model_output.create({
-              //     op_id: md_id,
-              //     op_col_id: j,
-              //     op_value: op_user_obj[j],
-              //     op_date_look_up: op_date_look_up,
-              //   });
-              // }
+        .update(
+          {
+            al_time: al_time,
+            user_id: user_id,
+            md_name: md_name,
+            al_name_mo: al_name_mo.split(",")[0],
+            file_id: file_id,
+            data_model_name: dataset_id,
+            date_look_up: date_look_up,
+            sub_data: sub_data_select,
+            data_processing_option: data_processing,
+            analysis_file_format: analysis_file_format,
+          },
+          { where: { md_id: md_id } }
+        )
+        .then(async () => {
+          // 모델 설명 TB Update
+          model_des.update(
+            { des_text: model_desc },
+            { where: { des_id: md_id } }
+          );
+          // 인풋 파람 필요 데이터 갯수 정의
+          let data_load_obj = new Object();
+          if (
+            Array.isArray(max_data_load_index) &&
+            Array.isArray(max_data_load)
+          ) {
+            max_data_load_index.map((user_index, idx) => {
+              data_load_obj[user_index] = max_data_load[idx];
             });
+          } else if (typeof max_data_load_index == "string") {
+            data_load_obj[max_data_load_index] = max_data_load;
+          }
+          // 인풋 파람 필요 텐서 타입 정의
+          let tf_shape_obj = new Object();
+          if (Array.isArray(tf_shape_index) && Array.isArray(tf_shape)) {
+            tf_shape_index.map((user_index, idx) => {
+              tf_shape_obj[user_index] = tf_shape[idx];
+            });
+          } else if (typeof tf_shape_index == "string") {
+            tf_shape_obj[tf_shape_index] = tf_shape;
+          }
+
+          // 인풋 파람 TB 업데이트
+          if (typeof user_input_param === "string") {
+            [user_input_param].filter((el, index) => {
+              if (el != "" && typeof ip_attr_value_type != "string") {
+                user_obj[ip_attr_name[index]] = [el, ip_attr_value_type[index]];
+              } else {
+                user_obj[ip_attr_name] = [el, ip_attr_value_type];
+              }
+            });
+          } else {
+            user_input_param.filter((el, index) => {
+              if (el !== "") {
+                user_obj[ip_attr_name[index]] = [
+                  el,
+                  ip_attr_value_type[index],
+                  data_load_obj[index],
+                  tf_shape_obj[index],
+                  user_input_order[index],
+                ];
+              }
+            });
+          }
+          for (i in user_obj) {
+            await model_input.update(
+              {
+                ip_param: i,
+                ip_value: user_obj[i][0],
+                ip_type: user_obj[i][1],
+                ip_load: user_obj[i][2],
+                ip_param_type: user_obj[i][3],
+                ip_order: user_obj[i][4],
+              },
+              { where: { md_id: md_id } }
+            );
+          }
         });
-      console.log("등록 완료 ");
+      console.log("수정 완료");
       return res.redirect("/dataAnalysisModels");
     } catch (err) {
+      console.log("model status error");
       console.log(err);
       return res.send(
         `<script>alert("${err}");location.href=history.back();</script>`
       );
-    }
-  },
-
-  // // 모델 상태 관리 선택 페이지 이동
-  // status_update: async (req, res) => {
-  //   const { md_id } = req.body;
-  //   const {mode } = req.query
-  //   const selected_model = await model_list
-  //     .findOne({ where: { md_id: md_id } })
-  //     .then((result) => result.run_status);
-  //   return res.redirect(`/dataAnalysisModelmodView?mode=${mode}?md_id=${md_id}?status=${selected_model}`);
-  // },
-  // 모델 상태 관리 선택; 실행 Or 중지
-  edit: async (req, res) => {
-    try {
-      console.log('aa')
-      return res.redirect('/dataAnalysisModels')
-      // const { new_status } = req.body;
-      // const md_id = req.params.md_id;
-      // await model_list.update(
-      //   { run_status: new_status },
-      //   { where: { md_id: md_id } }
-      // );
-      // return res.redirect("/dataAnalysisModels");
-    } catch (err) {
-      console.log("model status error");
     }
   },
 

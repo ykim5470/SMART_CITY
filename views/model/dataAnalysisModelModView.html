@@ -5,6 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>모델 등록</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
+    "></script>
+    <script src ='/js/model/jsonTree.js'></script>
+    <!-- <script src="/js/model/test.js"></script> -->
+    <link href="/css/test.css" rel="stylesheet" />
   </head>
   <body>
     <form
@@ -123,11 +128,14 @@
           <thead>
             output 파라미터 매칭
           </thead>
+          <div id='wrapper'></div>
           <tbody>
             <th>속성 타입</th>
             <th>속성 이름</th>
             <th>아웃풋 값</th>
-            <table class="output_params_insert"></table>
+            <table class="output_params_insert">
+              <input class ='user_output_param'name='user_output_param' hidden>
+            </table>
             <table class="output_look_up_insert"></table>
           </tbody>
         </table>
@@ -169,6 +177,7 @@
       </div>
       <script src="/socket.io/socket.io.js"></script>
       <script src="/js/model/add.js"></script>
+
     </form>
   </body>
 </html>

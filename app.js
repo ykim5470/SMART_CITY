@@ -12,7 +12,7 @@ const session = require("express-session");
 const FileStore = require("session-file-store")(session);
 const model_scheduler = require("./public/js/event_handlers/model_scheduler");
 const dash_handler = require("./public/js/dashboard/dash_handler");
-const model_data = require('./public/js/event_handlers/model_data')
+const model_data = require("./public/js/event_handlers/model_data");
 const dataset_select = require("./public/js/event_handlers/dataset_select");
 const analysis_select = require("./public/js/event_handlers/analysis_select");
 const { tokenToJson } = require("./api/tokenToJson");
@@ -24,6 +24,7 @@ const { auth } = require("./models");
 
 //routers
 const index_router = require("./routes/index");
+const { requestLogout } = require("./api/requestLogout");
 
 // models.sequelize
 //   .sync({ force: false})
@@ -79,7 +80,7 @@ app.get("/Oauth/token", sessionMiddleware, async (req, res, next) => {
       tokenArray = await requestToken(req, res);
       let access_token = tokenArray[0];
 
-      console.log(tokenArray)
+      console.log(tokenArray);
 
       // 쿠키 생성 (access_token을 expires_in만큼 쿠키 생성)
       await res.cookie("token", tokenArray[0], {
@@ -88,7 +89,6 @@ app.get("/Oauth/token", sessionMiddleware, async (req, res, next) => {
       });
 
       const token = await tokenToJson(req, res, access_token);
-  
 
       console.log("이거 처음에만 실행");
       // 처음 로그인한 유저일 경우
@@ -123,32 +123,28 @@ app.use(async (req, res, next) => {
     await auth
       .findOne({ where: { userId: userId }, attributes: ["refreshToken"] })
       .then((result) => {
-        const {refreshToken} = result
-        console.log(refreshToken)
+        const { refreshToken } = result;
         if (refreshToken != null) {
           refresh_token_result[0] = refreshToken;
-        } 
+        } else {
+          requestLogout(req, res);
+        }
       });
 
     // 토큰 만료시간이 10분 이하일 때 토큰 재발급
     if (
-      tokenjson.exp - Math.floor(Date.now() / 1000) < 45 * 60    &&
+      tokenjson.exp - Math.floor(Date.now() / 1000) < 1 * 60 &&
       refresh_token_result.length !== 0
     ) {
       // 토큰 재발급 전 기존 쿠키 삭제
       console.log("10분 이하 남았음");
       res.clearCookie("token");
-      console.log(refresh_token_result)
-      console.log(refresh_token_result.length)
       // 토큰 재발급
       tokenArray = await requestRefreshToken(req, res, refresh_token_result[0]);
       console.log("토큰 재발급 완료");
 
-      await auth
-      .update({refreshToken: null}, {where: { userId: userId }})
-      refresh_token_result = new Array
-
-
+      await auth.update({ refreshToken: null }, { where: { userId: userId } });
+      refresh_token_result = new Array();
 
       // 재발급 토큰으로 session update
       const token = await tokenToJson(req, res, tokenArray[0]);
@@ -188,6 +184,7 @@ const io = socket(server, {
 
 // Socket Connection
 io.on("connection", (socket) => {
+  try{
   console.log("Made socket connection");
   //대시보드
   dash_handler(socket);
@@ -206,6 +203,10 @@ io.on("connection", (socket) => {
   // 선택 된 분석 모델 API calling; attributes GET
   analysis_select(socket);
 
-  // 분석 모델 정보 
-  model_data(socket)
+  // 분석 모델 정보
+  model_data(socket);
+  }catch(err){
+    console.log('여기서 잡히나?')
+    console.log(err)
+  }
 });
