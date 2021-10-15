@@ -61,7 +61,7 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: true,
   store: new FileStore(),
-  cookie: { maxAge: 3600000 },
+  // cookie: { maxAge: 3600000 },
 });
 
 app.use(morgan("dev"));
@@ -131,43 +131,43 @@ app.use(async (req, res, next) => {
         }
       });
 
-    // 토큰 만료시간이 10분 이하일 때 토큰 재발급
-    if (
-      tokenjson.exp - Math.floor(Date.now() / 1000) < 1 * 60 &&
-      refresh_token_result.length !== 0
-    ) {
-      // 토큰 재발급 전 기존 쿠키 삭제
-      console.log("10분 이하 남았음");
-      res.clearCookie("token");
-      // 토큰 재발급
-      tokenArray = await requestRefreshToken(req, res, refresh_token_result[0]);
-      console.log("토큰 재발급 완료");
+    // // 토큰 만료시간이 10분 이하일 때 토큰 재발급
+    // if (
+    //   tokenjson.exp - Math.floor(Date.now() / 1000) < 1 * 60 &&
+    //   refresh_token_result.length !== 0
+    // ) {
+    //   // 토큰 재발급 전 기존 쿠키 삭제
+    //   console.log("10분 이하 남았음");
+    //   res.clearCookie("token");
+    //   // 토큰 재발급
+    //   tokenArray = await requestRefreshToken(req, res, refresh_token_result[0]);
+    //   console.log("토큰 재발급 완료");
 
-      await auth.update({ refreshToken: null }, { where: { userId: userId } });
-      refresh_token_result = new Array();
+    //   await auth.update({ refreshToken: null }, { where: { userId: userId } });
+    //   refresh_token_result = new Array();
 
-      // 재발급 토큰으로 session update
-      const token = await tokenToJson(req, res, tokenArray[0]);
+    //   // 재발급 토큰으로 session update
+    //   const token = await tokenToJson(req, res, tokenArray[0]);
 
-      console.log("이건 토큰 재발급 시 실행되어야 함.");
-      req.session.userInfo = token;
+    //   console.log("이건 토큰 재발급 시 실행되어야 함.");
+    //   req.session.userInfo = token;
 
-      // 토큰 검증
-      let publicKey = await requestPublicKey();
-      let verifyOptions = {
-        issuer: "urn:datahub:cityhub:security",
-        algorithm: "RS256",
-      };
-      try {
-        let decoded = jwt.verify(req.cookies.token, publicKey, verifyOptions);
-        if (decoded.userId.length === 0 || decoded.userId === undefined) {
-          console.log("토큰만료. 로그인창으로 이동");
-          res.redirect("/");
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
+    //   // 토큰 검증
+    //   let publicKey = await requestPublicKey();
+    //   let verifyOptions = {
+    //     issuer: "urn:datahub:cityhub:security",
+    //     algorithm: "RS256",
+    //   };
+    //   try {
+    //     let decoded = jwt.verify(req.cookies.token, publicKey, verifyOptions);
+    //     if (decoded.userId.length === 0 || decoded.userId === undefined) {
+    //       console.log("토큰만료. 로그인창으로 이동");
+    //       res.redirect("/");
+    //     }
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // }
     return;
   }
   next();
