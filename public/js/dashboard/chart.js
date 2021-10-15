@@ -54,7 +54,6 @@ let colorchip = [
   "153,50,204",
   "233,150,122",
   "143,188,143",
-  "47,79,79",
   "0,210,215",
   "255,20,147",
   "0,191,255",
@@ -363,15 +362,16 @@ const chart_maker = (data, title) => {
       for (var i = 0; i < y.length; i++) {
         let a = y[i].data;
         for (var j = 0; j < a.length; j++) {
-          y[i].data[j].x = j
+          // y[i].data[j].x = y[i].data[j].x.replace(/[^0-9]/g,'');
+          y[i].data[j].x = Date.parse(y[i].data[j].x);
         }
       }
-      console.log(y)
       break;
     case "polarArea" :
       console.log(y)
       break;
   }
+  console.log(y)
   thisChartCon["options"] = options;
   thisChartCon["data"]["datasets"] = y;
   if (data.hasOwnProperty("plugin")) {
