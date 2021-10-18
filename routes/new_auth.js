@@ -129,6 +129,7 @@ const output = {
           model_list.prototype.dateFormat = (date) =>
             moment(date).format("YYYY.MMM.DD - hh:mm A");
           return res.render(`model/dataAnalysisModels`, {
+            userId: userId,
             list_data: result.rows,
             pages: pageArray,
             nextUrl: hasMore,

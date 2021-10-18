@@ -91,6 +91,9 @@ const tensor_shape_convert = (
 
         var sorted_zipped_input = Object.keys(sorted_zipped_input_obj).map(el => zipped_input[el])
         // console.log(sorted_zipped_input)
+        console.log('---------성능 테스트')
+        tf.enableDebugMode()
+        // console.log(tf.enableDebugMode())
       
         var predicted_outputs = models.predict(sorted_zipped_input)
         
