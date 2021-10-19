@@ -42,6 +42,9 @@ module.exports = {
       data_limit: {
         type: Sequelize.STRING,
       },
+      turn_num: {
+        type: Sequelize.STRING,
+      },
       chart_type: {
         type: Sequelize.STRING,
         allowNull: false,

@@ -130,8 +130,20 @@ const datamodel_attr_load = () => {
     console.log(err);
   }
 };
-dataset_type.addEventListener("change", () => {
+dataset_type.addEventListener("change", (e) => {
   dataset_list_load();
+  if(e.target.value=="분석데이터"){
+    console.log(e.target.value)
+    // document.getElementById('processedBox').style.display == 'block'
+    // document.getElementById('sourceBox').style.display == 'none' 
+    $('#sourceBox').css('display','none') 
+    $('#processedBox').css('display','block') 
+  }else{
+    $('#sourceBox').css('display','block') 
+    $('#processedBox').css('display','none') 
+    // document.getElementById('processedBox').style.display == 'none' 
+    // document.getElementById('sourceBox').style.display == 'block'
+  }
 });
 regi_widget.addEventListener("click", async () => {
   document.getElementById("widgetFrm").reset();
@@ -162,6 +174,7 @@ function treeViewTest(data) {
       console.log(err);
     }
   };
+  
   // Create checkbox for attribute name identify
   var node_list = document.getElementsByClassName("jsontree_node");
   for (let i = 0; i < node_list.length; i++) {

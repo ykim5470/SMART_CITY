@@ -191,7 +191,7 @@ function Attribute(data) {
   this.get_source_data = function () {
     for (key in data) {
       let t = new Object();
-      if (!exceptList.includes(key)) {
+      if (!exceptList.includes(key) && key != "inflowFlux" && key != "outflowFlux") {
         t["label"] = key;
         t["data"] = [];
         data[key].map((el) => {
@@ -205,6 +205,7 @@ function Attribute(data) {
           }
           t["data"].push(ii);
         });
+        t["data"] = t["data"].reverse();
         t["backgroundColor"] = `rgba(${colorchip[Math.floor(Math.random() * colorchip.length)]})`;
         t["borderColor"] = t["backgroundColor"];
         values.push(t);
@@ -213,6 +214,45 @@ function Attribute(data) {
     return values;
   };
 }
+const polarData = (data) => {
+  let result = new Object();
+  result["labels"] = [];
+  result["data"] = [];
+  result["backgroundColor"] = [];
+  if (data.length > 0) {
+    let id = data[0].data.length - 1;
+    for (const item of data) {
+      result["labels"].push(item["label"]);
+      result["data"].push(item["data"][id].y);
+      result.backgroundColor.push(item["backgroundColor"]);
+    }
+    result["title"] = data[0].data[id].x;
+    return [result];
+  }
+  return [];
+};
+// const pie_doughMaker = (data) => {
+//   let result = new Array();
+//   let labels = new Array();
+//   console.log(data)
+//   for (var i = 0; i < data.length; i++) {
+//     let values = new Array();
+//     let colors = new Array();
+//     let temp = new Object();
+//     let a = data[i].data;
+//     for (var j = 0; j < a.length; j++) {
+//       if (!labels.includes(a[j].x)) {
+//         labels.push(a[j].x);
+//       }
+//       values.push(a[j].y);
+//       colors.push
+//     }
+//     temp["label"] = data[i].label;
+//     temp["data"] = values;
+    
+//   }
+//   result.push(labels)
+// };
 const make_chart = async (data) => {
   let widget = Object.keys(data);
   for (var i = 0; i < widget.length; i++) {
@@ -232,17 +272,8 @@ const make_chart = async (data) => {
     let widget_id = $(this).attr("id");
     socket.emit("widget_delete", widget_id);
     $(this).parents(".chart-list-item").remove();
-    // $(this).removeClass('float-right card_del');
   });
 };
-// const chart_config = (data, title) => {
-//   if (lineCha.includes(data.chart_type)) {
-//     line_maker(data, title);
-//   } else if (barCha.includes(data.chart_type)) {
-//     bar_maker(data, title);
-//   } else if (otherCha.includes(data.chart_type)) {
-//   }
-// };
 const chart_maker = (data, title) => {
   let options = {
     responsive: true,
@@ -357,21 +388,96 @@ const chart_maker = (data, title) => {
         y[i]["borderSkipped"] = false;
       }
       break;
-    case "scatter" :
-      thisChartCon["type"] = "scatter";
-      for (var i = 0; i < y.length; i++) {
-        let a = y[i].data;
-        for (var j = 0; j < a.length; j++) {
-          // y[i].data[j].x = y[i].data[j].x.replace(/[^0-9]/g,'');
-          y[i].data[j].x = Date.parse(y[i].data[j].x);
-        }
+    // case "scatter":
+    //   thisChartCon["type"] = "scatter";
+    //   for (var i = 0; i < y.length; i++) {
+    //     let a = y[i].data;
+    //     for (var j = 0; j < a.length; j++) {
+    //       // y[i].data[j].x = y[i].data[j].x.replace(/[^0-9]/g,'');
+    //       y[i].data[j].x = Date.parse(y[i].data[j].x);
+    //     }
+    //   }
+    //   break;
+    case "polarArea":
+      thisChartCon["type"] = "polarArea";
+      y = polarData(y);
+      if (y.length > 0) {
+        thisChartCon["data"]["labels"] = y[0].labels;
+        delete y[0].labels;
+        y[0]["label"] = "test";
+        options.plugins.legend["position"] = "top";
+        options.plugins["title"] = {
+          display: true,
+          text: y[0].title,
+        };
+        delete y[0].title;
       }
       break;
-    case "polarArea" :
-      console.log(y)
+    case "radar":
+      thisChartCon["type"] = "radar";
+      let radarLabel = new Array();
+      for (var i = 0; i < y.length; i++) {
+        let radarValue = new Array();
+        let a = y[i].data;
+        for (var j = 0; j < a.length; j++) {
+          if (!radarLabel.includes(a[j].x)) {
+            radarLabel.push(a[j].x);
+          }
+          radarValue.push(a[j].y);
+        }
+        y[i].data = radarValue;
+        y[i].backgroundColor = y[i].backgroundColor.replace(")", ",0.5)");
+      }
+      thisChartCon["data"]["labels"] = radarLabel;
+      break;
+    case "doughnut":
+      thisChartCon["type"] = "doughnut";
+      options["pieceLabel"] = { mode:"label", position:"inside", fontSize: 11, fontStyle: 'bold' }
+      let doughLabel = new Array();
+      let doughColors = new Array();
+      for(var i=0; i<y[0].data.length; i++){
+        doughColors.push(`rgba(${colorchip[Math.floor(Math.random() * colorchip.length)]})`)
+      }
+      for (var i = 0; i < y.length; i++) {
+        let doughValue = new Array();
+        let a = y[i].data;
+        for (var j = 0; j < a.length; j++) {
+          if (!doughLabel.includes(a[j].x)) {
+            doughLabel.push(a[j].x);
+          }
+          doughValue.push(a[j].y);
+        }
+        y[i].backgroundColor = doughColors;
+        y[i].borderColor = 'rgba(255,255,255)';
+        y[i].data = doughValue;
+      }
+      thisChartCon["data"]["labels"] = doughLabel;
+      break;
+    case "pie":
+      thisChartCon["type"] = "pie";
+      options["pieceLabel"] = { mode:"label", position:"inside", fontSize: 11, fontStyle: 'bold' }
+      let pieLabel = new Array();
+      let pieColors = new Array();
+      for(var i=0; i<y[0].data.length; i++){
+        pieColors.push(`rgba(${colorchip[Math.floor(Math.random() * colorchip.length)]})`)
+      }
+      for (var i = 0; i < y.length; i++) {
+        let pieValue = new Array();
+        let a = y[i].data;
+        for (var j = 0; j < a.length; j++) {
+          if (!pieLabel.includes(a[j].x)) {
+            pieLabel.push(a[j].x);
+          }
+          pieValue.push(a[j].y);
+        }
+        y[i].backgroundColor = pieColors;
+        y[i].borderColor = 'rgba(255,255,255)';
+        y[i].data = pieValue;
+      }
+      thisChartCon["data"]["labels"] = pieLabel;
       break;
   }
-  console.log(y)
+
   thisChartCon["options"] = options;
   thisChartCon["data"]["datasets"] = y;
   if (data.hasOwnProperty("plugin")) {
@@ -382,6 +488,7 @@ const chart_maker = (data, title) => {
     //   thisChartCon["plugins"] = [quadrants];
     // }
   }
+  console.log(thisChartCon);
   let makeCha = new Chart(chart, thisChartCon);
 };
 
