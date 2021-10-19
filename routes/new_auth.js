@@ -130,6 +130,7 @@ const output = {
             moment(date).format("YYYY.MMM.DD - hh:mm A");
           return res.render(`model/dataAnalysisModels`, {
             userId: userId,
+            is_active: 'is-active',
             list_data: result.rows,
             pages: pageArray,
             nextUrl: hasMore,

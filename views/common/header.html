@@ -4,13 +4,13 @@
   </h1>
   <nav class="gnb">
     <ul class="gnb-list">
-      <li class="gnb-item gnb-item-batch is-active">
+      <li class="gnb-item gnb-item-batch">
         <a href="/dashboard" class="gnb-link">
           <span class="gnb-link-icon"></span>
           <p class="gnb-link-text">대시보드</p>
         </a>
       </li>
-      <li class="gnb-item gnb-item-template">
+      <li class="gnb-item gnb-item-template {{is_active}}">
         {% if type %}
         <button
           class="gnb-link"
