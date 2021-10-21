@@ -41,8 +41,7 @@ if (data_select_input.value !== "") {
 }
 
 // 분석 데이터 선택
-console.log('------------------------2')
-console.log(analysis_select_input.value)
+
 if (analysis_select_input.value !== "") {
 	socket.emit("분석 모델 선택", {
 		al_name_mo: analysis_select_input.value.split(",")[0],

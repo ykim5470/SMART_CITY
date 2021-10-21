@@ -24,15 +24,6 @@ const { resolve } = require("path");
 
 // Get
 const output = {
-  
-  testtest: async( req, res) => {
-    // console.log(req)
-    try {
-      res.send(`dashboard/test`);
-    } catch (err) {
-      console.log(err)
-    }
-  },
 
   // 대시보드 페이지 Rendering
   dashboard: async (req, res) => {

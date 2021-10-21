@@ -29,7 +29,6 @@ exports.requestToken = async (req, res) => {
       return tokenArr;
     });
   } catch (err) {
-    console.log("토큰 요청 실패");
     console.log(err);
   }
 };

@@ -32,7 +32,6 @@ socket.on("al_time", (data) => {
 // 모델 분석 조회 기간 Fill
 socket.on("date_look_up", (data) => {
   const { date_look_up } = data;
-  console.log(date_look_up);
   const { date, hour, min, sec } = JSON.parse(date_look_up);
   const look_up_date = document.querySelector("#data_lookup_date");
   const look_up_hour = document.querySelector("#data_lookup_hour");
@@ -70,10 +69,6 @@ socket.on("model_des", (data) => {
 });
 
 window.addEventListener("load", (e) => {
-  // let select = document.querySelector('#data_select')
-  // let value = select.options[select.selectedIndex].text
-  // select.text = value
-  // console.log(value)
   if (data_select_input.value != "") {
     socket.emit("데이터 선택", {
       dataset_info: data_select_input.value,
@@ -100,7 +95,7 @@ data_select_input.addEventListener("change", (e) => {
 socket.on("input_param", (user_param) => {
   socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
     const data_model = attr;
-    console.log(user_param);
+
 
     const input_box = data_model.map((items, index) => {
       return `
@@ -177,7 +172,6 @@ socket.on("input_param", (user_param) => {
     user_param.map((el, idx) => {
       for (let j = 0; j < ip_attr.length; j++) {
         if (ip_attr[j].value == el.ip_param) {
-          console.log(el);
           document.querySelector(`.max_data_load_limit${j}`).value = el.ip_load;
           document.querySelector(`.tf_shape${j}`).value = JSON.parse(
             el.ip_param_type
@@ -195,7 +189,6 @@ socket.on("sub_data", (selected_data) => {
   const { sub_data } = selected_data;
 
   socket.on("데이터 선택 완료 및 개별 센서 데이터 calling", (data) => {
-    // console.log(data); // all sub_data
 
     if (typeof sub_data == "string") {
       let selected_id = sub_data.split("/")[0];
@@ -262,8 +255,7 @@ socket.on("sub_data", (selected_data) => {
       let sub_data_list = temp_sub_data_list.filter((item) => {
         return item !== undefined;
       });
-      console.log("----------2");
-      console.log(sub_data_list);
+
       if (sub_data_list.length >= 2) {
         let sub_option_box = `
               <td>

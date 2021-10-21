@@ -2,7 +2,6 @@ var colNum = 0;
 function attrChange(idx) {
   var elements = document.getElementsByName(idx.name);
   var valueType = document.getElementsByName("valueType");
-  console.log(idx.parentElement);
   for (var i = 0; i < elements.length; i++) {
     if (elements[i] == idx) {
       if (elements[i].value == "GeoProperty") {
@@ -77,7 +76,6 @@ function delCol(id) {
       }
     }
     document.getElementsByName("attributes")[0].value = attrData;
-    console.log(document.getElementsByName("attributes")[0].value)
   }
   del.remove();
 }

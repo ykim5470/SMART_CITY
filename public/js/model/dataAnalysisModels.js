@@ -8,7 +8,6 @@ let del_arr = new Array();
 
 del_md_id.forEach((el) => {
     el.addEventListener("click", (e) => {
-      console.log(el.checked)
       if(el.checked){
           del_arr.push(e.target.value)
       }
@@ -21,7 +20,6 @@ del_md_id.forEach((el) => {
 del_btn.addEventListener("click", (e) => {
   try{
     let status = 'stop'
-    console.log(del_arr)
     del_arr.map(async(md_list) => {
          await socket.emit('모델 스케쥴러 조작', {status, md_id: md_list})
     })

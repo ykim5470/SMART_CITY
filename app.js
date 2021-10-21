@@ -22,10 +22,11 @@ const { requestRefreshToken } = require("./api/requestRefreshToken");
 const { userCheck } = require("./api/userCheck");
 const { auth } = require("./models");
 
-//routers
+// Routers
 const index_router = require("./routes/index");
 const { requestLogout } = require("./api/requestLogout");
 
+// Sequelize 
 // models.sequelize
 //   .sync({ force: false})
 //   .then(() => {
@@ -56,9 +57,10 @@ nunjucks.configure("views", {
   watch: true,
 });
 
+// Session Middleware
 const sessionMiddleware = session({
   secret: "userInfo",
-  resave: false,
+  resave: true,
   saveUninitialized: true,
   store: new FileStore(),
   // cookie: { maxAge: 3600000 },
@@ -73,6 +75,7 @@ app.use(methodOverride("_method"));
 app.use(cookieParser());
 app.use(sessionMiddleware, index_router);
 
+// SSO Redirect Page Router
 app.get("/Oauth/token", sessionMiddleware, async (req, res, next) => {
   try {
     if (STATE === res.req.query.state) {
@@ -90,7 +93,6 @@ app.get("/Oauth/token", sessionMiddleware, async (req, res, next) => {
 
       const token = await tokenToJson(req, res, access_token);
 
-      console.log("이거 처음에만 실행");
       // 처음 로그인한 유저일 경우
       if (req.session.userInfo == undefined) {
         req.session.userInfo = token;
@@ -108,70 +110,70 @@ app.get("/Oauth/token", sessionMiddleware, async (req, res, next) => {
   }
 });
 
-app.use(async (req, res, next) => {
-  let token = await req.cookies.token;
 
-  if (req.originalUrl === "/") {
-    next();
-  } else if (token === undefined) {
-    res.redirect("/");
-  } else {
-    let tokenjson = await tokenToJson(req, res, token);
-    let userId = tokenjson.userId;
+// app.use(async (req, res, next) => {
+//   let token = await req.cookies.token;
 
-    // DB에서 refresh_token이 있는지 확인, 있으면 refresh_token_result에 넣음
-    await auth
-      .findOne({ where: { userId: userId }, attributes: ["refreshToken"] })
-      .then((result) => {
-        const { refreshToken } = result;
-        if (refreshToken != null) {
-          refresh_token_result[0] = refreshToken;
-        } else {
-          requestLogout(req, res);
-        }
-      });
+//   if (req.originalUrl === "/") {
+//     next();
+//   } else if (token === undefined) {
+//     res.redirect("/");
+//   } else {
+//     let tokenjson = await tokenToJson(req, res, token);
+//     let userId = tokenjson.userId;
 
-    // // 토큰 만료시간이 10분 이하일 때 토큰 재발급
-    // if (
-    //   tokenjson.exp - Math.floor(Date.now() / 1000) < 1 * 60 &&
-    //   refresh_token_result.length !== 0
-    // ) {
-    //   // 토큰 재발급 전 기존 쿠키 삭제
-    //   console.log("10분 이하 남았음");
-    //   res.clearCookie("token");
-    //   // 토큰 재발급
-    //   tokenArray = await requestRefreshToken(req, res, refresh_token_result[0]);
-    //   console.log("토큰 재발급 완료");
+//     await auth
+//       .findOne({ where: { userId: userId }, attributes: ["refreshToken"] })
+//       .then((result) => {
+//         const { refreshToken } = result;
+//         if (refreshToken != null) {
+//           refresh_token_result[0] = refreshToken;
+//         } else {
+//           requestLogout(req, res);
+//         }
+//       });
 
-    //   await auth.update({ refreshToken: null }, { where: { userId: userId } });
-    //   refresh_token_result = new Array();
+//     // // 토큰 만료시간이 10분 이하일 때 토큰 재발급
+//     // if (
+//     //   tokenjson.exp - Math.floor(Date.now() / 1000) < 1 * 60 &&
+//     //   refresh_token_result.length !== 0
+//     // ) {
+//     //   // 토큰 재발급 전 기존 쿠키 삭제
+//     //   console.log("10분 이하 남았음");
+//     //   res.clearCookie("token");
+//     //   // 토큰 재발급
+//     //   tokenArray = await requestRefreshToken(req, res, refresh_token_result[0]);
+//     //   console.log("토큰 재발급 완료");
 
-    //   // 재발급 토큰으로 session update
-    //   const token = await tokenToJson(req, res, tokenArray[0]);
+//     //   await auth.update({ refreshToken: null }, { where: { userId: userId } });
+//     //   refresh_token_result = new Array();
 
-    //   console.log("이건 토큰 재발급 시 실행되어야 함.");
-    //   req.session.userInfo = token;
+//     //   // 재발급 토큰으로 session update
+//     //   const token = await tokenToJson(req, res, tokenArray[0]);
 
-    //   // 토큰 검증
-    //   let publicKey = await requestPublicKey();
-    //   let verifyOptions = {
-    //     issuer: "urn:datahub:cityhub:security",
-    //     algorithm: "RS256",
-    //   };
-    //   try {
-    //     let decoded = jwt.verify(req.cookies.token, publicKey, verifyOptions);
-    //     if (decoded.userId.length === 0 || decoded.userId === undefined) {
-    //       console.log("토큰만료. 로그인창으로 이동");
-    //       res.redirect("/");
-    //     }
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // }
-    return;
-  }
-  next();
-});
+//     //   console.log("이건 토큰 재발급 시 실행되어야 함.");
+//     //   req.session.userInfo = token;
+
+//     //   // 토큰 검증
+//     //   let publicKey = await requestPublicKey();
+//     //   let verifyOptions = {
+//     //     issuer: "urn:datahub:cityhub:security",
+//     //     algorithm: "RS256",
+//     //   };
+//     //   try {
+//     //     let decoded = jwt.verify(req.cookies.token, publicKey, verifyOptions);
+//     //     if (decoded.userId.length === 0 || decoded.userId === undefined) {
+//     //       console.log("토큰만료. 로그인창으로 이동");
+//     //       res.redirect("/");
+//     //     }
+//     //   } catch (err) {
+//     //     console.log(err);
+//     //   }
+//     // }
+//     return;
+//   }
+//   next();
+// });
 
 const server = app.listen(app.get("port"), () => {
   console.log(`http://localhost:${app.get("port")}`);
@@ -206,7 +208,6 @@ io.on("connection", (socket) => {
   // 분석 모델 정보
   model_data(socket);
   }catch(err){
-    console.log('여기서 잡히나?')
     console.log(err)
   }
 });

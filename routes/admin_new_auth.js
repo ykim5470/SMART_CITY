@@ -71,79 +71,6 @@ const dataRequest = {
 };
 
 const output = {
-  // test
-  test: (req, res) => {
-    var data = {
-      type: "TransmissivityPrediction",
-      namespace: "kr.waterdna",
-      version: "1.2",
-      name: "LID 투수량 예측",
-      context: ["http://uri.etsi.org/ngsi-ld/core-context.jsonld"],
-      description: "LID 투수량 예측",
-      attributes: [
-        {
-          name: "TransmissivityVolume",
-          isRequired: true,
-          valueType: "Object",
-          objectMembers: [
-            {
-              name: "predictedAt",
-              valueType: "ArrayString",
-            },
-            {
-              name: "volume",
-              valueType: "ArrayInteger",
-            },
-          ],
-          attributeType: "Property",
-          hasObservedAt: true,
-          childAttributes: [
-            {
-              name: "TransmissivityRatio",
-              isRequired: true,
-              valueType: "Object",
-              objectMembers: [
-                {
-                  name: "predictedAt",
-                  valueType: "ArrayString",
-                },
-                {
-                  name: "ratio",
-                  valueType: "ArrayDouble",
-                },
-              ],
-              attributeType: "Property",
-              hasObservedAt: true,
-            },
-          ],
-        },
-      ],
-      createdAt: "2021-08-31T10:26:00,020+09:00",
-      modifiedAt: "2021-09-08T12:42:15,900+09:00",
-    };
-    function getObjectDepth(obj) {
-      if (typeof obj !== "object" || obj === null) {
-        return 0;
-      }
-
-      const flat = flatten(obj);
-      console.log(flat);
-
-      const keys = Object.keys(flat);
-
-      if (keys.length === 0) {
-        return 1;
-      }
-
-      const depthOfKeys = keys.map((key) => key.split(".").length);
-
-      return Math.max(...depthOfKeys);
-    }
-
-    console.log(getObjectDepth(JSON.parse(JSON.stringify(data))));
-
-    res.render("model/test");
-  },
   // 데이터 적재 모델 리스트
   list: async (req, res) => {
     try {
@@ -408,7 +335,6 @@ const process = {
       tf_shape_index,
       user_output_param,
     } = req.body;
-    console.log(req.body);
 
     const user_id = req.session.userInfo.userId
     // Error handling from server
@@ -553,32 +479,6 @@ const process = {
                 });
               }
 
-              // // 아웃풋 파람 생성
-              // let op_user_obj = new Object();
-              // if (typeof user_output_param !== "string") {
-              //   user_output_param.filter((el, idx) => {
-              //     if (el !== "") {
-              //       op_user_obj[op_col_id[idx]] = el;
-              //     }
-              //   });
-              // } else {
-              //   op_user_obj[op_col_id] = user_output_param;
-              // }
-              // // 아웃풋 TB Create
-              // let op_date_look_up = {
-              //   date: op_data_lookup_date,
-              //   hour: op_data_lookup_hour,
-              //   min: op_data_lookup_min,
-              //   sec: op_data_lookup_sec,
-              // };
-              // for (j in op_user_obj) {
-              //   model_output.create({
-              //     op_id: md_id,
-              //     op_col_id: j,
-              //     op_value: op_user_obj[j],
-              //     op_date_look_up: op_date_look_up,
-              //   });
-              // }
             });
         });
       console.log("등록 완료 ");
@@ -591,16 +491,7 @@ const process = {
     }
   },
 
-  // // 모델 상태 관리 선택 페이지 이동
-  // status_update: async (req, res) => {
-  //   const { md_id } = req.body;
-  //   const {mode } = req.query
-  //   const selected_model = await model_list
-  //     .findOne({ where: { md_id: md_id } })
-  //     .then((result) => result.run_status);
-  //   return res.redirect(`/dataAnalysisModelmodView?mode=${mode}?md_id=${md_id}?status=${selected_model}`);
-  // },
-  // 모델 상태 관리 선택; 실행 Or 중지
+
   edit: async (req, res) => {
     try {
       const { new_status } = req.body;

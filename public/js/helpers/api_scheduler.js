@@ -71,24 +71,7 @@ const my_scheduleJob = (
     running_jobs.cancel();
     console.log("실행중이던 job 중지");
   }
-  // if (cancel) {
-  //   schedule.scheduleJob(jobId, rule, () => {
-  //     console.log(jobId + "실행");
-  //     function_name();
-  //   });
-  // } else {
-  // let jobs = schedule.scheduledJobs;
-  // var running_jobs = jobs[jobId];
-  // if (Object.keys(jobs).length === 0 && jobs.constructor === Object) {
-  //   console.log("실행중이던 job 존재하지 않음");
-  //   return;
-  // } else {
-  //   running_jobs.cancel();
-  //   console.log("실행중이던 job 중지");
-  // }
-  // }
 }catch(err){
-  console.log('여기서 잡히나?????')
   console.log(err)
 }
 };
@@ -136,7 +119,6 @@ const predict_time_generator = (date_look_up, current_time) => {
 
   var moment_time = moment(res).toISOString(true).split(".");
   var observed_time = moment_time.join(",");
-  console.log(observed_time);
   return observed_time;
 };
 

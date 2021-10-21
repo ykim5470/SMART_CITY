@@ -88,6 +88,65 @@ const output = {
       }));
   },
 
+  test1: async (req, res) => {
+    // const userId = req.session.userInfo.userId
+    // res.cookie("user_id",userId)
+    res.render(`dashboard/dashboard`);
+  },
+
+  test: async (req, res) => {
+    try {
+      // const userId = req.session.userInfo.userId;
+      // const nickName = req.session.userInfo.nickname;
+      const currentPage = req.query.page;
+      const temp = req.url;
+      let offset = 0;
+      if (currentPage > 1) {
+        offset = 10 * (currentPage - 1);
+      }
+      await model_list
+        .findAndCountAll({
+          where: { soft_delete: "0" },
+          limit: req.query.limit,
+          offset: offset,
+          attributes: {
+            exclude: ["updatedAt"],
+          },
+        })
+        .then((result) => {
+          const itemCount = result.count; // total posts
+          const pageCount = Math.ceil(itemCount / req.query.limit); // per page
+          const base = "dataAnalysisModels"; // base url
+          const pageArray = paging.makeArray(
+            base,
+            currentPage,
+            pageCount,
+            temp
+          );
+          const hasMore =
+            currentPage < pageCount
+              ? `${base}?page=${currentPage + 1}&limit=10`
+              : `${base}?page=${currentPage}&limit=10`;
+          const hasprev =
+            currentPage > 1
+              ? `${base}?page=${currentPage - 1}&limit=10`
+              : `${base}?page=${currentPage}&limit=10`;
+          model_list.prototype.dateFormat = (date) =>
+            moment(date).format("YYYY.MMM.DD - hh:mm A");
+          return res.render(`model/dataAnalysisModels`, {
+            is_active: "is-active",
+            list_data: result.rows,
+            pages: pageArray,
+            nextUrl: hasMore,
+            prevUrl: hasprev,
+            // nickName: nickName,
+          });
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
   // 데이터 적재 모델 리스트
   list: async (req, res) => {
     try {
@@ -130,7 +189,7 @@ const output = {
             moment(date).format("YYYY.MMM.DD - hh:mm A");
           return res.render(`model/dataAnalysisModels`, {
             userId: userId,
-            is_active: 'is-active',
+            is_active: "is-active",
             list_data: result.rows,
             pages: pageArray,
             nextUrl: hasMore,
@@ -242,14 +301,16 @@ const output = {
   },
 
   // 모델 상태 관리 페이지
-  manage_status: async(req, res) => {
+  manage_status: async (req, res) => {
     try {
-      console.log('여기 이동')
-      const {status_md_id, new_status} = req.query
-      await model_list.update({run_status: new_status}, {where: {md_id: status_md_id}})
+      console.log("여기 이동");
+      const { status_md_id, new_status } = req.query;
+      await model_list.update(
+        { run_status: new_status },
+        { where: { md_id: status_md_id } }
+      );
 
-      res.redirect(`/dataAnalysisModels`)
-     
+      res.redirect(`/dataAnalysisModels`);
     } catch (err) {
       return res.status(500).json({
         err: "manage board page calling failed",
@@ -425,7 +486,7 @@ const process = {
             date_look_up: date_look_up,
             data_processing_option: data_processing,
             analysis_file_format: analysis_file_format,
-            processed_model: al_name_mo
+            processed_model: al_name_mo,
           })
           .then(() => {
             // 생성된 모델 리스트 TB의 md_id GET
@@ -530,16 +591,6 @@ const process = {
       console.log(err);
     }
   },
-
-  // // // 모델 상태 관리 선택 페이지 이동
-  // status_update: async (req, res) => {
-  //   const { md_id } = req.body;
-  //   const {mode } = req.query
-  //   const selected_model = await model_list
-  //     .findOne({ where: { md_id: md_id } })
-  //     .then((result) => result.run_status);
-  //   return res.redirect(`/dataAnalysisModelmodView?mode=${mode}?md_id=${md_id}?status=${selected_model}`);
-  // },
   // 모델 상태 관리 선택; 실행 Or 중지
   edit: async (req, res) => {
     try {

@@ -22,7 +22,6 @@ const Path = require("path");
 const model_scheduler = (socket) => {
   try{
   socket.on("모델 스케쥴러 조작", (data) => {
-    // console.log('삭제 시 요청 받았나?')
     const { status, md_id } = data;
     // 선택 모델 정보 GET
     try {
@@ -127,7 +126,6 @@ const model_scheduler = (socket) => {
 
                           try {
                             // 변환된 파일이 존재한다면 데이터 값 loading실행
-                            console.log(`${target_dir}/${filename}/model.json`);
                             if (fs.existsSync(`${target_dir}/${filename}`)) {
                               model_output
                                 .findAll({
@@ -141,9 +139,7 @@ const model_scheduler = (socket) => {
                                   const op_data_str = JSON.stringify(op_data);
                                   const op_data_value = JSON.parse(op_data_str);
 
-                                  // console.log("실행되는감????");
                                   let url = `http://localhost:4000/uploads/model/${filename}/model.json`;
-                                  // console.log(url)
                                   let predicted_output =
                                     await tensor_shape_convert(
                                       analysis_file_format,
@@ -153,7 +149,6 @@ const model_scheduler = (socket) => {
                                       url
                                     );
 
-                                  // console.log(predicted_output)
                                   data_upsert_serving(predicted_output, md_id);
                                 });
                             } else {
@@ -204,11 +199,7 @@ const model_scheduler = (socket) => {
                   var processed_data = options(
                     data_processing_option,
                     pre_processed_data
-                  );
-
-                  // 옵션 적용된 다중 센서 데이터 Promise
-                  // processed_data
-                  // processed_data.then(test => console.log(test))
+                  )
                 }
               };
               // scheduler modules
@@ -228,14 +219,12 @@ const model_scheduler = (socket) => {
     } catch (err) {
       // Scheduler halt
       console.log(err);
-      console.log('0000000000000000000000000000000000이거')
       model_list.update({run_status : 'halt'}, {where: {md_id: md_id}})
       error_log.create({err_code: 500, err_desc: err, err_model: md_id})
       socket.emit('모델 스케쥴러 조작',{status: 'halt', md_id: md_id}  )
     }
   });
 }catch(err){
-  console.log('----123 여기서 잡히나?')
   console.log(err)
 }
 };
