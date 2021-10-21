@@ -32,6 +32,7 @@ body { background-color: #f4f4f4; }
 
 /* align text */
 .align-left { text-align: left !important; } 
+.align-right { text-align: right !important; } 
 .align-center { text-align: center !important; } 
 
 /* width */
@@ -324,6 +325,8 @@ body {background-color: #f4f4f4; }
 .item-input-date input {background-image: url(/img/ico-input-date.png);background-position: 100% 50%; } 
 .item-input-date input[disabled],
 .item-input-date.is-disabled input {background-image: url(/img/ico-input-date-disabled.png); } 
+.item-input-flex{display: flex;flex-direction: row;justify-content: center;flex-wrap: nowrap;align-items: center;gap: 10px;}
+.item-input-flex span{width: 60px;}
 
 .item-file {position: relative;display: flex; } 
 .item-file-input {overflow: hidden;position: relative;display: flex;flex-grow: 1;box-sizing: border-box;height: 40px;padding: 9px 15px;font-size: 13px;line-height: 20px;border-radius: 5px 0 0 5px;background: #fff;border: 1px solid #c3c6cf;border-right: 0;color: #9f9f9f; } 
