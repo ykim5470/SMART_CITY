@@ -17,7 +17,7 @@
 .sub_data_insert tr:first-child{border-top:0}
 .input_params_insert td{padding: 10px;border-left: 1px solid #e5e5e5!important;border-bottom: 1px solid #f4f4f4;}
 .input_params_insert td input{width:100%;}
-.model_table + #wrapper{padding: 20px 10px;margin-top: 10px;border: 1px solid #f4f4f4;}
+.model_table + #wrapper{padding: 20px 10px;margin-top: 10px;border: 1px solid #f4f4f4; max-height:420px; overflow:auto;}
 .input_params_insert input:read-only{border: 1px solid #ddd;cursor:not-allowed;background-color: #eee;color:#c3c6cf;line-height: 20px;outline: 0;}
 .input_params_insert input:read-only:focus{outline:0;}
 

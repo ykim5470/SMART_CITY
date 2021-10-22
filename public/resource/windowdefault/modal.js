@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(window).on('load',function () {
 
     var modalOpen = {
         'display': 'block',
@@ -50,6 +50,7 @@ $(document).ready(function () {
             nonfixedBody();
         });
     });
+    
 
     // 사용자페이지 - 데이터 모델 등록 - 등록 버튼
     var applyBtn = $('.js-apply-btn');
