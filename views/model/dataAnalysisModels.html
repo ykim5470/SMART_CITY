@@ -19,6 +19,12 @@
         $("#delModel").val(chkArray);
         $("#confirm").submit();
       }
+      $(document).ready(function(){
+        $(".model_status_btn").on("click", function(){
+          window.open("", "popup_window", "width=500, height=300, scrollbars=no");
+          $("#myform").submit();
+        });
+      });
     </script>
   </head>
   <body>
@@ -151,8 +157,9 @@
                 <td>{{item.dateFormat(item.createdAt)}}</td>
                 <td>{{item.run_status}}</td>
                 <td>{{item.user_id}}</td>
+                <!-- check -->
                 <td>
-                  <form action="/dataAnalysisModelmodView?mode=status" method="get">
+                  <form action="/dataAnalysisModelmodView?mode=status" id="myform" method="get" action="popup url" target="popup_window">
                     <button
                       class="model_status_btn"
                       type="submit"
@@ -203,7 +210,7 @@
                 <td>{{item.dateFormat(item.createdAt)}}</td>
                 <td>{{item.run_status}}</td>
                 <td>
-                  <form action="/dataAnalysisModelmodView?mode=status" method="get">
+                  <form action="/dataAnalysisModelmodView?mode=status" id="myform" method="get" action="popup url" target="popup_window">
                     <button
                       class="model_status_btn"
                       type="submit"

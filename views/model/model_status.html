@@ -5,28 +5,35 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>모델 등록 관리</title>
+    <link rel="stylesheet" href="/css/dashboard/common.css" />
+    <link rel="stylesheet" href="/css/contents.css" />
+    <script src="/resource/windowdefault/jquery-3.4.1.min.js"></script>
   </head>
   <body>
-    <div class="container pt-3">
+    <div class="container pt-3 mng_modal">
       <h1>분석 모델 관리 모달</h1>
-      <div>현재 분석 상황: {{current_status}}</div>
+      <div>현재 분석 상황: <b class="status">{{current_status}}</b></div>
       <form action="/model_updated?md_id={{md_id}}" method="GET">
         <input class="status_md_id" name = "status_md_id" value="{{md_id}}" hidden />
-
-        <button class="status_btn" type="submit" name="new_status" value="stop">
-          중지
-        </button>
-        <button
-          type="submit"
-          class="status_btn"
-          name="new_status"
-          value="running"
-        >
-          실행
-        </button>
+        <button class="status_btn btn btn-c-tertiary" type="submit" name="new_status" value="stop">중지</button>
+        <button class="status_btn btn btn-c-tertiary" type="submit" name="new_status" value="running">실행</button>
       </form>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/model/status.js"></script>
+    <script>
+      $(window).on('load',function(){
+        var status_info = $(".status").text()
+        console.log(status_info)
+        if(status_info == "running"){
+          $("button[value='running']").addClass("none")
+          $("button[value='stop']").removeClass("none")
+        } else if(status_info == "stop"){
+          $("button[value='stop']").addClass("none")
+          $("button[value='running']").removeClass("none")
+        }
+      })
+      
+    </script>
   </body>
 </html>
