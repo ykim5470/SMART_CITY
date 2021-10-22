@@ -94,7 +94,7 @@ let colorchip = [
 const lineCha = ["lineChart", "multiAxisLineChart", "steppedLineChart", "lineChartStacked", "lineStyling", "pointStyle", "gridConfiguration"];
 const barCha = ["verticalBarChart", "programmaticEventTriggers", "horizontalBarChart", "stackedBarChart", "barChartBorderRadius"];
 const otherCha = ["scatter", "doughnut", "pie", "polarArea", "radar"];
-const exceptList = ["data_type", "chart_type", "type", "modifiedAt", "name", "datasetId", "id", "widgetId", "value", "observedAt", "plugin", "location"];
+const exceptList = ["data_type", "chart_type", "type", "modifiedAt", "name", "datasetId", "id", "widgetId", "value", "observedAt", "plugin", "location", "load_attr", "turn_num"];
 const multiAxisCon = {
   y: {
     type: "linear",
@@ -133,6 +133,24 @@ const gridCon = {
 };
 function Attribute(data) {
   let values = new Array();
+  // this.get_title = function (limit) {
+  //   for (el in data) {
+  //     if (typeof data[el] == "object" && !exceptList.includes(el)) {
+  //       if (data[el].length < limit) {
+  //         return "none data";
+  //       }else{
+  //         return data[el][0]["observedAt"];
+  //       }
+  //     }
+  //   }
+  // };
+  this.label = function (data) {
+    for (var x in data) {
+      if (x != "predictedAt") {
+        return x;
+      }
+    }
+  };
   this.get_child = function (data) {
     for (el in data) {
       if (exceptList.includes(el)) {
@@ -142,7 +160,7 @@ function Attribute(data) {
     if (Object.keys(data).length > 0) {
       let s = new Object();
       for (el in data) {
-        s["label"] = el;
+        let label = (s["label"] = this.label(data[el].value));
         s["value"] = data[el].value;
         values.push(s);
       }
@@ -170,14 +188,17 @@ function Attribute(data) {
     });
     return dataArr;
   };
-  this.get_processed_data = function () {
+  this.get_processed_data = function (limit) {
     for (el in data) {
       if (typeof data[el] == "object" && !exceptList.includes(el)) {
         let t = new Object();
-        t["label"] = el;
-        t["value"] = data[el][0].value; // 순번은 나중에 지정 가능한 것으로 수정 할 것
+        if (data[el].length < limit) {
+          return "none data";
+        }
+        t["label"] = this.label(data[el][limit].value);
+        t["value"] = data[el][limit].value;
         values.push(t);
-        this.get_child(data[el][0]);
+        this.get_child(data[el][limit]);
       }
     }
     for (const item of values) {
@@ -191,7 +212,7 @@ function Attribute(data) {
   this.get_source_data = function () {
     for (key in data) {
       let t = new Object();
-      if (!exceptList.includes(key) && key != "inflowFlux" && key != "outflowFlux") {
+      if (!exceptList.includes(key)) {
         t["label"] = key;
         t["data"] = [];
         data[key].map((el) => {
@@ -231,28 +252,6 @@ const polarData = (data) => {
   }
   return [];
 };
-// const pie_doughMaker = (data) => {
-//   let result = new Array();
-//   let labels = new Array();
-//   console.log(data)
-//   for (var i = 0; i < data.length; i++) {
-//     let values = new Array();
-//     let colors = new Array();
-//     let temp = new Object();
-//     let a = data[i].data;
-//     for (var j = 0; j < a.length; j++) {
-//       if (!labels.includes(a[j].x)) {
-//         labels.push(a[j].x);
-//       }
-//       values.push(a[j].y);
-//       colors.push
-//     }
-//     temp["label"] = data[i].label;
-//     temp["data"] = values;
-    
-//   }
-//   result.push(labels)
-// };
 const make_chart = async (data) => {
   let widget = Object.keys(data);
   for (var i = 0; i < widget.length; i++) {
@@ -308,186 +307,201 @@ const chart_maker = (data, title) => {
     if (!exceptList.includes(key)) {
       let a = new Attribute(data[key]);
       if (data.data_type === "분석데이터") {
-        y = a.get_processed_data();
+        let title = "";
+        if (data.turn_num != undefined) {
+          y = a.get_processed_data(data.turn_num);
+          // console.log(a.get_title(data.turn_num))
+        } else {
+          y = a.get_processed_data(0);
+          // console.log(a.get_title(0))
+        }
       } else {
         y = a.get_source_data();
       }
     }
   }
-  switch (data.chart_type) {
-    case "multiAxisLineChart":
-      if (y.length == 2) {
-        y[0]["yAxisID"] = "y";
-        y[1]["yAxisID"] = "y1";
-        options["scales"] = multiAxisCon;
-      }
-      break;
-    case "steppedLineChart":
-      for (var i = 0; i < y.length; i++) {
-        y[i]["stepped"] = true;
-      }
-      break;
-    case "lineChartStacked":
-      for (var i = 0; i < y.length; i++) {
-        y[i]["fill"] = true;
-      }
-      break;
-    case "lineStyling":
-      for (var i = 0; i < y.length; i++) {
-        if (i % 3 == 1) {
-          y[i]["borderDash"] = [5, 5];
-        } else if (i % 3 == 2) {
+  if (y != "none data") {
+    y = y.filter((el) => data.load_attr.includes(el.label));
+    switch (data.chart_type) {
+      case "multiAxisLineChart":
+        if (y.length == 2) {
+          y[0]["yAxisID"] = "y";
+          y[1]["yAxisID"] = "y1";
+          options["scales"] = multiAxisCon;
+        }
+        break;
+      case "steppedLineChart":
+        for (var i = 0; i < y.length; i++) {
+          y[i]["stepped"] = true;
+        }
+        break;
+      case "lineChartStacked":
+        for (var i = 0; i < y.length; i++) {
           y[i]["fill"] = true;
         }
-      }
-      break;
-    case "pointStyle":
-      for (var i = 0; i < y.length; i++) {
-        y[i]["borderWidth"] = 1;
-        y[i]["pointStyle"] = "rectRot";
-        y[i]["pointRadius"] = 5;
-        y[i]["pointBorderColor"] = "rgb(0, 0, 0)";
-      }
-      break;
-    case "gridConfiguration":
-      options["scales"] = gridCon;
-      break;
-    case "programmaticEventTriggers":
-      for (var i = 0; i < y.length; i++) {
-        y[i]["hoverBorderWidth"] = 3;
-        y[i]["hoverBorderColor"] = "rgb(0, 0, 0)";
-      }
-      break;
-    case "horizontalBarChart":
-      options["indexAxis"] = "y";
-      let label = new Array();
-      for (var i = 0; i < y.length; i++) {
-        let value = new Array();
-        let a = y[i].data;
-        for (var j = 0; j < a.length; j++) {
-          if (!label.includes(a[j].x)) {
-            label.push(a[j].x);
+        break;
+      case "lineStyling":
+        for (var i = 0; i < y.length; i++) {
+          if (i % 3 == 1) {
+            y[i]["borderDash"] = [5, 5];
+          } else if (i % 3 == 2) {
+            y[i]["fill"] = true;
           }
-          value.push(a[j].y);
         }
-        y[i].data = value;
-      }
-      thisChartCon["data"]["labels"] = label;
-      break;
-    case "stackedBarChart":
-      options["scales"] = {
-        x: { stacked: true },
-        y: { stacked: true },
-      };
-      break;
-    case "barChartBorderRadius":
-      for (var i = 0; i < y.length; i++) {
-        y[i].backgroundColor = y[i].backgroundColor.replace(")", ",0.6)");
-        y[i]["borderWidth"] = 3;
-        y[i]["borderRadius"] = Math.floor(Math.random() * 101);
-        y[i]["borderSkipped"] = false;
-      }
-      break;
-    // case "scatter":
-    //   thisChartCon["type"] = "scatter";
-    //   for (var i = 0; i < y.length; i++) {
-    //     let a = y[i].data;
-    //     for (var j = 0; j < a.length; j++) {
-    //       // y[i].data[j].x = y[i].data[j].x.replace(/[^0-9]/g,'');
-    //       y[i].data[j].x = Date.parse(y[i].data[j].x);
-    //     }
-    //   }
-    //   break;
-    case "polarArea":
-      thisChartCon["type"] = "polarArea";
-      y = polarData(y);
-      if (y.length > 0) {
-        thisChartCon["data"]["labels"] = y[0].labels;
-        delete y[0].labels;
-        y[0]["label"] = "test";
-        options.plugins.legend["position"] = "top";
-        options.plugins["title"] = {
-          display: true,
-          text: y[0].title,
+        break;
+      case "pointStyle":
+        for (var i = 0; i < y.length; i++) {
+          y[i]["borderWidth"] = 1;
+          y[i]["pointStyle"] = "rectRot";
+          y[i]["pointRadius"] = 5;
+          y[i]["pointBorderColor"] = "rgb(0, 0, 0)";
+        }
+        break;
+      case "gridConfiguration":
+        options["scales"] = gridCon;
+        break;
+      case "programmaticEventTriggers":
+        for (var i = 0; i < y.length; i++) {
+          y[i]["hoverBorderWidth"] = 3;
+          y[i]["hoverBorderColor"] = "rgb(0, 0, 0)";
+        }
+        break;
+      case "horizontalBarChart":
+        options["indexAxis"] = "y";
+        let label = new Array();
+        for (var i = 0; i < y.length; i++) {
+          let value = new Array();
+          let a = y[i].data;
+          for (var j = 0; j < a.length; j++) {
+            if (!label.includes(a[j].x)) {
+              label.push(a[j].x);
+            }
+            value.push(a[j].y);
+          }
+          y[i].data = value;
+        }
+        thisChartCon["data"]["labels"] = label;
+        break;
+      case "stackedBarChart":
+        options["scales"] = {
+          x: { stacked: true },
+          y: { stacked: true },
         };
-        delete y[0].title;
-      }
-      break;
-    case "radar":
-      thisChartCon["type"] = "radar";
-      let radarLabel = new Array();
-      for (var i = 0; i < y.length; i++) {
-        let radarValue = new Array();
-        let a = y[i].data;
-        for (var j = 0; j < a.length; j++) {
-          if (!radarLabel.includes(a[j].x)) {
-            radarLabel.push(a[j].x);
-          }
-          radarValue.push(a[j].y);
+        break;
+      case "barChartBorderRadius":
+        for (var i = 0; i < y.length; i++) {
+          y[i].backgroundColor = y[i].backgroundColor.replace(")", ",0.6)");
+          y[i]["borderWidth"] = 3;
+          y[i]["borderRadius"] = Math.floor(Math.random() * 101);
+          y[i]["borderSkipped"] = false;
         }
-        y[i].data = radarValue;
-        y[i].backgroundColor = y[i].backgroundColor.replace(")", ",0.5)");
-      }
-      thisChartCon["data"]["labels"] = radarLabel;
-      break;
-    case "doughnut":
-      thisChartCon["type"] = "doughnut";
-      options["pieceLabel"] = { mode:"label", position:"inside", fontSize: 11, fontStyle: 'bold' }
-      let doughLabel = new Array();
-      let doughColors = new Array();
-      for(var i=0; i<y[0].data.length; i++){
-        doughColors.push(`rgba(${colorchip[Math.floor(Math.random() * colorchip.length)]})`)
-      }
-      for (var i = 0; i < y.length; i++) {
-        let doughValue = new Array();
-        let a = y[i].data;
-        for (var j = 0; j < a.length; j++) {
-          if (!doughLabel.includes(a[j].x)) {
-            doughLabel.push(a[j].x);
-          }
-          doughValue.push(a[j].y);
+        break;
+      case "polarArea":
+        thisChartCon["type"] = "polarArea";
+        y = polarData(y);
+        if (y.length > 0) {
+          thisChartCon["data"]["labels"] = y[0].labels;
+          delete y[0].labels;
+          y[0]["label"] = "test";
+          options.plugins.legend["position"] = "top";
+          options.plugins["title"] = {
+            display: true,
+            text: y[0].title,
+          };
+          delete y[0].title;
         }
-        y[i].backgroundColor = doughColors;
-        y[i].borderColor = 'rgba(255,255,255)';
-        y[i].data = doughValue;
-      }
-      thisChartCon["data"]["labels"] = doughLabel;
-      break;
-    case "pie":
-      thisChartCon["type"] = "pie";
-      options["pieceLabel"] = { mode:"label", position:"inside", fontSize: 11, fontStyle: 'bold' }
-      let pieLabel = new Array();
-      let pieColors = new Array();
-      for(var i=0; i<y[0].data.length; i++){
-        pieColors.push(`rgba(${colorchip[Math.floor(Math.random() * colorchip.length)]})`)
-      }
-      for (var i = 0; i < y.length; i++) {
-        let pieValue = new Array();
-        let a = y[i].data;
-        for (var j = 0; j < a.length; j++) {
-          if (!pieLabel.includes(a[j].x)) {
-            pieLabel.push(a[j].x);
+        break;
+      case "radar":
+        thisChartCon["type"] = "radar";
+        let radarLabel = new Array();
+        for (var i = 0; i < y.length; i++) {
+          let radarValue = new Array();
+          let a = y[i].data;
+          for (var j = 0; j < a.length; j++) {
+            if (!radarLabel.includes(a[j].x)) {
+              radarLabel.push(a[j].x);
+            }
+            radarValue.push(a[j].y);
           }
-          pieValue.push(a[j].y);
+          y[i].data = radarValue;
+          y[i].backgroundColor = y[i].backgroundColor.replace(")", ",0.5)");
         }
-        y[i].backgroundColor = pieColors;
-        y[i].borderColor = 'rgba(255,255,255)';
-        y[i].data = pieValue;
-      }
-      thisChartCon["data"]["labels"] = pieLabel;
-      break;
-  }
-
-  thisChartCon["options"] = options;
-  thisChartCon["data"]["datasets"] = y;
-  if (data.hasOwnProperty("plugin")) {
-    if (data["plugin"] === "areaBorder") {
-      thisChartCon["plugins"] = [chartAreaBorder];
+        thisChartCon["data"]["labels"] = radarLabel;
+        break;
+      case "doughnut":
+        thisChartCon["type"] = "doughnut";
+        options["pieceLabel"] = { mode: "label", position: "inside", fontSize: 11, fontStyle: "bold" };
+        let doughLabel = new Array();
+        let doughColors = new Array();
+        for (var i = 0; i < y[0].data.length; i++) {
+          doughColors.push(`rgba(${colorchip[Math.floor(Math.random() * colorchip.length)]})`);
+        }
+        for (var i = 0; i < y.length; i++) {
+          let doughValue = new Array();
+          let a = y[i].data;
+          for (var j = 0; j < a.length; j++) {
+            if (!doughLabel.includes(a[j].x)) {
+              doughLabel.push(a[j].x);
+            }
+            doughValue.push(a[j].y);
+          }
+          y[i].backgroundColor = doughColors;
+          y[i].borderColor = "rgba(255,255,255)";
+          y[i].data = doughValue;
+        }
+        thisChartCon["data"]["labels"] = doughLabel;
+        break;
+      case "pie":
+        thisChartCon["type"] = "pie";
+        options["pieceLabel"] = { mode: "label", position: "inside", fontSize: 11, fontStyle: "bold" };
+        let pieLabel = new Array();
+        let pieColors = new Array();
+        for (var i = 0; i < y[0].data.length; i++) {
+          pieColors.push(`rgba(${colorchip[Math.floor(Math.random() * colorchip.length)]})`);
+        }
+        for (var i = 0; i < y.length; i++) {
+          let pieValue = new Array();
+          let a = y[i].data;
+          for (var j = 0; j < a.length; j++) {
+            if (!pieLabel.includes(a[j].x)) {
+              pieLabel.push(a[j].x);
+            }
+            pieValue.push(a[j].y);
+          }
+          y[i].backgroundColor = pieColors;
+          y[i].borderColor = "rgba(255,255,255)";
+          y[i].data = pieValue;
+        }
+        thisChartCon["data"]["labels"] = pieLabel;
+        break;
     }
-    // if (data["plugin"] === "quadrants") {
-    //   thisChartCon["plugins"] = [quadrants];
-    // }
+    if (y.length <= 0) {
+      thisChartCon["data"]["datasets"] = [];
+      options.plugins.legend["position"] = "top";
+      options.plugins["title"] = {
+        display: true,
+        text: "none data",
+      };
+    } else {
+      thisChartCon["data"]["datasets"] = y;
+    }
+    if (data.hasOwnProperty("plugin")) {
+      if (data["plugin"] === "areaBorder") {
+        thisChartCon["plugins"] = [chartAreaBorder];
+      }
+      // if (data["plugin"] === "quadrants") {
+      //   thisChartCon["plugins"] = [quadrants];
+      // }
+    }
+  } else {
+    thisChartCon["data"]["datasets"] = [];
+    options.plugins.legend["position"] = "top";
+    options.plugins["title"] = {
+      display: true,
+      text: "none data",
+    };
   }
+  thisChartCon["options"] = options;
   console.log(thisChartCon);
   let makeCha = new Chart(chart, thisChartCon);
 };

@@ -90,7 +90,7 @@ const dataset_data_list_load = () => {
           var unique_id = `${data_array[i]}_${i}`;
           html_contents.push(
             `<div class="item-box">
-            <input type="checkbox" name="data_id" id="${unique_id}" value="${data_array[i]}"/>
+            <input type="radio" name="data_id" id="${unique_id}" value="${data_array[i]}"/>
             <label for="${unique_id}"><span class="check-ico"></span>${data_array[i]}</label>
           </div>`
           );
