@@ -110,6 +110,12 @@ app.get("/Oauth/token", sessionMiddleware, async (req, res, next) => {
   }
 });
 
+// session 만료시 로그인 페이지 이동 
+app.use(async (req, res, next) => {
+  if(req.session.userId != undefined){
+    redirect('/')
+  }
+})
 
 // app.use(async (req, res, next) => {
 //   let token = await req.cookies.token;

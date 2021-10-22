@@ -10,6 +10,12 @@
     <link rel="stylesheet" href="/css/dashboard/sidebar.css" />
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script>
+      $(document).ready(function(){
+        $(".model_status_btn").on("click", function(){
+          window.open("", "popup_window", "width=500, height=300, scrollbars=no");
+          $("#myform").submit();
+        });
+      });
       function ListDelete() {
         var chkArray = new Array();
         $("input:checkbox[name=md_id]:checked").each(function () {
@@ -19,12 +25,6 @@
         $("#delModel").val(chkArray);
         $("#confirm").submit();
       }
-      $(document).ready(function(){
-        $(".model_status_btn").on("click", function(){
-          window.open("", "popup_window", "width=500, height=300, scrollbars=no");
-          $("#myform").submit();
-        });
-      });
     </script>
   </head>
   <body>
