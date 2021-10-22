@@ -5,14 +5,309 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>모델 등록</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
-    "></script>
+    <link rel="stylesheet" href="/css/dashboard/common.css" />
+    <link rel="stylesheet" href="/css/dashboard/sidebar.css" />
+    <link rel="stylesheet" href="/css/contents.css" />
+    <script src="/resource/windowdefault/jquery-3.4.1.min.js"></script>
     <script src ='/js/model/jsonTree.js'></script>
     <!-- <script src="/js/model/test.js"></script> -->
-    <link href="/css/test.css" rel="stylesheet" />
+    <!-- <link href="/css/test.css" rel="stylesheet" /> -->
   </head>
   <body>
-    <form
+    
+    <div id="main">
+      <!-- common area -->
+      <div class="common-area">
+        {% include "../common/header.html" %}
+        <div class="contents-header clearfix">
+          <h2 class="contents-title float-left"><span>스마트시티</span> 데이터 실시간 분석 대시보드</h2>
+          <div class="user float-right clearfix">
+            <a href="../mypage.html" class="user-name float-left" id="userIdInfo">{{userId}}</a>
+            <button type="button" class="float-left btn btn-c-secondary btn-size-sm logout-btn" onclick="location.href='/logout'">로그아웃</button>
+          </div>
+        </div>
+      </div>
+      <!-- //common area -->
+    </div>
+
+          <!-- contents-area -->
+          <div class="contents">
+            <h3 class="hidden">컨텐츠 시작</h3>
+            <!-- path -->
+            <div class="path">
+                <ul class="clearfix">
+                    <li class="path-name">Home</li>
+                    <li class="path-name">모델 등록</li>
+                </ul>
+            </div>
+            <!-- path -->
+            <form action="/model/register/complete" method="POST" id="register_complete" enctype="multipart/form-data" class="model_form_box">
+              <div class="model_form_wrap">
+                <table class="model_table">
+                  <thead>
+                    <tr>
+                      <th>
+                        모델 이름
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div class="item-input">
+                        <input type="text" name="md_name" />
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table class="model_table">
+                  <colgroup>
+                    <col style="width:120px;">
+                    <col style="width:calc(120px - 100%)">
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>
+                        모델 시간 세팅
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="tb_st01">
+                    <tr>
+                      <th>
+                        <span>요청 시간</span> 
+                      </th>
+                      <td>
+                          <input
+                            type="text"
+                            id="al_time"
+                            name="al_time"
+                            placeholder="요청 시간"
+                          />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table class="model_table">
+                  <thead>
+                    <tr>
+                      <th>
+                        데이터 조회 기간
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div class="item-input item-input-flex">
+                          <input
+                            class="data_lookup"
+                            type="number"
+                            name="data_lookup_date"
+                            placeholder="일"
+                          />
+                          <input
+                            class="data_lookup"
+                            type="number"
+                            name="data_lookup_hour"
+                            placeholder="시간"
+                          />
+                          <input
+                            class="data_lookup"
+                            type="number"
+                            name="data_lookup_min"
+                            placeholder="분"
+                          />
+                          <input
+                            class="data_lookup"
+                            type="number"
+                            name="data_lookup_sec"
+                            placeholder="초"
+                          />
+                          </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table class="model_table">
+                  <thead>
+                    <tr>
+                      <th>
+                        데이터 선택
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <select name="dataset_id" id="data_select">
+                          <option value="">-선택-</option>
+                          {% for name in raw_dataset_name%}
+                          <option
+                            value="{{name.value.id}},{{name.value.dataModelType}},{{name.value.dataModelNamespace}},{{name.value.dataModelVersion}}"
+                          >
+                            {{name.key}}
+                          </option>
+                          {% endfor %}
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="sub_data_insert_wrap">
+                <table class="sub_data_insert"></table>
+                </div>
+                <table class="sub_data_insert_option"></table>
+                <table class="model_table">
+                  <colgroup>
+                    <col style="width:25%">
+                    <col style="width:25%">
+                    <col style="width:25%">
+                    <col style="width:25%">
+                    <col style="width:25%">
+                    <col style="width:25%">
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>
+                        input 파라미터 매칭
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="tr_st01">
+                      <th>값 타입</th>
+                      <th>속성</th>
+                      <th>파라미터</th>
+                      <th>파라미터 로드 갯수</th>
+                      <th colspan="2">파라미터 텐서 타입</th>
+                      <table class="input_params_insert"></table>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                <table class="model_table">
+                  <colgroup>
+                    <col style="width:120px;">
+                    <col style="width:calc(120px - 100%)">
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>
+                        분석결과 테이블
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="tb_st01">
+                    <tr>
+                      <th>
+                        <label for="al_name_mo">/분석 테이블/</label>
+                      </th>
+                      <td>
+                        <select name="al_name_mo" id="al_select">
+                          <option value="">-선택-</option>
+                          {% for el in processed_dataset %}
+                          <option
+                            value="{{el.dataModelType}},{{el.dataModelNamespace}},{{el.dataModelVersion}},{{el.id}}"
+                          >
+                            {{el.name}}
+                          </option>
+                          {% endfor %}
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>    
+                <table class="model_table">
+                  <thead>
+                    <tr>
+                      <th>
+                        데이터 예측 간격
+                      </th>
+                    </tr>
+                  </thead>
+                  <div id='wrapper'></div>
+                  <tbody>
+                    <td>
+                      <table class="output_look_up_insert">
+                      </table>
+                    </td>
+                        <!-- <table class="output_params_insert">             
+                            <input class ='user_output_param'name='user_output_param' hidden>
+                        </table> -->
+                  </tbody>
+                </table>
+                
+                <table class="model_table">
+                  <colgroup>
+                    <col style="width:120px">
+                    <col style="width:calc(120px - 100%)">
+                    <col style="width:120px">
+                    <col style="width:calc(120px - 100%)">
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>
+                        분석 모델
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="tb_st01">
+                    <tr>
+                      <th>파일 업로드</th>
+                      <td>
+                        <input
+                          type="file"
+                          id="file_select"
+                          name="atch_origin_file_name"
+                        />
+                      </td>
+                      <th>                        
+                        <label for="analysis_file_format">분석 파일 포맷</label>
+                      </th>
+                      <td>
+                        <select name="analysis_file_format">
+                          <option value="">--선택--</option>
+                          <option value="loadLayersModel">Layers</option>
+                          <option value="loadGraphModel">Graph</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table class="model_table">
+                  <thead>
+                    <tr>
+                      <th>
+                        내용 (500자 내외로 작성해주세요)
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                      <div></div>
+                      <input
+                        type="text"
+                        class="md_desc"
+                        name="model_desc"
+                        style="height: 100px"
+                      />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="align-right">
+                  <button type="button" class="btn btn-c-primary register-btn" id="submitBtn">등록 완료</button>
+                </div>
+              </div>
+              <script src="/socket.io/socket.io.js"></script>
+              <script src="/js/model/add.js"></script>
+            </form>
+          </div>
+          <!-- //contents-area -->
+    <!-- <form
       action="/model/register/complete"
       method="POST"
       id="register_complete"
@@ -178,6 +473,6 @@
       <script src="/socket.io/socket.io.js"></script>
       <script src="/js/model/add.js"></script>
 
-    </form>
+    </form> -->
   </body>
 </html>

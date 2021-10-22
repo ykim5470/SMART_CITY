@@ -160,32 +160,38 @@ socket.on("데이터 선택 완료 및 개별 센서 데이터 calling", (data) 
 socket.on("분석 모델 선택 완료 및 JSON calling", async (data) => {
 
   const output_look_up_data = `<table>
-  데이터 예측 간격
-  <input
-    class="op_data_lookup"
-    type="number"
-    name="op_data_lookup_date"
-    placeholder="일"
-  />
-  <input
-    class="op_data_lookup"
-    type="number"
-    name="op_data_lookup_hour"
-    placeholder="시간"
-  />
-  <input
-    class="op_data_lookup"
-    type="number"
-    name="op_data_lookup_min"
-    placeholder="분"
-  />
-  <input
-    class="op_data_lookup"
-    type="number"
-    name="op_data_lookup_sec"
-    placeholder="초"
-  />
-</table>`;
+  <tbody>
+    <tr>
+      <td>
+        <div class="item-input item-input-flex">
+          <input
+            class="op_data_lookup"
+            type="number"
+            name="op_data_lookup_date"
+            placeholder="일"
+          />
+          <input
+            class="op_data_lookup"
+            type="number"
+            name="op_data_lookup_hour"
+            placeholder="시간"
+          />
+          <input
+            class="op_data_lookup"
+            type="number"
+            name="op_data_lookup_min"
+            placeholder="분"
+          />
+          <input
+            class="op_data_lookup"
+            type="number"
+            name="op_data_lookup_sec"
+            placeholder="초"
+          />
+        </td>
+      </tr>
+    </tbody>
+  </table>`;
   output_look_up_insert.innerHTML = output_look_up_data;
   // op_sequence array
   const temp_op_sequence = new Array();
