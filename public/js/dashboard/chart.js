@@ -266,37 +266,32 @@ const make_chart = async (data) => {
     html.appendChild(can);
     parent_chart.insertBefore(html, null);
     chart_maker(data[widget[i]], widget[i]);
-      function reload(){
-        var modalOpen = {
-          'display': 'block',
-          'z-index': '1000',
-          'opacity': 1
-      }
-
+    function reload() {
+      var modalOpen = {
+        display: "block",
+        "z-index": "1000",
+        opacity: 1,
+      };
       var modalClose = {
-          'display': 'none',
-          'z-index': '-1',
-          'opacity': 0
-      }
-
+        display: "none",
+        "z-index": "-1",
+        opacity: 0,
+      };
       function fixedBody() {
-          $('body').css({ 'overflow': 'hidden', 'padding-right': '15px' });
+        $("body").css({ overflow: "hidden", "padding-right": "15px" });
       }
-
       function nonfixedBody() {
-          $('body').css({ 'overflow': 'auto', 'padding-right': '' });
+        $("body").css({ overflow: "auto", "padding-right": "" });
       }
       // 대시보드 - 위젯02
-      var widgetBtn02 = $('.js-widget-btn02');
-        widgetBtn02.on('click', function () {
-        console.log("dodo")
+      var widgetBtn02 = $(".js-widget-btn02");
+      widgetBtn02.on("click", function () {
+        console.log("dodo");
         var widgetModal = $('[data-layer="modal-widget02"]'),
-        alertCloseBtn = $('[data-role="layerClose"]');
-
+          alertCloseBtn = $('[data-role="layerClose"]');
         widgetModal.css(modalOpen);
         fixedBody();
-
-        alertCloseBtn.on('click', function () {
+        alertCloseBtn.on("click", function () {
           widgetModal.css(modalClose);
           nonfixedBody();
         });

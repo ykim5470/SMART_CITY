@@ -43,7 +43,7 @@ router.get("/logout", async (req, res) => {
 
 // Dashboard
 router.get("/dashboard", dash.output.dashboard);
-router.get("/admin/dashboard", admin_dash.output.dashboard);
+router.get("/admin/dashboard",userController(), admin_dash.output.dashboard);
 router.get("/dashboard/dataset_load/:data", dash.output.dataset_load);
 router.get("/dashboard/data_load/:data", dash.output.data_load);
 router.get("/dashboard/attr_load/:data", dash.output.attr_load);

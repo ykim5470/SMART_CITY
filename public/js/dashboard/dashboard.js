@@ -1,32 +1,5 @@
 // Client socket instance create
 const socket = io();
-// function setCookie(cName, cValue, cDay) {
-//   var expire = new Date();
-//   expire.setDate(expire.getDate() + cDay);
-//   cookies = cName + "=" + escape(cValue) + "; path=/ ";
-//   if (typeof cDay != "undefined") cookies += ";expires=" + expire.toGMTString() + ";";
-//   document.cookie = cookies;
-// }
-
-// function getCookie(name) {
-//   var nameOfCookie = name + "=";
-//   var x = 0;
-//   while (x <= document.cookie.length) {
-//     var y = x + nameOfCookie.length;
-//     if (document.cookie.substring(x, y) == nameOfCookie) {
-//       if ((endOfCookie = document.cookie.indexOf(";", y)) == -1) endOfCookie = document.cookie.length;
-//       return unescape(document.cookie.substring(y, endOfCookie));
-//     }
-//     x = document.cookie.indexOf(" ", x) + 1;
-//     if (x == 0) break;
-//   }
-//   return "없어";
-// }
-// // setCookie("test","test","123")
-// socket.on("로그인 유저 정보 GET", (data) => {
-//   console.log(data);
-// });
-//const user = getCookie("user_id");
 const user = document.querySelector("#userIdInfo").innerText;
 console.log(user) // cookie 동작이 안되면 이걸로 하자
 socket.emit("widget_onload", user);

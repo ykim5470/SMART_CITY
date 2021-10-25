@@ -62,7 +62,12 @@ const dash_handler = (socket) => {
   });
 
   socket.on("widget_onload", async (data) => {
-    const charts = await widget.findAll({ where: { widget_delYn: "N", user_id: data }, order: [["createdAt", "desc"]] });
+    let charts
+    if(data=="vredu"){
+      charts = await widget.findAll({ where: { widget_delYn: "N"}, order: [["createdAt", "desc"]] });
+    }else{
+      charts = await widget.findAll({ where: { widget_delYn: "N", user_id: data }, order: [["createdAt", "desc"]] });
+    }
     if (charts.length > 0) {
       const endDate = new Date();
       const req_result = new Object();
