@@ -204,6 +204,9 @@ const output = {
 
   add: async (req, res) => {
     try {
+      let userId = req.session.userId
+      let nickName = req.session.userInfo.nickname;
+
       var { mode } = req.query;
       if (mode === "add") {
         output.processed_data().then((processed_dataset_resolve) => {
@@ -213,6 +216,8 @@ const output = {
             res.render("model/dataAnalysisModelModView", {
               processed_dataset: processed_dataset,
               raw_dataset_name: raw_dataset_select,
+              userId: userId,
+              nickName: nickName
             });
           });
         });
@@ -227,6 +232,8 @@ const output = {
               md_id: md_id,
               processed_dataset: processed_dataset,
               raw_dataset_name: raw_dataset_select,
+              userId: userId,
+              nickName:nickName
             });
           });
         });
@@ -536,7 +543,7 @@ const process = {
                         ip_attr_value_type[index],
                       ];
                     } else {
-                      user_obj[ip_attr_name] = [el, ip_attr_value_type];
+                      user_obj[ip_attr_name] = [el, ip_attr_value_type,data_load_obj[0],tf_shape_obj[0],user_input_order];
                     }
                   });
                 } else {

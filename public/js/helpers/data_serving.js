@@ -103,74 +103,145 @@ const data_mapping = async (predicted_output, md_id) => {
     let temp_obj = new Object();
     let final_array = new Array();
 
-    let max_length = predicted_output[0].dataSync().length;
-    for (let j = 0; j < predicted_output.length; j++) {
-      max_length =
-        max_length > predicted_output[j].dataSync().length
-          ? max_length
-          : predicted_output[j].dataSync().length;
+    // Tensor 결과가 1개 일때
+    if(predicted_output.length == undefined){
+      let max_length = predicted_output.dataSync().length;
+    
+      const output_sequence = await model_output
+        .findOne({
+          where: { op_id: md_id },
+          attributes: ["op_sequence", "op_date_look_up"],
+        })
+        .then(async(res) => {
+          const { op_sequence, op_date_look_up } = res;
+          const op_sequence_list = op_sequence.split(",");
+  
+          const predicted_time_list = new Array();
+          let l = 0;
+          let current_time = new Date();
+          while (l < max_length) {
+            let start_time = predict_time_generator(
+              JSON.parse(op_date_look_up),
+              current_time
+            );
+            predicted_time_list.push(start_time);
+            current_time = start_time;
+            l += 1;
+          }
+  
+         let model_info = await model_list.findOne({where: {md_id: md_id}, attributes: ['processed_model']}).then(result => {
+            const {processed_model}  = result 
+            
+            let model_type = processed_model.split(',')[0]
+            let model_namespace =processed_model.split(',')[1]
+            let model_version = processed_model.split(',')[2]
+            return {'model_type': model_type, 'model_namespace': model_namespace, 'model_version': model_version}
+          })
+   
+          model_type = model_info.model_type
+          model_namespace = model_info.model_namespace
+          model_version = model_info.model_version
+  
+          const user_arr = data_model_get(model_type, model_namespace, model_version).then((result) => {
+            let i = 0;
+            op_sequence_list.map((el) => {
+              var to_string = el.replace(/'/gi, "").split(".");
+  
+              var name_check = check_recursion(to_string, result.attributes);
+  
+              if (name_check == "predictedAt") {
+                temp_obj[el.replace(/'/gi, "")] = predicted_time_list;
+              } else {
+                temp_obj[el.replace(/'/gi, "")] = Array.from(
+                  predicted_output.dataSync()
+                );
+                ++i;
+              }
+              final_array.push(temp_obj);
+              temp_obj = {};
+            });
+            return temp_obj;
+          });
+  
+          return user_arr;
+        });
+      // final_array.push(output_sequence)
+      return final_array;
+    }
+    else{
+      let max_length = predicted_output[0].dataSync().length;
+    
+      for (let j = 0; j < predicted_output.length; j++) {
+        max_length =
+          max_length > predicted_output[j].dataSync().length
+            ? max_length
+            : predicted_output[j].dataSync().length;
+      }
+  
+      const output_sequence = await model_output
+        .findOne({
+          where: { op_id: md_id },
+          attributes: ["op_sequence", "op_date_look_up"],
+        })
+        .then(async(res) => {
+          const { op_sequence, op_date_look_up } = res;
+          const op_sequence_list = op_sequence.split(",");
+  
+          const predicted_time_list = new Array();
+          let l = 0;
+          let current_time = new Date();
+          while (l < max_length) {
+            let start_time = predict_time_generator(
+              JSON.parse(op_date_look_up),
+              current_time
+            );
+            predicted_time_list.push(start_time);
+            current_time = start_time;
+            l += 1;
+          }
+  
+         let model_info = await model_list.findOne({where: {md_id: md_id}, attributes: ['processed_model']}).then(result => {
+            const {processed_model}  = result 
+            
+            let model_type = processed_model.split(',')[0]
+            let model_namespace =processed_model.split(',')[1]
+            let model_version = processed_model.split(',')[2]
+            return {'model_type': model_type, 'model_namespace': model_namespace, 'model_version': model_version}
+          })
+   
+          model_type = model_info.model_type
+          model_namespace = model_info.model_namespace
+          model_version = model_info.model_version
+  
+          const user_arr = data_model_get(model_type, model_namespace, model_version).then((result) => {
+            let i = 0;
+            op_sequence_list.map((el) => {
+              var to_string = el.replace(/'/gi, "").split(".");
+  
+              var name_check = check_recursion(to_string, result.attributes);
+  
+              if (name_check == "predictedAt") {
+                temp_obj[el.replace(/'/gi, "")] = predicted_time_list;
+              } else {
+                temp_obj[el.replace(/'/gi, "")] = Array.from(
+                  predicted_output[i].dataSync()
+                );
+                ++i;
+              }
+              final_array.push(temp_obj);
+              temp_obj = {};
+            });
+            return temp_obj;
+          });
+  
+          return user_arr;
+        });
+      // final_array.push(output_sequence)
+      return final_array;
+
     }
 
-    const output_sequence = await model_output
-      .findOne({
-        where: { op_id: md_id },
-        attributes: ["op_sequence", "op_date_look_up"],
-      })
-      .then(async(res) => {
-        const { op_sequence, op_date_look_up } = res;
-        const op_sequence_list = op_sequence.split(",");
 
-        const predicted_time_list = new Array();
-        let l = 0;
-        let current_time = new Date();
-        while (l < max_length) {
-          let start_time = predict_time_generator(
-            JSON.parse(op_date_look_up),
-            current_time
-          );
-          predicted_time_list.push(start_time);
-          current_time = start_time;
-          l += 1;
-        }
-
-       let model_info = await model_list.findOne({where: {md_id: md_id}, attributes: ['processed_model']}).then(result => {
-          const {processed_model}  = result 
-          
-          let model_type = processed_model.split(',')[0]
-          let model_namespace =processed_model.split(',')[1]
-          let model_version = processed_model.split(',')[2]
-          return {'model_type': model_type, 'model_namespace': model_namespace, 'model_version': model_version}
-        })
- 
-        model_type = model_info.model_type
-        model_namespace = model_info.model_namespace
-        model_version = model_info.model_version
-
-        const user_arr = data_model_get(model_type, model_namespace, model_version).then((result) => {
-          let i = 0;
-          op_sequence_list.map((el) => {
-            var to_string = el.replace(/'/gi, "").split(".");
-
-            var name_check = check_recursion(to_string, result.attributes);
-
-            if (name_check == "predictedAt") {
-              temp_obj[el.replace(/'/gi, "")] = predicted_time_list;
-            } else {
-              temp_obj[el.replace(/'/gi, "")] = Array.from(
-                predicted_output[i].dataSync()
-              );
-              ++i;
-            }
-            final_array.push(temp_obj);
-            temp_obj = {};
-          });
-          return temp_obj;
-        });
-
-        return user_arr;
-      });
-    // final_array.push(output_sequence)
-    return final_array;
   } catch (err) {
     console.log(err);
   }

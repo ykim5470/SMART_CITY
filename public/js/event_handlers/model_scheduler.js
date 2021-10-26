@@ -90,7 +90,7 @@ const model_scheduler = (socket) => {
                       `http://203.253.128.184:18227/temporal/entities/${sub_data_list.slice(
                         0,
                         -1
-                      )}?timerel=between&time=2020-06-01T00:00:00+09:00&endtime=2021-08-01T00:00:00+09:00&limit=${max_load}&lastN=${max_load}&timeproperty=modifiedAt`,
+                      )}?timerel=between&time=${start_time}&endtime=${end_time}&limit=${max_load}&lastN=${max_load}&timeproperty=modifiedAt`,
                       { headers: { Accept: "application/json" } }
                     )
                     .then((result) => {

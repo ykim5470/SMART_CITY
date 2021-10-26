@@ -145,7 +145,18 @@ const single_processed_data = (
     var variable_attr_ip_value = Object.values(sorted_input_param)[j];
     running_result[variable_attr_ip_value] = variable_attr_data;
   }
-  return running_result;
+  let temp_key = Object.keys(running_result)
+  let temp_key_value = running_result[temp_key][0]
+  if(typeof temp_key_value === 'object'){
+    return {
+      name: Object.values(temp_key_value)
+    }
+  }
+  else{
+    return running_result
+  }
+
+  // return running_result;
 };
 
 // 다중 데이터 센서 선택 시 맵핑 데이터 생성 모듈

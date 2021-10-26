@@ -113,6 +113,7 @@ socket.on("데이터 선택 완료 및 인풋 calling", (attr) => {
 
 // sub_data GET & add to page
 socket.on("데이터 선택 완료 및 개별 센서 데이터 calling", (data) => {
+  console.log(data)
   const sub_data = data;
   const sub_box = sub_data.map((items, index) => {
     return `
@@ -120,7 +121,7 @@ socket.on("데이터 선택 완료 및 개별 센서 데이터 calling", (data) 
 			<td>
 				<input type='checkbox' class='sub_data_select' name='sub_data_select' value=${items.id}/>
 			</td>
-			<td>${items.name.value}</td>
+			<td>${items.id}</td>
 		<tr>
 		`;
   });

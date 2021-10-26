@@ -1,4 +1,5 @@
 const tf = require("@tensorflow/tfjs-node");
+const { single_processed_data } = require("./api_scheduler");
 const tensor_shape_convert = (
   analysis_file_format,
   op_data_value,
@@ -17,6 +18,7 @@ const tensor_shape_convert = (
     return model;
   } else if (analysis_file_format === "loadLayersModel") {
 
+    console.log(single_processed_data_result)
     // 레이어 모델
     const model = tf.loadLayersModel(url).then((models) => {
       var tensor_shape_object = new Object();
