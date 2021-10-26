@@ -26,7 +26,7 @@ const { auth } = require("./models");
 const index_router = require("./routes/index");
 const { requestLogout } = require("./api/requestLogout");
 
-// Sequelize 
+// // Sequelize 
 // models.sequelize
 //   .sync({ force: false})
 //   .then(() => {
@@ -112,8 +112,8 @@ app.get("/Oauth/token", sessionMiddleware, async (req, res, next) => {
 
 // session 만료시 로그인 페이지 이동 
 app.use(async (req, res, next) => {
-  if(req.session.userId != undefined){
-    redirect('/')
+  if(req.session.userInfo == undefined){
+    res.redirect('/')
   }
 })
 

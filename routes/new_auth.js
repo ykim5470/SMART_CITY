@@ -204,7 +204,7 @@ const output = {
 
   add: async (req, res) => {
     try {
-      let userId = req.session.userId
+      let userId = req.session.userInfo.userId
       let nickName = req.session.userInfo.nickname;
 
       var { mode } = req.query;
