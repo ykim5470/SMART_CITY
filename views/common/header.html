@@ -2,6 +2,24 @@
   <h1 class="header-logo">
     <img src="/img/logo.png" alt="스마트 시티 로고" class="logo-img" />
   </h1>
+  {% if type %}
+  <nav class="gnb">
+    <ul class="gnb-list">
+      <li class="gnb-item gnb-item-batch">
+        <a href="/admin/dashboard" class="gnb-link">
+          <span class="gnb-link-icon"></span>
+          <p class="gnb-link-text">대시보드</p>
+        </a>
+      </li>
+      <li class="gnb-item gnb-item-template {{is_active}}">
+        <button class="gnb-link" type="button" onclick="location.href='/admin/dataAnalysisModels?userId={{userId}}' ">
+          <span class="gnb-link-icon"></span>
+          <p class="gnb-link-text">나의 모델 관리</p>
+        </button>
+      </li>
+    </ul>
+  </nav>
+  {%else%}
   <nav class="gnb">
     <ul class="gnb-list">
       <li class="gnb-item gnb-item-batch">
@@ -11,35 +29,14 @@
         </a>
       </li>
       <li class="gnb-item gnb-item-template {{is_active}}">
-        {% if type %}
-        <button
-          class="gnb-link"
-          type="button"
-          onclick="location.href='/admin/dataAnalysisModels?userId={{userId}}' "
-        >
-        {% else %}
-        <button
-        class="gnb-link"
-        type="button"
-        onclick="location.href='/dataAnalysisModels?userId={{userId}}' "
-      >
-      {% endif %}
+        <button class="gnb-link" type="button" onclick="location.href='/dataAnalysisModels?userId={{userId}}' ">
           <span class="gnb-link-icon"></span>
           <p class="gnb-link-text">나의 모델 관리</p>
         </button>
       </li>
-      <!-- <li class="gnb-item gnb-item-template">
-        <button
-          class="gnb-link"
-          type="button"
-          onclick="location.href='/admin/dataAnalysisModels?userId={{userId}}?type={{type}}' "
-        >
-          <span class="gnb-link-icon"></span>
-          <p class="gnb-link-text">전체 사용자 모델 관리</p>
-        </button>
-      </li> -->
     </ul>
   </nav>
+  {% endif %}
   <button class="gnb-toggle-btn">
     <span class="toggle-btn-line"></span>
     <span class="toggle-btn-line"></span>

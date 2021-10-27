@@ -254,6 +254,7 @@ const polarData = (data) => {
 };
 const make_chart = async (data) => {
   let widget = Object.keys(data);
+  console.log(widget)
   for (var i = 0; i < widget.length; i++) {
     let can = document.createElement("canvas");
     let html = document.getElementsByClassName("chart-list-item")[0].cloneNode(true);
@@ -261,11 +262,11 @@ const make_chart = async (data) => {
     let wid_title = html.children[0].children[0];
     html.children[0].children[1].id = `${data[widget[i]].widgetId}`;
     wid_title.innerText = `${widget[i]}`;
-    can.id = `${widget[i]}`;
+    can.id = `${data[widget[i]].widgetId.replace(/-/g,"")}`;
     can.height = "301";
     html.appendChild(can);
     parent_chart.insertBefore(html, null);
-    chart_maker(data[widget[i]], widget[i]);
+    chart_maker(data[widget[i]], data[widget[i]].widgetId.replace(/-/g,""));
     function reload() {
       var modalOpen = {
         display: "block",

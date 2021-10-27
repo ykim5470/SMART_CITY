@@ -133,7 +133,7 @@ const output = {
   dashboard: async (req, res) => {
     const userId = req.session.userInfo.userId
     // res.cookie("user_id",userId)
-    res.render(`dashboard/dashboard`, {userId: userId , admin:true});
+    res.render(`dashboard/dashboard`, {userId: userId , type:true});
   },
   get_widget: async (req, res) => {
     const charts = await widget.findAll({ where: { widget_delYn: "N" } });
