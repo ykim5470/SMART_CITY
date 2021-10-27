@@ -317,7 +317,7 @@ const output = {
         { where: { md_id: status_md_id } }
       );
 
-      res.redirect(`/dataAnalysisModels`);
+      res.send("<script> window.close(); </script>");
     } catch (err) {
       return res.status(500).json({
         err: "manage board page calling failed",

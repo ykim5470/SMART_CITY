@@ -169,6 +169,10 @@ function treeViewTest(data) {
 }
 const register = document.querySelector(".register-btn");
 register.addEventListener("click", () => {
+  if(document.getElementById("widgetTitle").value ==""){
+    window.alert("제목을 입력해주세요")
+    return;
+  }
   var formSerializeArray = $("#widgetFrm").serializeArray();
   var object = {};
   for (var i = 0; i < formSerializeArray.length; i++) {
