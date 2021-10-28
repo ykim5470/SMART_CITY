@@ -64,7 +64,7 @@ fs.readFile("./차량 예측 원본 데이터 샘플.csv", "utf-8", (err, data) 
         } catch (err) {
           console.log(err);
         }
-      }, i * 5000);
+      }, i * 60000);
     })(i);
   }
 
@@ -161,7 +161,7 @@ fs.readFile("./차량 예측 원본 데이터 샘플.csv", "utf-8", (err, data) 
         } catch (err) {
           console.log(err);
         }
-      }, i * 5000);
+      }, i * 60000);
     })(i);
   }
 
@@ -231,7 +231,7 @@ fs.readFile("./공기질 예측 원본 데이터 샘플.csv", "utf-8", (err, dat
         } catch (err) {
           console.log(err);
         }
-      }, i * 5000);
+      }, i * 60000);
     })(i);
   }
 
