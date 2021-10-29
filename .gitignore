@@ -5,10 +5,14 @@
 node_modules/
 
 #uploads
-uploads/
+# uploads/
 
 # sessions
 sessions/
+
+# data api
+data_api/package-lock.json
+data_api/node_modules
 
 # Logs
 logs
