@@ -23,6 +23,21 @@ const attr_load = async (data) => {
   let datamodel_attr = await fetch(`/dashboard/attr_load/${data}`).then((res) => res.json());
   return datamodel_attr.data;
 };
+const data_type_change = () =>{
+  dataset_type_value = document.getElementsByName("dataset_type")[0].value;
+  console.log(dataset_type_value)
+  if(dataset_type_value=="분석데이터"){
+    // document.getElementById('processedBox').style.display == 'block'
+    // document.getElementById('sourceBox').style.display == 'none' 
+    $('#sourceBox').css('display','none') 
+    $('#processedBox').css('display','block') 
+  }else{
+    $('#sourceBox').css('display','block') 
+    $('#processedBox').css('display','none') 
+    // document.getElementById('processedBox').style.display == 'none' 
+    // document.getElementById('sourceBox').style.display == 'block'
+  }
+}
 const dataset_list_load = () => {
   try {
     dataset_type_value = document.getElementsByName("dataset_type")[0].value;
@@ -103,24 +118,14 @@ const datamodel_attr_load = () => {
     console.log(err);
   }
 };
-dataset_type.addEventListener("change", (e) => {
+dataset_type.addEventListener("change", () => {
   dataset_list_load();
-  if(e.target.value=="분석데이터"){
-    console.log(e.target.value)
-    // document.getElementById('processedBox').style.display == 'block'
-    // document.getElementById('sourceBox').style.display == 'none' 
-    $('#sourceBox').css('display','none') 
-    $('#processedBox').css('display','block') 
-  }else{
-    $('#sourceBox').css('display','block') 
-    $('#processedBox').css('display','none') 
-    // document.getElementById('processedBox').style.display == 'none' 
-    // document.getElementById('sourceBox').style.display == 'block'
-  }
+  data_type_change();
 });
 regi_widget.addEventListener("click", async () => {
   document.getElementById("widgetFrm").reset();
   dataset_list_load();
+  data_type_change();
 });
 dataset_select_box.addEventListener("change", () => {
   dataset_data_list_load();

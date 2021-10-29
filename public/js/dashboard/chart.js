@@ -182,7 +182,8 @@ function Attribute(data) {
     }
     predic.forEach((item, id) => {
       let u = new Object();
-      u["x"] = item.replace(",000+09:00", "");
+      let timeset = item.split(",")
+      u["x"] = timeset[0];
       u["y"] = val[id];
       dataArr.push(u);
     });
@@ -219,7 +220,8 @@ function Attribute(data) {
           let ii = new Object();
           for (item in el) {
             if (item == "observedAt") {
-              ii["x"] = el[item].replace(",000+09:00", "");
+              let timeset = el[item].split(",")
+              ii["x"] = timeset[0];
             } else if (item == "value") {
               ii["y"] = el[item]; // 나중에 소수점 관련 문제 있으면 parseFloat(el[item])으로 바꾸기
             }
