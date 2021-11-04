@@ -600,6 +600,7 @@ const process = {
     }
   },
   // 모델 상태 관리 선택; 실행 Or 중지
+  // 해당 edit은 일단 stop. 단순히 대시보드로 Redirect만 하게 구성. 
   edit: async (req, res) => {
     try {
       // const { md_id } = req.query;
