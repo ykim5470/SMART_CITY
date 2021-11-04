@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>모델 수정</title>
+    <title>모델 상세</title>
   </head>
   <body>
     <form
@@ -19,7 +19,7 @@
             모델 이름
           </thead>
           <tbody>
-            <input type="text" name="md_name" class="md_name" />
+            <input type="text" name="md_name" class="md_name" disabled/>
           </tbody>
         </table>
         <table>
@@ -34,6 +34,7 @@
                 id="al_time"
                 name="al_time"
                 placeholder="요청 시간"
+                disabled
               />
             </td>
           </tbody>
@@ -46,6 +47,7 @@
             type="number"
             name="data_lookup_date"
             placeholder="일"
+            disabled
           />
           <input
             class="data_lookup"
@@ -53,6 +55,7 @@
             type="number"
             name="data_lookup_hour"
             placeholder="시간"
+            disabled
           />
           <input
             class="data_lookup"
@@ -60,6 +63,7 @@
             type="number"
             name="data_lookup_min"
             placeholder="분"
+            disabled
           />
           <input
             class="data_lookup"
@@ -67,6 +71,7 @@
             type="number"
             name="data_lookup_sec"
             placeholder="초"
+            disabled
           />
         </table>
         <table>
@@ -75,7 +80,7 @@
           </thead>
           <tbody>
             <td class='selector'>
-              <select name="dataset_id" id="data_select">
+              <select name="dataset_id" id="data_select" disabled>
                 <option id ='default_data_model'></option>
                 {% for name in raw_dataset_name%}
                 <option
@@ -110,7 +115,7 @@
           <tbody>
             <td>
               <label for="al_name_mo">/분석 테이블/</label>
-              <select name="al_name_mo" id="al_select">
+              <select name="al_name_mo" id="al_select" disabled>
                 <option value="">-선택-</option>
                 {% for el in processed_dataset %}
                 <option
@@ -142,15 +147,12 @@
             </thead>
             <tbody>
               <tr>
-                <input
-                  type="file"
-                  id="file_select"
-                  name="atch_origin_file_name"
-                />
+
+                <input id='file_select' name='atch_origin_file_name' disabled/>
               </tr>
               <td>
                 <label for="analysis_file_format">분석 파일 포맷</label>
-                <select name="analysis_file_format">
+                <select name="analysis_file_format" id='analysis_file_foramt' disabled>
                   <option value="">--선택--</option>
                   <option value="loadLayersModel">Layers</option>
                   <option value="loadGraphModel">Graph</option>
@@ -166,10 +168,11 @@
               class="md_desc"
               name="model_desc"
               style="width: 200px; height: 100px"
+              disabled
             />
           </thead>
         </table>
-        <button type="button" id="submitBtn">수정 완료</button>
+        <button type="button" id="submitBtn">대시보드 이동</button>
       </div>
       <script src="/socket.io/socket.io.js"></script>
       <script src="/js/model/dataAnalysisModelsView.js"></script>

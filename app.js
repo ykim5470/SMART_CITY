@@ -20,15 +20,18 @@ const { requestPublicKey } = require("./api/requestPublicKey");
 const { requestToken } = require("./api/requestToken");
 const { requestRefreshToken } = require("./api/requestRefreshToken");
 const { userCheck } = require("./api/userCheck");
-const { auth } = require("./models");
+const { model_list } = require("./models");
+const schedule = require("node-schedule");
+
 
 // Routers
 const index_router = require("./routes/index");
 const { requestLogout } = require("./api/requestLogout");
+const { model } = require("@tensorflow/tfjs-layers");
 
 // // Sequelize 
 // models.sequelize
-//   .sync({ force: false})
+//   .sync({ force:false})
 //   .then(() => {
 //     console.log("DB connected");
 //   })
@@ -109,6 +112,29 @@ app.get("/Oauth/token", sessionMiddleware, async (req, res, next) => {
     console.log(err);
   }
 });
+
+
+// 서버 에러 발생 시, 모델 halt
+app.use(async(error,req,res,next)=>{
+  console.error(error) // log an error
+  let current_running_models = await model_list.findAll({where: {run_status: 'running'}, attributes: ['md_id']}).then(
+    (running_md_id) => {
+      let running_md_id_str = JSON.stringify(running_md_id)
+      let running_md_id_value = JSON.parse(running_md_id_str)
+      return running_md_id_value
+    }
+  )
+  
+  current_running_models.map(async(el,idx) => {
+    await model_list.update({run_status: 'halt'}, {where: {md_id: el['md_id']}})
+    let jobs = schedule.scheduledJobs
+    var running_jobs = jobs[el['md_id']];
+    running_jobs.cancel()
+    console.log('500 internel server error scheduler halt')
+    next()
+  })
+  res.status(500).send('500 Internel server error!')
+  })
 
 // session 만료시 로그인 페이지 이동 
 app.use(async (req, res, next) => {

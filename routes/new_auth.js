@@ -264,6 +264,7 @@ const output = {
     }
   },
 
+
   // 원천 데이터 셋 Object GET
   raw_dataset_select: async (req, res) => {
     try {
@@ -601,163 +602,163 @@ const process = {
   // 모델 상태 관리 선택; 실행 Or 중지
   edit: async (req, res) => {
     try {
-      const { md_id } = req.query;
-      const {
-        md_name,
-        al_name_mo,
-        al_time,
-        dataset_id,
-        model_desc,
-        ip_attr_name,
-        user_input_order,
-        user_input_param,
-        ip_attr_value_type,
-        sub_data_select,
-        data_lookup_date,
-        data_lookup_hour,
-        data_lookup_min,
-        data_lookup_sec,
-        max_data_load,
-        max_data_load_index,
-        data_processing,
-        analysis_file_format,
-        tf_shape_index,
-        tf_shape,
-      } = req.body;
-
-      const user_id = req.session.userInfo.userId;
-      errorHandling.al_time_handling(al_time); // 3600
-      errorHandling.dataset_handling(dataset_id); // dataset_0625,now test,kr.citydatahub,2.0
-      errorHandling.input_param_handling(user_input_param); // ['유량','','','','','',''] or ''
-      errorHandling.al_name_mo_handling(al_name_mo); // lewis-dataset111
-      errorHandling.file_upload_handling(req.file); // {file_name: '', mimtype: '', etc}
-      errorHandling.data_look_up_handling(
-        data_lookup_date,
-        data_lookup_hour,
-        data_lookup_min,
-        data_lookup_sec
-      );
-      // errorHandling.data_look_up_handling(
-      //   op_data_lookup_date,
-      //   op_data_lookup_hour,
-      //   op_data_lookup_min,
-      //   op_data_lookup_sec
-      // );
-      errorHandling.max_data_load_handling(max_data_load); // limit 48, 5, 2
-      // errorHandling.data_processing_option_handling(
+      // const { md_id } = req.query;
+      // const {
+      //   md_name,
+      //   al_name_mo,
+      //   al_time,
+      //   dataset_id,
+      //   model_desc,
+      //   ip_attr_name,
+      //   user_input_order,
+      //   user_input_param,
+      //   ip_attr_value_type,
       //   sub_data_select,
-      //   data_processing
+      //   data_lookup_date,
+      //   data_lookup_hour,
+      //   data_lookup_min,
+      //   data_lookup_sec,
+      //   max_data_load,
+      //   max_data_load_index,
+      //   data_processing,
+      //   analysis_file_format,
+      //   tf_shape_index,
+      //   tf_shape,
+      // } = req.body;
+
+      // const user_id = req.session.userInfo.userId;
+      // errorHandling.al_time_handling(al_time); // 3600
+      // errorHandling.dataset_handling(dataset_id); // dataset_0625,now test,kr.citydatahub,2.0
+      // errorHandling.input_param_handling(user_input_param); // ['유량','','','','','',''] or ''
+      // errorHandling.al_name_mo_handling(al_name_mo); // lewis-dataset111
+      // errorHandling.file_upload_handling(req.file); // {file_name: '', mimtype: '', etc}
+      // errorHandling.data_look_up_handling(
+      //   data_lookup_date,
+      //   data_lookup_hour,
+      //   data_lookup_min,
+      //   data_lookup_sec
       // );
-      errorHandling.tf_shape_handling(
-        max_data_load,
-        tf_shape,
-        analysis_file_format
-      );
+      // // errorHandling.data_look_up_handling(
+      // //   op_data_lookup_date,
+      // //   op_data_lookup_hour,
+      // //   op_data_lookup_min,
+      // //   op_data_lookup_sec
+      // // );
+      // errorHandling.max_data_load_handling(max_data_load); // limit 48, 5, 2
+      // // errorHandling.data_processing_option_handling(
+      // //   sub_data_select,
+      // //   data_processing
+      // // );
+      // errorHandling.tf_shape_handling(
+      //   max_data_load,
+      //   tf_shape,
+      //   analysis_file_format
+      // );
 
-      let date_look_up = {
-        date: data_lookup_date,
-        hour: data_lookup_hour,
-        min: data_lookup_min,
-        sec: data_lookup_sec,
-      };
+      // let date_look_up = {
+      //   date: data_lookup_date,
+      //   hour: data_lookup_hour,
+      //   min: data_lookup_min,
+      //   sec: data_lookup_sec,
+      // };
 
-      let file_id;
-      let user_obj = new Object();
+      // let file_id;
+      // let user_obj = new Object();
 
-      // 파일 TB Create
-      await process.file_add(req, res);
+      // // 파일 TB Create
+      // await process.file_add(req, res);
 
-      // 파일 TB file_id GET
-      await atch_file_tb
-        .findAll({ order: [["createdAt", "DESC"]] })
-        .then((res) => {
-          const model_from_file = JSON.stringify(res);
-          const model_from_file_value = JSON.parse(model_from_file)[0];
-          return (file_id = model_from_file_value.file_id);
-        });
+      // // 파일 TB file_id GET
+      // await atch_file_tb
+      //   .findAll({ order: [["createdAt", "DESC"]] })
+      //   .then((res) => {
+      //     const model_from_file = JSON.stringify(res);
+      //     const model_from_file_value = JSON.parse(model_from_file)[0];
+      //     return (file_id = model_from_file_value.file_id);
+      //   });
 
-      // 모델 리스트 TB Update
-      await model_list
-        .update(
-          {
-            al_time: al_time,
-            user_id: user_id,
-            md_name: md_name,
-            al_name_mo: al_name_mo.split(",")[0],
-            file_id: file_id,
-            data_model_name: dataset_id,
-            date_look_up: date_look_up,
-            sub_data: sub_data_select,
-            data_processing_option: data_processing,
-            analysis_file_format: analysis_file_format,
-          },
-          { where: { md_id: md_id } }
-        )
-        .then(async () => {
-          // 모델 설명 TB Update
-          model_des.update(
-            { des_text: model_desc },
-            { where: { des_id: md_id } }
-          );
-          // 인풋 파람 필요 데이터 갯수 정의
-          let data_load_obj = new Object();
-          if (
-            Array.isArray(max_data_load_index) &&
-            Array.isArray(max_data_load)
-          ) {
-            max_data_load_index.map((user_index, idx) => {
-              data_load_obj[user_index] = max_data_load[idx];
-            });
-          } else if (typeof max_data_load_index == "string") {
-            data_load_obj[max_data_load_index] = max_data_load;
-          }
-          // 인풋 파람 필요 텐서 타입 정의
-          let tf_shape_obj = new Object();
-          if (Array.isArray(tf_shape_index) && Array.isArray(tf_shape)) {
-            tf_shape_index.map((user_index, idx) => {
-              tf_shape_obj[user_index] = tf_shape[idx];
-            });
-          } else if (typeof tf_shape_index == "string") {
-            tf_shape_obj[tf_shape_index] = tf_shape;
-          }
+      // // 모델 리스트 TB Update
+      // await model_list
+      //   .update(
+      //     {
+      //       al_time: al_time,
+      //       user_id: user_id,
+      //       md_name: md_name,
+      //       al_name_mo: al_name_mo.split(",")[0],
+      //       file_id: file_id,
+      //       data_model_name: dataset_id,
+      //       date_look_up: date_look_up,
+      //       sub_data: sub_data_select,
+      //       data_processing_option: data_processing,
+      //       analysis_file_format: analysis_file_format,
+      //     },
+      //     { where: { md_id: md_id } }
+      //   )
+      //   .then(async () => {
+      //     // 모델 설명 TB Update
+      //     model_des.update(
+      //       { des_text: model_desc },
+      //       { where: { des_id: md_id } }
+      //     );
+      //     // 인풋 파람 필요 데이터 갯수 정의
+      //     let data_load_obj = new Object();
+      //     if (
+      //       Array.isArray(max_data_load_index) &&
+      //       Array.isArray(max_data_load)
+      //     ) {
+      //       max_data_load_index.map((user_index, idx) => {
+      //         data_load_obj[user_index] = max_data_load[idx];
+      //       });
+      //     } else if (typeof max_data_load_index == "string") {
+      //       data_load_obj[max_data_load_index] = max_data_load;
+      //     }
+      //     // 인풋 파람 필요 텐서 타입 정의
+      //     let tf_shape_obj = new Object();
+      //     if (Array.isArray(tf_shape_index) && Array.isArray(tf_shape)) {
+      //       tf_shape_index.map((user_index, idx) => {
+      //         tf_shape_obj[user_index] = tf_shape[idx];
+      //       });
+      //     } else if (typeof tf_shape_index == "string") {
+      //       tf_shape_obj[tf_shape_index] = tf_shape;
+      //     }
 
-          // 인풋 파람 TB 업데이트
-          if (typeof user_input_param === "string") {
-            [user_input_param].filter((el, index) => {
-              if (el != "" && typeof ip_attr_value_type != "string") {
-                user_obj[ip_attr_name[index]] = [el, ip_attr_value_type[index]];
-              } else {
-                user_obj[ip_attr_name] = [el, ip_attr_value_type];
-              }
-            });
-          } else {
-            user_input_param.filter((el, index) => {
-              if (el !== "") {
-                user_obj[ip_attr_name[index]] = [
-                  el,
-                  ip_attr_value_type[index],
-                  data_load_obj[index],
-                  tf_shape_obj[index],
-                  user_input_order[index],
-                ];
-              }
-            });
-          }
-          for (i in user_obj) {
-            await model_input.update(
-              {
-                ip_param: i,
-                ip_value: user_obj[i][0],
-                ip_type: user_obj[i][1],
-                ip_load: user_obj[i][2],
-                ip_param_type: user_obj[i][3],
-                ip_order: user_obj[i][4],
-              },
-              { where: { md_id: md_id } }
-            );
-          }
-        });
-      console.log("수정 완료");
+      //     // 인풋 파람 TB 업데이트
+      //     if (typeof user_input_param === "string") {
+      //       [user_input_param].filter((el, index) => {
+      //         if (el != "" && typeof ip_attr_value_type != "string") {
+      //           user_obj[ip_attr_name[index]] = [el, ip_attr_value_type[index]];
+      //         } else {
+      //           user_obj[ip_attr_name] = [el, ip_attr_value_type];
+      //         }
+      //       });
+      //     } else {
+      //       user_input_param.filter((el, index) => {
+      //         if (el !== "") {
+      //           user_obj[ip_attr_name[index]] = [
+      //             el,
+      //             ip_attr_value_type[index],
+      //             data_load_obj[index],
+      //             tf_shape_obj[index],
+      //             user_input_order[index],
+      //           ];
+      //         }
+      //       });
+      //     }
+      //     for (i in user_obj) {
+      //       await model_input.update(
+      //         {
+      //           ip_param: i,
+      //           ip_value: user_obj[i][0],
+      //           ip_type: user_obj[i][1],
+      //           ip_load: user_obj[i][2],
+      //           ip_param_type: user_obj[i][3],
+      //           ip_order: user_obj[i][4],
+      //         },
+      //         { where: { md_id: md_id } }
+      //       );
+      //     }
+      //   });
+      // console.log("수정 완료");
       return res.redirect("/dataAnalysisModels");
     } catch (err) {
       console.log("model status error");

@@ -100,12 +100,12 @@ socket.on("input_param", (user_param) => {
     const input_box = data_model.map((items, index) => {
       return `
           <tr>
-              <td><input name="ip_attr_value_type" value="${items.valueType}" readonly /></td>
-              <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" readonly /></td>
-              <td><input type="number" id="user_input_order${index}" name="user_input_order"/></td> 
-              <td><input type="text" class="user_input_param${index}" name="user_input_param"/></td>
-              <td id='max_data_load_box${index}'></td>
-              <td id='param_tf_shape${index}'></td>
+              <td><input name="ip_attr_value_type" value="${items.valueType}" disabled /></td>
+              <td><input class='ip_attr_name' name="ip_attr_name" value="${items.name}" disabled /></td>
+              <td><input type="number" id="user_input_order${index}" name="user_input_order" disabled/></td> 
+              <td><input type="text" class="user_input_param${index}" name="user_input_param" disabled/></td>
+              <td id='max_data_load_box${index}' ></td>
+              <td id='param_tf_shape${index}' ></td>
           </tr>
           `;
     });
@@ -137,11 +137,11 @@ socket.on("input_param", (user_param) => {
         if (el.value !== "") {
           max_data_load_box.innerHTML = `
           <input name='max_data_load_index' value=${index} hidden/>
-          <input class='max_data_load_limit${index}' type='number' name='max_data_load' placeholder="i.e. 5 10 48 etc"/>
+          <input class='max_data_load_limit${index}' type='number' name='max_data_load' placeholder="i.e. 5 10 48 etc" disabled/>
           `;
           param_tf_shape_box.innerHTML = `
           <input name='tf_shape_index' value=${index} hidden/>
-          <input name='tf_shape' class='tf_shape${index}' placeholder='i.e. [40] [[1,2,3],[4,5,6]]'/>`;
+          <input name='tf_shape' class='tf_shape${index}' placeholder='i.e. [40] [[1,2,3],[4,5,6]]' disabled/>`;
         } else {
           max_data_load_box.innerHTML = "";
           param_tf_shape_box.innerHTML = "";
@@ -198,9 +198,9 @@ socket.on("sub_data", (selected_data) => {
           return `
           <tr>
               <td>
-                  <input type='checkbox' class='sub_data_select' name='sub_data_select' value=${items.id} checked/>
+                  <input type='checkbox' class='sub_data_select' name='sub_data_select' value=${items.id} checked disabled/>
               </td>
-              <td>${items.name.value}</td>
+              <td>${items.id}</td>
           <tr>
           `;
         } else {
@@ -209,7 +209,7 @@ socket.on("sub_data", (selected_data) => {
             <td>
                 <input type='checkbox' class='sub_data_select' name='sub_data_select' value=${items.id}/>
             </td>
-            <td>${items.name.value}</td>
+            <td>${items.id}</td>
         <tr>
         `;
         }
@@ -223,18 +223,18 @@ socket.on("sub_data", (selected_data) => {
           return `
               <tr>
                   <td>
-                      <input type='checkbox' class='sub_data_select' name='sub_data_select' value=${items.id} checked/>
+                      <input type='checkbox' class='sub_data_select' name='sub_data_select' value=${items.id} checked disabled/>
                   </td>
-                  <td>${items.name.value}</td>
+                  <td>${items.id}</td>
               <tr>
               `;
         } else {
           return `
               <tr>
                   <td>
-                      <input type='checkbox' class='sub_data_select' name='sub_data_select' value=${items.id}/>
+                      <input type='checkbox' class='sub_data_select' name='sub_data_select' value=${items.id} disabled/>
                   </td>
-                  <td>${items.name.value}</td>
+                  <td>${items.id}</td>
               <tr>
               `;
         }
@@ -275,6 +275,25 @@ socket.on("sub_data", (selected_data) => {
     });
   });
 });
+
+// 가공데이터 셋 Fill
+socket.on('processed_model', (data)=>{
+  const {processed_model} = data
+  document.querySelector('#al_select').value = processed_model
+})
+
+// 분석 파일 Fill
+socket.on('file_name', (data)=>{
+  const {originalname} = data
+  document.querySelector('#file_select').value = originalname
+})
+
+// 분석 파일 포맷 Fill
+socket.on('analysis_file_format', data =>{
+  const {analysis_file_format} = data
+  document.querySelector('#analysis_file_foramt').value = analysis_file_format
+  
+})
 
 const register_submit = () => {
   register_complete.addEventListener("click", async (e) => {

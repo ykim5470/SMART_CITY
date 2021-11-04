@@ -7,8 +7,7 @@ const tensor_shape_convert = (
   single_processed_data_result,
   url
 ) => {
-
-
+  try{
   // 그래프 모델
   if (analysis_file_format === "loadGraphModel") {
     const model = tf.loadGraphModel(url).then((models) => {
@@ -68,6 +67,9 @@ const tensor_shape_convert = (
     return model;
   } else {
     throw "잘못 된 분석 파일 포맷입니다. 레이어 혹은 그래프 모델을 올려주세요";
+  }}
+  catch(err){
+    console.log(err)
   }
 };
 

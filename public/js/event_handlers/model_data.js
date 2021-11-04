@@ -1,4 +1,4 @@
-const { model_list, model_input, model_des } = require("../../../models");
+const { model_list, model_input, model_des, atch_file_tb } = require("../../../models");
 
 const get_model_name = async (md_id) => {
   return await model_list
@@ -60,20 +60,44 @@ const get_user_param = async (md_id) => {
     });
 };
 
-// const get_processed_model = async(md_id) =>{
-//   return await model_list.findOne({
-//     where: {md_id : md_id},
-//     attributes: [
+const get_selected_processed_dataset = async (md_id) => {
+  try {
+    return await model_list
+      .findOne({ where: { md_id: md_id }, attributes: ["processed_model"] })
+      .then((result) => {
+        return result;
+      });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-//     ]
-//   })
-// }
+const get_desc = async (md_id) => {
+  return await model_des
+    .findOne({ where: { des_id: md_id }, attributes: ["des_text"] })
+    .then((result) => {
+      return result;
+    });
+};
 
-const get_desc = async(md_id) =>{
-  return await model_des.findOne({where: {des_id: md_id}, attributes:['des_text']})
-  .then(result => {return result})
+const file_name = async(md_id) =>{
+  return await model_list.findOne({where:{md_id: md_id}, attributes: ['file_id']}).then(
+    result =>{
+      const {file_id} = result
+      return atch_file_tb.findOne({where: {file_id: file_id}, attributes:['originalname']}).then(
+        response => {return response}
+      )
+    }
+  )
 }
 
+const file_format = async(md_id) =>{
+  return await model_list.findOne({where: {md_id: md_id}, attributes: ['analysis_file_format']}).then(
+    result => {
+    return result
+    }
+  )
+}
 
 const model_data = async (socket) => {
   // GET model id
@@ -109,10 +133,24 @@ const model_data = async (socket) => {
       socket.emit("input_param", result);
     });
 
+    get_desc(md_id).then((result) => {
+      const { des_text } = result;
+      socket.emit("model_des", { model_des: des_text });
+    });
 
-    get_desc(md_id).then(result =>{
-      const {des_text} = result
-      socket.emit('model_des', {model_des: des_text})
+    get_selected_processed_dataset(md_id).then((result)=>{
+      const {processed_model} = result;
+      socket.emit('processed_model', {processed_model: processed_model})
+    }) 
+
+    file_name(md_id).then(result=>{
+      const {originalname} = result
+      socket.emit('file_name', {originalname : originalname})
+    })
+
+    file_format(md_id).then(result=>{
+      const {analysis_file_format} = result
+      socket.emit('analysis_file_format', {analysis_file_format: analysis_file_format})
     })
 
     return;

@@ -66,13 +66,13 @@ router.get("/analysis/editCheck/:id", newAnaly.output.editChk);
 //Model
 
 
-router.get(
-  '/test', paginate.middleware(10, 55),
-  new_auth.output.test
-)
-router.get(
-  '/test1', new_auth.output.test1
-)
+// router.get(
+//   '/test', paginate.middleware(10, 55),
+//   new_auth.output.test
+// )
+// router.get(
+//   '/test1', new_auth.output.test1
+// )
 router.get(
   "/dataAnalysisModels",
   paginate.middleware(10, 50),
